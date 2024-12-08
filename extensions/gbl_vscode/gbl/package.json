@@ -1,0 +1,42 @@
+{
+    "name": "gbl",
+    "displayName": "gbl",
+    "publisher": "imno",
+    "description": "gbl programming language support",
+    "version": "0.0.1",
+    "engines": {
+        "vscode": "^1.95.0"
+    },
+    "categories": [
+        "Programming Languages"
+    ],
+    "contributes": {
+        "languages": [
+            {
+                "id": "gbl",
+                "aliases": [
+                    "gembalalang",
+                    "gbl"
+                ],
+                "extensions": [
+                    ".gbl .imp"
+                ],
+                "configuration": "./language-configuration.json"
+            }
+        ],
+        "grammars": [
+            {
+                "language": "gbl",
+                "scopeName": "source.gbl",
+                "path": "./syntaxes/gbl.tmLanguage.json"
+            }
+        ],
+        "iconThemes": [
+            {
+                "id": "gembalalang-icons",
+                "label": "Gembalalang Icons",
+                "path": "./icon-theme.json"
+            }
+        ]
+    }
+}

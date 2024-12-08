@@ -1,0 +1,41 @@
+{
+  "name": "geassembly",
+  "displayName": "GeAssembly",
+  "description": "Gelang assembly",
+  "version": "0.0.1",
+  "publisher": "bajtek",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/BajtekRogue/Gelang-Compiler"
+  },
+  "engines": {
+    "vscode": "^1.95.0"
+  },
+  "categories": [
+    "Programming Languages"
+  ],
+  "contributes": {
+    "languages": [
+      {
+        "id": "geassembly",
+        "aliases": ["GeAssembly", "geassembly"],
+        "extensions": [".mr"],
+        "configuration": "./language-configuration.json"
+      }
+    ],
+    "grammars": [
+      {
+        "language": "geassembly",
+        "scopeName": "source.geassembly",
+        "path": "./syntaxes/geassembly.tmLanguage.json"
+      }
+    ],
+    "themes": [
+      {
+        "label": "GeAssembly Theme",
+        "uiTheme": "vs-dark",
+        "path": "./themes/geassembly-color-theme.json"
+      }
+    ]
+  }
+}

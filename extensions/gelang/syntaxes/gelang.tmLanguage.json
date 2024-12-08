@@ -1,0 +1,55 @@
+{
+    "$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
+    "name": "Gelang",
+    "patterns": [
+        {
+            "name": "keyword.control.gelang",
+            "match": "\\b(PROGRAM|IS|BEGIN|END|IF|THEN|ELSE|ENDIF|WHILE|DO|ENDWHILE|REPEAT|UNTIL|ENDFOR|FOR|FROM|TO|DOWNTO|READ|WRITE|PROCEDURE)\\b"
+        },
+        {
+            "name": "keyword.operator.comparison.gelang",
+            "match": "(=|!=|>|<|>=|<=)"
+        },
+        {
+            "name": "keyword.operator.arithmetic.gelang",
+            "match": "(\\+|-|\\*|/|%)"
+        },
+        {
+            "name": "keyword.other.assignment.gelang",
+            "match": ":="
+        },
+        {
+            "name": "storage.type.gelang",
+            "match": "\\b(T)\\b"
+        },
+        {
+            "name": "constant.numeric.gelang",
+            "match": "\\b\\d+\\b"
+        },
+        {
+            "name": "variable.other.gelang",
+            "match": "\\[_a-z]+\\b"
+        },
+        {
+            "name": "comment.line.gelang",
+            "match": "#.*"
+        },
+        {
+            "name": "punctuation.separator.gelang",
+            "match": "(;|,|\\(|\\)|\\[|\\])"
+        },
+        {
+            "name": "entity.name.function.gelang",
+            "match": "\\b[_a-z]+\\b(?=\\s*\\()"
+        },
+        {
+        "name": "punctuation.parentheses.gelang",
+        "match": "[()]"
+        },
+        {
+        "name": "punctuation.brackets.gelang",
+        "match": "[\\[\\]]"
+        }
+    ],
+    "scopeName": "source.gelang"
+}

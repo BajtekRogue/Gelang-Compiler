@@ -1,0 +1,79 @@
+{
+  "name": "Gelang Dark Theme",
+  "type": "dark",
+  "tokenColors": [
+      {
+          "scope": [
+              "keyword.control.gelang"
+          ],
+          "settings": {
+              "foreground": "#569CD6",
+              "fontStyle": "bold"
+          }
+      },
+      {
+          "scope": [
+              "keyword.operator.comparison.gelang",
+          ],
+          "settings": {
+              "foreground": "#C678DD"
+          }
+      },
+      {
+          "scope": [
+              "keyword.operator.arithmetic.gelang",
+              "keyword.other.assignment.gelang"
+          ],
+          "settings": {
+              "foreground": "#D19A66"
+          }
+      },
+      {
+          "scope": [
+              "constant.numeric.gelang"
+          ],
+          "settings": {
+              "foreground": "#98C379"
+          }
+      },
+      {
+          "scope": [
+              "variable.other.gelang"
+          ],
+          "settings": {
+              "foreground": "#E5E5E5"
+          }
+      },
+      {
+          "scope": [
+              "storage.type.gelang"
+          ],
+          "settings": {
+              "foreground": "#61AFEF"
+          }
+      },
+      {
+          "scope": [
+              "comment.line.gelang"
+          ],
+          "settings": {
+              "foreground": "#6A9955",
+              "fontStyle": "italic"
+          }
+      },
+      {
+          "scope": [
+              "punctuation.separator.gelang"
+          ],
+          "settings": {
+              "foreground": "#ABB2BF"
+          }
+      }
+  ],
+  "colors": {
+      "editor.background": "#282C34",
+      "editor.foreground": "#ABB2BF",
+      "editorLineNumber.foreground": "#5A6374",
+      "editorCursor.foreground": "#528BFF"
+  }
+}

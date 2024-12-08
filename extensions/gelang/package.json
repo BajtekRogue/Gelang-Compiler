@@ -1,0 +1,37 @@
+{
+  "name": "gelang",
+  "displayName": "Gelang Language",
+  "description": "A syntax highlighting extension for .imp files",
+  "version": "0.0.1",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/BajtekRogue/Gelang-Compiler"
+  },
+  "publisher": "your-username",
+  "engines": {
+    "vscode": "^1.60.0"
+  },
+  "contributes": {
+    "languages": [
+      {
+        "id": "gelang",
+        "extensions": [".imp"],
+        "aliases": ["Gelang"]
+      }
+    ],
+    "grammars": [
+      {
+        "language": "gelang",
+        "scopeName": "source.gelang",
+        "path": "./syntaxes/gelang.tmLanguage.json"
+      }
+    ],
+    "themes": [
+      {
+        "label": "Gelang Theme",
+        "uiTheme": "vs-dark",
+        "path": "./themes/gelang-theme.json"
+      }
+    ]
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "iconDefinitions": {
+    "gembalalang-icon": {
+      "iconPath": "./images/gbl.png"
+    }
+  },
+  "fileExtensions": {
+    "gbl": "gembalalang-icon"
+  }
+}

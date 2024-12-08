@@ -1,0 +1,31 @@
+{
+    "name": "GeAssembly Theme",
+    "type": "dark",
+    "colors": {
+      "editor.foreground": "#FFFFFF",
+      "editor.background": "#1E1E1E"
+    },
+    "tokenColors": [
+      {
+        "scope": "keyword.control.geassembly",
+        "settings": {
+          "foreground": "#FF0000",  // Red for instructions
+          "fontStyle": "bold"
+        }
+      },
+      {
+        "scope": "constant.numeric.geassembly",
+        "settings": {
+          "foreground": "#3cff00"  // Blue for numbers
+        }
+      },
+      {
+        "scope": "comment.line.geassembly",
+        "settings": {
+          "foreground": "#0400ff",  // Green for comments
+          "fontStyle": "italic"
+        }
+      }
+    ]
+  }
+  
