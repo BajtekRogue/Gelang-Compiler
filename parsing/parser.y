@@ -52,7 +52,7 @@ struct json_object *program_json;
 %type <json_obj> proc_head proc_call declarations args_decl args 
 %type <json_obj> expression condition value identifier pidentifier number
 
-%token <str_val> IDENTIFIER
+%token <str_val> IDENTIFIER, ARRAY
 %token <int_val> NUMBER
 
 %%
@@ -224,10 +224,10 @@ args_decl: args_decl COMMA pidentifier {
     json_object_array_add($1, $3);
     $$ = $1;
         }
-| args_decl COMMA IDENTIFIER pidentifier {
+| args_decl COMMA ARRAY pidentifier {
     if (!$1) $1 = json_object_new_array();
     struct json_object *arg_obj = json_object_new_object();
-    json_object_object_add(arg_obj, "type", json_object_new_string($3));
+    json_object_object_add(arg_obj, "type", json_object_new_string("array"));
     json_object_object_add(arg_obj, "identifier", $4);
     json_object_array_add($1, arg_obj);
     $$ = $1;
@@ -237,10 +237,10 @@ args_decl: args_decl COMMA pidentifier {
     json_object_array_add(arg_array, $1);
     $$ = arg_array;
         }
-| IDENTIFIER pidentifier {
+| ARRAY pidentifier {
     struct json_object *arg_array = json_object_new_array();
     struct json_object *arg_obj = json_object_new_object();
-    json_object_object_add(arg_obj, "type", json_object_new_string($1));
+    json_object_object_add(arg_obj, "type", json_object_new_string("array"));
     json_object_object_add(arg_obj, "identifier", $2);
     json_object_array_add(arg_array, arg_obj);
     $$ = arg_array;
@@ -371,12 +371,11 @@ identifier: pidentifier {
     $$ = arr_access;
 };
 
-
 %%
 
 /* Error Handling */
 void yyerror(const char *s) {
-    fprintf(stderr, "Error: %s at line %d\n", s, yylineno);
+    exit(1); // Stop parsing on error
 }
 
 int main(int argc, char *argv[]) {

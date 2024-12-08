@@ -15,7 +15,7 @@ YACC_OUTPUT = parser.tab.c
 YACC_HEADER = parser.tab.h
 
 # Executable
-EXEC = compiler
+EXEC = parser
 
 # JSON Output
 JSON_OUTPUT = program.json
@@ -36,11 +36,6 @@ $(YACC_OUTPUT) $(YACC_HEADER): $(YACC_FILE)
 # Generate Lexer File
 $(LEX_OUTPUT): $(LEX_FILE)
 	flex $(LEX_FILE)
-
-# Run and Generate JSON
-run: $(EXEC)
-	./$(EXEC) input.imp > $(JSON_OUTPUT)
-	@echo "JSON output saved to $(JSON_OUTPUT)"
 
 # Clean Up
 clean:

@@ -154,24 +154,25 @@ enum yysymbol_kind_t
   YYSYMBOL_RBRACKET = 42,                  /* RBRACKET  */
   YYSYMBOL_ERROR = 43,                     /* ERROR  */
   YYSYMBOL_IDENTIFIER = 44,                /* IDENTIFIER  */
-  YYSYMBOL_NUMBER = 45,                    /* NUMBER  */
-  YYSYMBOL_YYACCEPT = 46,                  /* $accept  */
-  YYSYMBOL_program_all = 47,               /* program_all  */
-  YYSYMBOL_procedures = 48,                /* procedures  */
-  YYSYMBOL_main = 49,                      /* main  */
-  YYSYMBOL_commands = 50,                  /* commands  */
-  YYSYMBOL_command = 51,                   /* command  */
-  YYSYMBOL_proc_head = 52,                 /* proc_head  */
-  YYSYMBOL_proc_call = 53,                 /* proc_call  */
-  YYSYMBOL_declarations = 54,              /* declarations  */
-  YYSYMBOL_args_decl = 55,                 /* args_decl  */
-  YYSYMBOL_args = 56,                      /* args  */
-  YYSYMBOL_expression = 57,                /* expression  */
-  YYSYMBOL_condition = 58,                 /* condition  */
-  YYSYMBOL_value = 59,                     /* value  */
-  YYSYMBOL_pidentifier = 60,               /* pidentifier  */
-  YYSYMBOL_number = 61,                    /* number  */
-  YYSYMBOL_identifier = 62                 /* identifier  */
+  YYSYMBOL_ARRAY = 45,                     /* ARRAY  */
+  YYSYMBOL_NUMBER = 46,                    /* NUMBER  */
+  YYSYMBOL_YYACCEPT = 47,                  /* $accept  */
+  YYSYMBOL_program_all = 48,               /* program_all  */
+  YYSYMBOL_procedures = 49,                /* procedures  */
+  YYSYMBOL_main = 50,                      /* main  */
+  YYSYMBOL_commands = 51,                  /* commands  */
+  YYSYMBOL_command = 52,                   /* command  */
+  YYSYMBOL_proc_head = 53,                 /* proc_head  */
+  YYSYMBOL_proc_call = 54,                 /* proc_call  */
+  YYSYMBOL_declarations = 55,              /* declarations  */
+  YYSYMBOL_args_decl = 56,                 /* args_decl  */
+  YYSYMBOL_args = 57,                      /* args  */
+  YYSYMBOL_expression = 58,                /* expression  */
+  YYSYMBOL_condition = 59,                 /* condition  */
+  YYSYMBOL_value = 60,                     /* value  */
+  YYSYMBOL_pidentifier = 61,               /* pidentifier  */
+  YYSYMBOL_number = 62,                    /* number  */
+  YYSYMBOL_identifier = 63                 /* identifier  */
 };
 typedef enum yysymbol_kind_t yysymbol_kind_t;
 
@@ -502,7 +503,7 @@ union yyalloc
 #define YYLAST   344
 
 /* YYNTOKENS -- Number of terminals.  */
-#define YYNTOKENS  46
+#define YYNTOKENS  47
 /* YYNNTS -- Number of nonterminals.  */
 #define YYNNTS  17
 /* YYNRULES -- Number of rules.  */
@@ -511,7 +512,7 @@ union yyalloc
 #define YYNSTATES  135
 
 /* YYMAXUTOK -- Last valid token kind.  */
-#define YYMAXUTOK   300
+#define YYMAXUTOK   301
 
 
 /* YYTRANSLATE(TOKEN-NUM) -- Symbol number corresponding to TOKEN-NUM
@@ -555,7 +556,7 @@ static const yytype_int8 yytranslate[] =
       15,    16,    17,    18,    19,    20,    21,    22,    23,    24,
       25,    26,    27,    28,    29,    30,    31,    32,    33,    34,
       35,    36,    37,    38,    39,    40,    41,    42,    43,    44,
-      45
+      45,    46
 };
 
 #if YYDEBUG
@@ -589,8 +590,8 @@ static const char *const yytname[] =
   "PROCEDURE", "READ", "WRITE", "ASSIGN", "PLUS", "MINUS", "MULTIPLY",
   "DIVIDE", "MODULO", "EQ", "NE", "LT", "GT", "LE", "GE", "SEMICOLON",
   "COLON", "COMMA", "LPAREN", "RPAREN", "LBRACKET", "RBRACKET", "ERROR",
-  "IDENTIFIER", "NUMBER", "$accept", "program_all", "procedures", "main",
-  "commands", "command", "proc_head", "proc_call", "declarations",
+  "IDENTIFIER", "ARRAY", "NUMBER", "$accept", "program_all", "procedures",
+  "main", "commands", "command", "proc_head", "proc_call", "declarations",
   "args_decl", "args", "expression", "condition", "value", "pidentifier",
   "number", "identifier", YY_NULLPTR
 };
@@ -616,19 +617,19 @@ yysymbol_name (yysymbol_kind_t yysymbol)
    STATE-NUM.  */
 static const yytype_int16 yypact[] =
 {
-     -37,     5,     3,   -37,    12,   -36,   -37,    -3,   -37,    24,
-     -26,   300,     2,    -6,    -1,     0,   -23,   -23,   300,   -36,
-     -36,   -23,     4,   -37,   -11,   -22,    31,   300,   -36,    11,
-     300,     9,   -36,    21,   -37,   -37,    56,    87,    27,   -37,
-     -37,    53,   229,    52,    35,    47,   -37,   -37,   -37,   -36,
-     -13,   -23,    23,    46,    55,   175,   300,   -37,    45,   -37,
-     300,   -23,   -23,   -23,   -23,   -23,   -23,   300,   -23,   -23,
-     -37,   -37,    22,   -37,    48,    54,    58,    49,   -37,    50,
-      62,   -37,   194,   -36,   -37,   219,   -37,   -37,   -37,   -37,
-     -37,   -37,   242,    72,    32,   -36,   -37,   -37,   -37,   -37,
-     -23,   -23,   -23,   -23,   -23,    88,    67,   -37,   -37,   300,
-     -37,   -37,   -37,   -23,   -23,   -37,   -37,   -37,   -37,   -37,
-     -37,    79,   -37,   260,   123,   124,   100,   -37,   300,   300,
+     -37,     5,     3,   -37,    12,   -36,   -37,    -3,   -37,    21,
+     -26,   300,     2,    -6,    -1,   -23,   -27,   -27,   300,   -36,
+     -36,   -27,     4,   -37,    -8,    20,    31,   300,   -36,    -2,
+     300,     9,   -36,    22,   -37,   -37,    48,    87,    24,   -37,
+     -37,    56,   229,    47,    51,    53,   -37,   -37,   -37,   -36,
+      25,   -27,    23,    42,    57,   175,   300,   -37,   -13,   -37,
+     300,   -27,   -27,   -27,   -27,   -27,   -27,   300,   -27,   -27,
+     -37,   -37,    52,   -37,    54,    66,    59,    49,   -37,    61,
+      63,   -37,   194,   -36,   -37,   219,   -37,   -37,   -37,   -37,
+     -37,   -37,   242,    88,    32,   -36,   -37,   -37,   -37,   -37,
+     -27,   -27,   -27,   -27,   -27,    98,    83,   -37,   -37,   300,
+     -37,   -37,   -37,   -27,   -27,   -37,   -37,   -37,   -37,   -37,
+     -37,    90,   -37,   260,   130,   131,   102,   -37,   300,   300,
      -37,   273,   283,   -37,   -37
 };
 
@@ -640,12 +641,12 @@ static const yytype_int8 yydefact[] =
        5,     0,     0,     1,     0,     0,     2,     0,    46,     0,
        0,     0,     0,    24,     0,     0,     0,     0,     0,     0,
        0,     0,     0,     9,     0,    48,     0,     0,     0,     0,
-       0,     0,    46,     0,    28,    47,     0,     0,    48,    44,
+       0,     0,     0,     0,    28,    47,     0,     0,    48,    44,
       45,     0,     0,     0,     0,     0,     7,     8,    17,     0,
        0,     0,     0,    22,     0,     0,     0,    29,     0,    20,
        0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
       18,    19,     0,    31,     0,     0,     0,    32,     6,     0,
-       0,     4,     0,    46,    26,     0,    38,    39,    41,    40,
+       0,     4,     0,     0,    26,     0,    38,    39,    41,    40,
       43,    42,     0,     0,     0,     0,    21,    50,    49,    10,
        0,     0,     0,     0,     0,     0,     0,     3,    27,     0,
       12,    13,    14,     0,     0,    30,    33,    34,    35,    36,
@@ -656,7 +657,7 @@ static const yytype_int8 yydefact[] =
 /* YYPGOTO[NTERM-NUM].  */
 static const yytype_int16 yypgoto[] =
 {
-     -37,   -37,   -37,   -37,   -18,   -19,   -37,   -37,   129,   -37,
+     -37,   -37,   -37,   -37,   -18,   -19,   -37,   -37,   132,   -37,
      -37,   -37,   -16,   111,    65,   -37,    37
 };
 
@@ -673,20 +674,20 @@ static const yytype_int8 yydefgoto[] =
 static const yytype_uint8 yytable[] =
 {
       42,    41,    11,    47,    30,     3,     4,    27,     8,    52,
-      46,    16,    55,    15,    56,    17,     7,    49,    18,    50,
-      19,     8,    35,    47,     5,    48,    20,    21,    14,    78,
-      16,     8,    74,    47,    17,    29,    47,    18,    82,    19,
-      28,     8,    85,     8,    32,    20,    21,    28,     8,    92,
-     113,   114,    93,    40,    40,    51,    54,    44,    40,    58,
-      95,    59,    96,    47,    60,    67,    47,     8,    50,    69,
-      10,    70,    13,    47,   100,   101,   102,   103,   104,    13,
-      34,    38,    38,    71,    43,    38,    38,    79,    40,    83,
-      97,   123,    80,    53,    99,   105,    98,    57,    40,    40,
-      40,    40,    40,    40,    47,    40,    40,   106,   112,   122,
+      46,    16,    55,    15,    56,    17,     7,     8,    18,    35,
+      19,     8,    32,    47,     5,    14,    20,    21,    48,    78,
+      16,     8,    83,    47,    17,    29,    47,    18,    82,    19,
+      28,     8,    85,     8,    54,    20,    21,    28,     8,    92,
+     113,   114,    93,    40,    40,    51,    60,    44,    40,    49,
+      58,    50,    59,    47,    69,    50,    47,     8,    67,     8,
+      10,    74,    13,    47,   100,   101,   102,   103,   104,    13,
+      34,    38,    38,    79,    43,    38,    38,    70,    40,    71,
+      95,   123,    96,    53,    80,    99,    97,    57,    40,    40,
+      40,    40,    40,    40,    47,    40,    40,   105,    98,   106,
      131,   132,    47,    47,    73,    75,    38,    61,    62,    63,
-      64,    65,    66,    84,   126,   121,    38,    38,    38,    38,
-      38,    38,    45,    38,    38,   128,   129,    40,    40,    40,
-      40,    40,   130,    31,     0,     0,     0,     0,   108,     0,
+      64,    65,    66,    84,   112,   122,    38,    38,    38,    38,
+      38,    38,    45,    38,    38,   121,   126,    40,    40,    40,
+      40,    40,   128,   129,   130,     0,    31,     0,   108,     0,
       40,    40,     0,     0,     0,     0,     0,     0,     0,     0,
      115,     0,    77,     0,     0,    38,    38,    38,    38,    38,
        0,     0,    86,    87,    88,    89,    90,    91,    38,    38,
@@ -712,20 +713,20 @@ static const yytype_uint8 yytable[] =
 static const yytype_int16 yycheck[] =
 {
       18,    17,     5,    22,     5,     0,     3,     5,    44,    27,
-       6,     7,    30,    39,     5,    11,     4,    39,    14,    41,
-      16,    44,    45,    42,    21,    36,    22,    23,     4,     6,
+       6,     7,    30,    39,     5,    11,     4,    44,    14,    46,
+      16,    44,    45,    42,    21,     4,    22,    23,    36,     6,
        7,    44,    45,    52,    11,    41,    55,    14,    56,    16,
-      38,    44,    60,    44,    44,    22,    23,    38,    44,    67,
-      18,    19,    68,    16,    17,    24,    45,    20,    21,    38,
-      38,    40,    40,    82,     8,    12,    85,    44,    41,    17,
-       5,    36,     7,    92,    25,    26,    27,    28,    29,    14,
-      15,    16,    17,    36,    19,    20,    21,    41,    51,    44,
-      42,   109,    37,    28,    36,    45,    42,    32,    61,    62,
-      63,    64,    65,    66,   123,    68,    69,    45,    36,    42,
+      38,    44,    60,    44,    46,    22,    23,    38,    44,    67,
+      18,    19,    68,    16,    17,    24,     8,    20,    21,    39,
+      38,    41,    40,    82,    17,    41,    85,    44,    12,    44,
+       5,    46,     7,    92,    25,    26,    27,    28,    29,    14,
+      15,    16,    17,    41,    19,    20,    21,    36,    51,    36,
+      38,   109,    40,    28,    37,    36,    42,    32,    61,    62,
+      63,    64,    65,    66,   123,    68,    69,    46,    42,    46,
      128,   129,   131,   132,    49,    50,    51,    30,    31,    32,
-      33,    34,    35,    58,    45,    37,    61,    62,    63,    64,
-      65,    66,    21,    68,    69,    12,    12,   100,   101,   102,
-     103,   104,    42,    14,    -1,    -1,    -1,    -1,    83,    -1,
+      33,    34,    35,    58,    36,    42,    61,    62,    63,    64,
+      65,    66,    21,    68,    69,    37,    46,   100,   101,   102,
+     103,   104,    12,    12,    42,    -1,    14,    -1,    83,    -1,
      113,   114,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
       95,    -1,    51,    -1,    -1,   100,   101,   102,   103,   104,
       -1,    -1,    61,    62,    63,    64,    65,    66,   113,   114,
@@ -752,31 +753,31 @@ static const yytype_int16 yycheck[] =
    state STATE-NUM.  */
 static const yytype_int8 yystos[] =
 {
-       0,    47,    48,     0,     3,    21,    49,     4,    44,    52,
-      60,     5,    54,    60,     4,    39,     7,    11,    14,    16,
-      22,    23,    50,    51,    53,    60,    62,     5,    38,    41,
-       5,    54,    44,    55,    60,    45,    58,    59,    60,    61,
-      62,    58,    50,    60,    62,    59,     6,    51,    36,    39,
-      41,    24,    50,    60,    45,    50,     5,    60,    38,    40,
+       0,    48,    49,     0,     3,    21,    50,     4,    44,    53,
+      61,     5,    55,    61,     4,    39,     7,    11,    14,    16,
+      22,    23,    51,    52,    54,    61,    63,     5,    38,    41,
+       5,    55,    45,    56,    61,    46,    59,    60,    61,    62,
+      63,    59,    51,    61,    63,    60,     6,    52,    36,    39,
+      41,    24,    51,    61,    46,    51,     5,    61,    38,    40,
        8,    30,    31,    32,    33,    34,    35,    12,    15,    17,
-      36,    36,    56,    60,    45,    60,    57,    59,     6,    41,
-      37,     6,    50,    44,    60,    50,    59,    59,    59,    59,
-      59,    59,    50,    58,    59,    38,    40,    42,    42,    36,
-      25,    26,    27,    28,    29,    45,    45,     6,    60,     9,
-      10,    13,    36,    18,    19,    60,    59,    59,    59,    59,
-      59,    37,    42,    50,    59,    59,    45,    10,    12,    12,
-      42,    50,    50,    20,    20
+      36,    36,    57,    61,    46,    61,    58,    60,     6,    41,
+      37,     6,    51,    45,    61,    51,    60,    60,    60,    60,
+      60,    60,    51,    59,    60,    38,    40,    42,    42,    36,
+      25,    26,    27,    28,    29,    46,    46,     6,    61,     9,
+      10,    13,    36,    18,    19,    61,    60,    60,    60,    60,
+      60,    37,    42,    51,    60,    60,    46,    10,    12,    12,
+      42,    51,    51,    20,    20
 };
 
 /* YYR1[RULE-NUM] -- Symbol kind of the left-hand side of rule RULE-NUM.  */
 static const yytype_int8 yyr1[] =
 {
-       0,    46,    47,    48,    48,    48,    49,    49,    50,    50,
-      51,    51,    51,    51,    51,    51,    51,    51,    51,    51,
-      52,    53,    54,    54,    54,    54,    55,    55,    55,    55,
-      56,    56,    57,    57,    57,    57,    57,    57,    58,    58,
-      58,    58,    58,    58,    59,    59,    60,    61,    62,    62,
-      62
+       0,    47,    48,    49,    49,    49,    50,    50,    51,    51,
+      52,    52,    52,    52,    52,    52,    52,    52,    52,    52,
+      53,    54,    55,    55,    55,    55,    56,    56,    56,    56,
+      57,    57,    58,    58,    58,    58,    58,    58,    59,    59,
+      59,    59,    59,    59,    60,    60,    61,    62,    63,    63,
+      63
 };
 
 /* YYR2[RULE-NUM] -- Number of symbols on the right-hand side of rule RULE-NUM.  */
@@ -1258,7 +1259,7 @@ yyreduce:
     json_object_object_add(program_json, "main", (yyvsp[0].json_obj));
     (yyval.json_obj) = program_json;
 }
-#line 1262 "parser.tab.c"
+#line 1263 "parser.tab.c"
     break;
 
   case 3: /* procedures: procedures PROCEDURE proc_head IS declarations BEGIN_BLOCK commands END  */
@@ -1272,7 +1273,7 @@ yyreduce:
     json_object_array_add((yyvsp[-7].json_obj), proc_obj);
     (yyval.json_obj) = (yyvsp[-7].json_obj);
 }
-#line 1276 "parser.tab.c"
+#line 1277 "parser.tab.c"
     break;
 
   case 4: /* procedures: procedures PROCEDURE proc_head IS BEGIN_BLOCK commands END  */
@@ -1285,13 +1286,13 @@ yyreduce:
     json_object_array_add((yyvsp[-6].json_obj), proc_obj);
     (yyval.json_obj) = (yyvsp[-6].json_obj);
 }
-#line 1289 "parser.tab.c"
+#line 1290 "parser.tab.c"
     break;
 
   case 5: /* procedures: %empty  */
 #line 85 "parser.y"
               { (yyval.json_obj) = NULL; }
-#line 1295 "parser.tab.c"
+#line 1296 "parser.tab.c"
     break;
 
   case 6: /* main: PROGRAM IS declarations BEGIN_BLOCK commands END  */
@@ -1302,7 +1303,7 @@ yyreduce:
     json_object_object_add(main_obj, "commands", (yyvsp[-1].json_obj));
     (yyval.json_obj) = main_obj;
 }
-#line 1306 "parser.tab.c"
+#line 1307 "parser.tab.c"
     break;
 
   case 7: /* main: PROGRAM IS BEGIN_BLOCK commands END  */
@@ -1312,7 +1313,7 @@ yyreduce:
     json_object_object_add(main_obj, "commands", (yyvsp[-1].json_obj));
     (yyval.json_obj) = main_obj;
 }
-#line 1316 "parser.tab.c"
+#line 1317 "parser.tab.c"
     break;
 
   case 8: /* commands: commands command  */
@@ -1322,7 +1323,7 @@ yyreduce:
     json_object_array_add((yyvsp[-1].json_obj), (yyvsp[0].json_obj));
     (yyval.json_obj) = (yyvsp[-1].json_obj);
 }
-#line 1326 "parser.tab.c"
+#line 1327 "parser.tab.c"
     break;
 
   case 9: /* commands: command  */
@@ -1332,7 +1333,7 @@ yyreduce:
     json_object_array_add(cmd_array, (yyvsp[0].json_obj));
     (yyval.json_obj) = cmd_array;
 }
-#line 1336 "parser.tab.c"
+#line 1337 "parser.tab.c"
     break;
 
   case 10: /* command: identifier ASSIGN expression SEMICOLON  */
@@ -1344,7 +1345,7 @@ yyreduce:
     json_object_object_add(cmd_obj, "expression", (yyvsp[-1].json_obj));
     (yyval.json_obj) = cmd_obj;
 }
-#line 1348 "parser.tab.c"
+#line 1349 "parser.tab.c"
     break;
 
   case 11: /* command: IF condition THEN commands ELSE commands ENDIF  */
@@ -1357,7 +1358,7 @@ yyreduce:
     json_object_object_add(cmd_obj, "else_commands", (yyvsp[-1].json_obj));
     (yyval.json_obj) = cmd_obj;
 }
-#line 1361 "parser.tab.c"
+#line 1362 "parser.tab.c"
     break;
 
   case 12: /* command: IF condition THEN commands ENDIF  */
@@ -1369,7 +1370,7 @@ yyreduce:
     json_object_object_add(cmd_obj, "commands", (yyvsp[-1].json_obj));
     (yyval.json_obj) = cmd_obj;
 }
-#line 1373 "parser.tab.c"
+#line 1374 "parser.tab.c"
     break;
 
   case 13: /* command: WHILE condition DO commands ENDWHILE  */
@@ -1381,7 +1382,7 @@ yyreduce:
     json_object_object_add(cmd_obj, "commands", (yyvsp[-1].json_obj));
     (yyval.json_obj) = cmd_obj;
 }
-#line 1385 "parser.tab.c"
+#line 1386 "parser.tab.c"
     break;
 
   case 14: /* command: REPEAT commands UNTIL condition SEMICOLON  */
@@ -1393,7 +1394,7 @@ yyreduce:
     json_object_object_add(cmd_obj, "condition", (yyvsp[-1].json_obj));
     (yyval.json_obj) = cmd_obj;
 }
-#line 1397 "parser.tab.c"
+#line 1398 "parser.tab.c"
     break;
 
   case 15: /* command: FOR pidentifier FROM value TO value DO commands ENDFOR  */
@@ -1407,7 +1408,7 @@ yyreduce:
     json_object_object_add(cmd_obj, "commands", (yyvsp[-1].json_obj));
     (yyval.json_obj) = cmd_obj;
 }
-#line 1411 "parser.tab.c"
+#line 1412 "parser.tab.c"
     break;
 
   case 16: /* command: FOR pidentifier FROM value DOWNTO value DO commands ENDFOR  */
@@ -1421,13 +1422,13 @@ yyreduce:
     json_object_object_add(cmd_obj, "commands", (yyvsp[-1].json_obj));
     (yyval.json_obj) = cmd_obj;
 }
-#line 1425 "parser.tab.c"
+#line 1426 "parser.tab.c"
     break;
 
   case 17: /* command: proc_call SEMICOLON  */
 #line 164 "parser.y"
                       { (yyval.json_obj) = (yyvsp[-1].json_obj); }
-#line 1431 "parser.tab.c"
+#line 1432 "parser.tab.c"
     break;
 
   case 18: /* command: READ identifier SEMICOLON  */
@@ -1438,7 +1439,7 @@ yyreduce:
     json_object_object_add(cmd_obj, "identifier", (yyvsp[-1].json_obj));
     (yyval.json_obj) = cmd_obj;
 }
-#line 1442 "parser.tab.c"
+#line 1443 "parser.tab.c"
     break;
 
   case 19: /* command: WRITE value SEMICOLON  */
@@ -1449,7 +1450,7 @@ yyreduce:
     json_object_object_add(cmd_obj, "value", (yyvsp[-1].json_obj));
     (yyval.json_obj) = cmd_obj;
 }
-#line 1453 "parser.tab.c"
+#line 1454 "parser.tab.c"
     break;
 
   case 20: /* proc_head: pidentifier LPAREN args_decl RPAREN  */
@@ -1460,7 +1461,7 @@ yyreduce:
     json_object_object_add(head_obj, "arguments", (yyvsp[-1].json_obj) ? (yyvsp[-1].json_obj) : json_object_new_null());
     (yyval.json_obj) = head_obj;
 }
-#line 1464 "parser.tab.c"
+#line 1465 "parser.tab.c"
     break;
 
   case 21: /* proc_call: pidentifier LPAREN args RPAREN  */
@@ -1472,7 +1473,7 @@ yyreduce:
     json_object_object_add(call_obj, "arguments", (yyvsp[-1].json_obj) ? (yyvsp[-1].json_obj) : json_object_new_null());
     (yyval.json_obj) = call_obj;
 }
-#line 1476 "parser.tab.c"
+#line 1477 "parser.tab.c"
     break;
 
   case 22: /* declarations: declarations COMMA pidentifier  */
@@ -1482,7 +1483,7 @@ yyreduce:
     json_object_array_add((yyvsp[-2].json_obj), (yyvsp[0].json_obj));
     (yyval.json_obj) = (yyvsp[-2].json_obj);
 }
-#line 1486 "parser.tab.c"
+#line 1487 "parser.tab.c"
     break;
 
   case 23: /* declarations: declarations COMMA pidentifier LBRACKET NUMBER COLON NUMBER RBRACKET  */
@@ -1496,7 +1497,7 @@ yyreduce:
     json_object_array_add((yyvsp[-7].json_obj), arr_decl);
     (yyval.json_obj) = (yyvsp[-7].json_obj);
 }
-#line 1500 "parser.tab.c"
+#line 1501 "parser.tab.c"
     break;
 
   case 24: /* declarations: pidentifier  */
@@ -1506,7 +1507,7 @@ yyreduce:
     json_object_array_add(decl_array, (yyvsp[0].json_obj));
     (yyval.json_obj) = decl_array;
 }
-#line 1510 "parser.tab.c"
+#line 1511 "parser.tab.c"
     break;
 
   case 25: /* declarations: pidentifier LBRACKET NUMBER COLON NUMBER RBRACKET  */
@@ -1520,7 +1521,7 @@ yyreduce:
     json_object_array_add(decl_array, arr_decl);
     (yyval.json_obj) = decl_array;
 }
-#line 1524 "parser.tab.c"
+#line 1525 "parser.tab.c"
     break;
 
   case 26: /* args_decl: args_decl COMMA pidentifier  */
@@ -1530,20 +1531,20 @@ yyreduce:
     json_object_array_add((yyvsp[-2].json_obj), (yyvsp[0].json_obj));
     (yyval.json_obj) = (yyvsp[-2].json_obj);
         }
-#line 1534 "parser.tab.c"
+#line 1535 "parser.tab.c"
     break;
 
-  case 27: /* args_decl: args_decl COMMA IDENTIFIER pidentifier  */
+  case 27: /* args_decl: args_decl COMMA ARRAY pidentifier  */
 #line 227 "parser.y"
-                                         {
+                                    {
     if (!(yyvsp[-3].json_obj)) (yyvsp[-3].json_obj) = json_object_new_array();
     struct json_object *arg_obj = json_object_new_object();
-    json_object_object_add(arg_obj, "type", json_object_new_string((yyvsp[-1].str_val)));
+    json_object_object_add(arg_obj, "type", json_object_new_string("array"));
     json_object_object_add(arg_obj, "identifier", (yyvsp[0].json_obj));
     json_object_array_add((yyvsp[-3].json_obj), arg_obj);
     (yyval.json_obj) = (yyvsp[-3].json_obj);
         }
-#line 1547 "parser.tab.c"
+#line 1548 "parser.tab.c"
     break;
 
   case 28: /* args_decl: pidentifier  */
@@ -1553,20 +1554,20 @@ yyreduce:
     json_object_array_add(arg_array, (yyvsp[0].json_obj));
     (yyval.json_obj) = arg_array;
         }
-#line 1557 "parser.tab.c"
+#line 1558 "parser.tab.c"
     break;
 
-  case 29: /* args_decl: IDENTIFIER pidentifier  */
+  case 29: /* args_decl: ARRAY pidentifier  */
 #line 240 "parser.y"
-                         {
+                    {
     struct json_object *arg_array = json_object_new_array();
     struct json_object *arg_obj = json_object_new_object();
-    json_object_object_add(arg_obj, "type", json_object_new_string((yyvsp[-1].str_val)));
+    json_object_object_add(arg_obj, "type", json_object_new_string("array"));
     json_object_object_add(arg_obj, "identifier", (yyvsp[0].json_obj));
     json_object_array_add(arg_array, arg_obj);
     (yyval.json_obj) = arg_array;
 }
-#line 1570 "parser.tab.c"
+#line 1571 "parser.tab.c"
     break;
 
   case 30: /* args: args COMMA pidentifier  */
@@ -1576,7 +1577,7 @@ yyreduce:
     json_object_array_add((yyvsp[-2].json_obj), (yyvsp[0].json_obj));
     (yyval.json_obj) = (yyvsp[-2].json_obj);
 }
-#line 1580 "parser.tab.c"
+#line 1581 "parser.tab.c"
     break;
 
   case 31: /* args: pidentifier  */
@@ -1586,7 +1587,7 @@ yyreduce:
     json_object_array_add(arg_array, (yyvsp[0].json_obj));
     (yyval.json_obj) = arg_array;
 }
-#line 1590 "parser.tab.c"
+#line 1591 "parser.tab.c"
     break;
 
   case 32: /* expression: value  */
@@ -1594,7 +1595,7 @@ yyreduce:
                   {
     (yyval.json_obj) = (yyvsp[0].json_obj);
 }
-#line 1598 "parser.tab.c"
+#line 1599 "parser.tab.c"
     break;
 
   case 33: /* expression: value PLUS value  */
@@ -1606,7 +1607,7 @@ yyreduce:
     json_object_object_add(expr_obj, "right", (yyvsp[0].json_obj));
     (yyval.json_obj) = expr_obj;
 }
-#line 1610 "parser.tab.c"
+#line 1611 "parser.tab.c"
     break;
 
   case 34: /* expression: value MINUS value  */
@@ -1618,7 +1619,7 @@ yyreduce:
     json_object_object_add(expr_obj, "right", (yyvsp[0].json_obj));
     (yyval.json_obj) = expr_obj;
 }
-#line 1622 "parser.tab.c"
+#line 1623 "parser.tab.c"
     break;
 
   case 35: /* expression: value MULTIPLY value  */
@@ -1630,7 +1631,7 @@ yyreduce:
     json_object_object_add(expr_obj, "right", (yyvsp[0].json_obj));
     (yyval.json_obj) = expr_obj;
 }
-#line 1634 "parser.tab.c"
+#line 1635 "parser.tab.c"
     break;
 
   case 36: /* expression: value DIVIDE value  */
@@ -1642,7 +1643,7 @@ yyreduce:
     json_object_object_add(expr_obj, "right", (yyvsp[0].json_obj));
     (yyval.json_obj) = expr_obj;
 }
-#line 1646 "parser.tab.c"
+#line 1647 "parser.tab.c"
     break;
 
   case 37: /* expression: value MODULO value  */
@@ -1654,7 +1655,7 @@ yyreduce:
     json_object_object_add(expr_obj, "right", (yyvsp[0].json_obj));
     (yyval.json_obj) = expr_obj;
 }
-#line 1658 "parser.tab.c"
+#line 1659 "parser.tab.c"
     break;
 
   case 38: /* condition: value EQ value  */
@@ -1666,7 +1667,7 @@ yyreduce:
     json_object_object_add(cond_obj, "right", (yyvsp[0].json_obj));
     (yyval.json_obj) = cond_obj;
 }
-#line 1670 "parser.tab.c"
+#line 1671 "parser.tab.c"
     break;
 
   case 39: /* condition: value NE value  */
@@ -1678,7 +1679,7 @@ yyreduce:
     json_object_object_add(cond_obj, "right", (yyvsp[0].json_obj));
     (yyval.json_obj) = cond_obj;
 }
-#line 1682 "parser.tab.c"
+#line 1683 "parser.tab.c"
     break;
 
   case 40: /* condition: value GT value  */
@@ -1690,7 +1691,7 @@ yyreduce:
     json_object_object_add(cond_obj, "right", (yyvsp[0].json_obj));
     (yyval.json_obj) = cond_obj;
 }
-#line 1694 "parser.tab.c"
+#line 1695 "parser.tab.c"
     break;
 
   case 41: /* condition: value LT value  */
@@ -1702,7 +1703,7 @@ yyreduce:
     json_object_object_add(cond_obj, "right", (yyvsp[0].json_obj));
     (yyval.json_obj) = cond_obj;
 }
-#line 1706 "parser.tab.c"
+#line 1707 "parser.tab.c"
     break;
 
   case 42: /* condition: value GE value  */
@@ -1714,7 +1715,7 @@ yyreduce:
     json_object_object_add(cond_obj, "right", (yyvsp[0].json_obj));
     (yyval.json_obj) = cond_obj;
 }
-#line 1718 "parser.tab.c"
+#line 1719 "parser.tab.c"
     break;
 
   case 43: /* condition: value LE value  */
@@ -1726,7 +1727,7 @@ yyreduce:
     json_object_object_add(cond_obj, "right", (yyvsp[0].json_obj));
     (yyval.json_obj) = cond_obj;
 }
-#line 1730 "parser.tab.c"
+#line 1731 "parser.tab.c"
     break;
 
   case 44: /* value: number  */
@@ -1734,7 +1735,7 @@ yyreduce:
               {
     (yyval.json_obj) = json_object_new_int((yyvsp[0].json_obj));
 }
-#line 1738 "parser.tab.c"
+#line 1739 "parser.tab.c"
     break;
 
   case 45: /* value: identifier  */
@@ -1742,7 +1743,7 @@ yyreduce:
              {
     (yyval.json_obj) = (yyvsp[0].json_obj);
 }
-#line 1746 "parser.tab.c"
+#line 1747 "parser.tab.c"
     break;
 
   case 46: /* pidentifier: IDENTIFIER  */
@@ -1750,7 +1751,7 @@ yyreduce:
                         {
     (yyval.json_obj) = json_object_new_string((yyvsp[0].str_val));
 }
-#line 1754 "parser.tab.c"
+#line 1755 "parser.tab.c"
     break;
 
   case 47: /* number: NUMBER  */
@@ -1758,7 +1759,7 @@ yyreduce:
                {
     (yyval.json_obj) = (yyvsp[0].int_val);
 }
-#line 1762 "parser.tab.c"
+#line 1763 "parser.tab.c"
     break;
 
   case 48: /* identifier: pidentifier  */
@@ -1766,7 +1767,7 @@ yyreduce:
                         {
     (yyval.json_obj) = (yyvsp[0].json_obj);
 }
-#line 1770 "parser.tab.c"
+#line 1771 "parser.tab.c"
     break;
 
   case 49: /* identifier: pidentifier LBRACKET pidentifier RBRACKET  */
@@ -1777,7 +1778,7 @@ yyreduce:
     json_object_object_add(arr_access, "index", (yyvsp[-1].json_obj));
     (yyval.json_obj) = arr_access;
 }
-#line 1781 "parser.tab.c"
+#line 1782 "parser.tab.c"
     break;
 
   case 50: /* identifier: pidentifier LBRACKET NUMBER RBRACKET  */
@@ -1788,11 +1789,11 @@ yyreduce:
     json_object_object_add(arr_access, "index", json_object_new_int((yyvsp[-1].int_val)));
     (yyval.json_obj) = arr_access;
 }
-#line 1792 "parser.tab.c"
+#line 1793 "parser.tab.c"
     break;
 
 
-#line 1796 "parser.tab.c"
+#line 1797 "parser.tab.c"
 
       default: break;
     }
@@ -1985,12 +1986,12 @@ yyreturnlab:
   return yyresult;
 }
 
-#line 375 "parser.y"
+#line 374 "parser.y"
 
 
 /* Error Handling */
 void yyerror(const char *s) {
-    fprintf(stderr, "Error: %s at line %d\n", s, yylineno);
+    exit(1); // Stop parsing on error
 }
 
 int main(int argc, char *argv[]) {

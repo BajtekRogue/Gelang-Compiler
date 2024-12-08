@@ -96,7 +96,8 @@ extern int yydebug;
     RBRACKET = 297,                /* RBRACKET  */
     ERROR = 298,                   /* ERROR  */
     IDENTIFIER = 299,              /* IDENTIFIER  */
-    NUMBER = 300                   /* NUMBER  */
+    ARRAY = 300,                   /* ARRAY  */
+    NUMBER = 301                   /* NUMBER  */
   };
   typedef enum yytokentype yytoken_kind_t;
 #endif
@@ -111,7 +112,7 @@ union YYSTYPE
     char *str_val;
     struct json_object *json_obj;
 
-#line 115 "parser.tab.h"
+#line 116 "parser.tab.h"
 
 };
 typedef union YYSTYPE YYSTYPE;
