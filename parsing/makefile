@@ -1,42 +1,45 @@
-# Compiler and Flags
-CC = gcc
-CFLAGS = -Wall -Wextra
+# Compiler settings
+CXX = g++
+CXXFLAGS = -std=c++17 -Wall -g
 
-# Libraries
-LIBS = -lfl -ljson-c
+# Bison and Flex
+YACC = bison
+YFLAGS = -d
+LEX = flex
 
-# File Names
-LEX_FILE = lexer.l
-YACC_FILE = parser.y
+# Source and output files
+SRCS = main.cpp
+PARSER = parser
+LEXER = lexer
 
-# Generated Files
-LEX_OUTPUT = lex.yy.c
-YACC_OUTPUT = parser.tab.c
-YACC_HEADER = parser.tab.h
+# Target executable
+TARGET = X
 
-# Executable
-EXEC = parser
+all: $(TARGET)
 
-# JSON Output
-JSON_OUTPUT = program.json
+# Generate parser and lexer
+$(PARSER).tab.cpp $(PARSER).tab.hpp: $(PARSER).y languageStructs.hpp
+	$(YACC) $(YFLAGS) -o $(PARSER).tab.cpp $(PARSER).y
 
-# Default Target
-.PHONY: all clean run
+$(LEXER).cpp: $(LEXER).l $(PARSER).tab.hpp
+	$(LEX) -o $(LEXER).cpp $(LEXER).l
 
-all: $(EXEC)
+# Compilation rules
+$(PARSER).tab.o: $(PARSER).tab.cpp $(PARSER).tab.hpp
+	$(CXX) $(CXXFLAGS) -c $(PARSER).tab.cpp
 
-# Build Executable
-$(EXEC): $(YACC_OUTPUT) $(LEX_OUTPUT)
-	$(CC) $(CFLAGS) -o $@ $^ $(LIBS)
+$(LEXER).o: $(LEXER).cpp
+	$(CXX) $(CXXFLAGS) -c $(LEXER).cpp
 
-# Generate Parser Files
-$(YACC_OUTPUT) $(YACC_HEADER): $(YACC_FILE)
-	bison -d $(YACC_FILE)
+main.o: main.cpp languageStructs.hpp
+	$(CXX) $(CXXFLAGS) -c main.cpp
 
-# Generate Lexer File
-$(LEX_OUTPUT): $(LEX_FILE)
-	flex $(LEX_FILE)
+# Linking
+$(TARGET): main.o $(PARSER).tab.o $(LEXER).o
+	$(CXX) $(CXXFLAGS) -o $(TARGET) main.o $(PARSER).tab.o $(LEXER).o -lfl
 
-# Clean Up
+# Clean up
 clean:
-	rm -f $(EXEC) $(LEX_OUTPUT) $(YACC_OUTPUT) $(YACC_HEADER) $(JSON_OUTPUT)
+	rm -f *.o $(PARSER).tab.cpp $(PARSER).tab.hpp $(LEXER).cpp $(TARGET)
+
+.PHONY: all clean
