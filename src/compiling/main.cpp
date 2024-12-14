@@ -1,0 +1,56 @@
+#include "languageStructs.hpp"
+#include "colors.hpp"
+#include "utility.hpp"
+
+extern void runParser(std::FILE* data, std::unique_ptr<Program>& parsedProgram);
+
+int main(int argc, char *argv[]) {
+
+    if (argc < 3 || argc > 4) {
+        fprintf(stderr, "%sUsage: %s <input_file_path> <output_file_path> [--AST]\n%s",
+                color_White.c_str(), argv[0], color_Reset.c_str());
+        return 1;
+    }
+
+    bool printAST = (argc == 4 && std::string(argv[3]) == "--AST"); // Flag to print AST
+    std::FILE* data = nullptr;
+    std::unique_ptr<Program> parsedProgram;
+
+    // Open the input file
+    data = std::fopen(argv[1], "r");
+    if (!data) {
+        fprintf(stderr, "%sError: Could not open file %s %s\n", color_Red.c_str(), argv[1], color_Reset.c_str());
+        return 1;
+    }
+
+    // Run the parser
+    runParser(data, parsedProgram);
+
+    // Always close the input file
+    if (data) {
+        std::fclose(data);
+    }
+
+    // Conditionally print the AST if --AST flag is set
+    if (printAST) {
+        std::cout << color_Magenta << "\nAST: " << color_Reset << "\n";
+        parsedProgram->print();
+    }
+
+    // Compile the program
+    std::vector<AssemblyInstruction> code = compile(parsedProgram);
+
+    // Open the output file
+    std::ofstream outputFile(argv[2]);
+    if (!outputFile) {
+        fprintf(stderr, "%sError: Could not open output file %s %s\n", color_Red.c_str(), argv[2], color_Reset.c_str());
+        return 1;
+    }
+
+    // Write the assembly code to the output file
+    for (const AssemblyInstruction& instruction : code) {
+        outputFile << instruction.print() << "\n";
+    }
+
+    return 0;
+}

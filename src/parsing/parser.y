@@ -6,7 +6,8 @@
 #include <variant>
 #include <optional>   
 #include <cstring>
-#include "languageStructs.hpp"
+#include "../headers/languageStructs.hpp"
+#include "../headers/colors.hpp"
 }
 %{
 #include <iostream>
@@ -16,14 +17,21 @@
 #include <variant>
 #include <optional>   
 #include <cstring>
-#include "languageStructs.hpp" // Include the C++ structs header
+#include "../headers/languageStructs.hpp"
+#include "../headers/colors.hpp" //colors for printing
 
 extern int yylineno;
 extern int yylex(void);
-void yyerror(Program** parsed_program, const char *s);
-void yyset_in(std::FILE * in_str);
+extern void initializeLineTracking(std::FILE* inputFile);
+extern std::vector<std::string> inputLines;
+void yyerror(Program** parsedProgram, const char *s);
+void yyset_in(std::FILE * inStr);
 
 %}
+
+%locations
+%define parse.error verbose
+%parse-param {Program** parsedProgram}
 
 
 /* Full Token Definitions */
@@ -47,11 +55,8 @@ void yyset_in(std::FILE * in_str);
 %token LPAREN RPAREN 
 %token LBRACKET RBRACKET
 
-/* Additional Tokens */
-%token ERROR
 
 /* Types */
-
 %union {
     int int_val;
     char* str_val;
@@ -84,7 +89,6 @@ void yyset_in(std::FILE * in_str);
     std::vector<std::unique_ptr<Value>>* values_vec;
 }
 
-%parse-param {Program** parsed_program}
 
 %type <program_val> program_all
 %type <procedures_vec> procedures
@@ -107,21 +111,17 @@ void yyset_in(std::FILE * in_str);
 %%
 
 program_all: procedures main {
-    // Allocate memory for parsed_program if not already allocated
-    if (*parsed_program == nullptr) {
-        *parsed_program = new Program();
+    if (*parsedProgram == nullptr) {
+        *parsedProgram = new Program();
     }
-
     if ($1) {
-        (*parsed_program)->procedures = std::move(*$1);
+        (*parsedProgram)->procedures = std::move(*$1);
         delete $1;
     }
-    
-    (*parsed_program)->declarations = std::move($2->declarations);
-    (*parsed_program)->mainCommands = std::move($2->commands);
+    (*parsedProgram)->declarations = std::move($2->declarations);
+    (*parsedProgram)->mainCommands = std::move($2->commands);
+    $$ = *parsedProgram;
     delete $2;
-
-    $$ = *parsed_program;
 };
 
 
@@ -130,13 +130,10 @@ procedures:
         if (!$1){
             $1 = new std::vector<std::unique_ptr<Procedure>>();
         }
-        
         $1->push_back(std::unique_ptr<Procedure>($3));
         $3->declarations = std::move(*$5);
         $3->commands = std::move(*$7);
-        
         $$ = $1;
-        
         delete $5;
         delete $7;
     }
@@ -144,15 +141,12 @@ procedures:
         if (!$1){
             $1 = new std::vector<std::unique_ptr<Procedure>>();
         }
-        
         $1->push_back(std::unique_ptr<Procedure>($3));
         $3->commands = std::move(*$6);
-        
         $$ = $1;
-        
         delete $6;
     }
-    | /* empty */ { $$ = nullptr; };
+    | %empty { $$ = nullptr; };
 
 main: 
     PROGRAM IS declarations BEGIN_BLOCK commands END {
@@ -175,7 +169,6 @@ commands:
         if (!$1) {
             $1 = new std::vector<std::unique_ptr<Command>>();
         }
-        
         $1->push_back(std::unique_ptr<Command>(static_cast<Command*>($2))); 
         $$ = $1;
     }
@@ -259,7 +252,6 @@ proc_head:
         proc->identifier = $1->asIdentifier();
         proc->parameters = $3 ? std::move(*$3) : std::vector<std::unique_ptr<Parameter>>();
         $$ = proc;
-        
         if ($1) {
             free($1);
         }
@@ -271,10 +263,9 @@ proc_head:
 proc_call: 
     pidentifier LPAREN args RPAREN {
         auto cmd = new ProcedureCallCommand();
-        cmd->identifier = std::unique_ptr<Value>($1);
+        cmd->identifier = $1->asIdentifier();
         cmd->arguments = $3 ? std::move(*$3) : std::vector<std::unique_ptr<Value>>();
         $$ = cmd;
-        
         if ($1) {
             free($1);
         }
@@ -288,16 +279,13 @@ declarations:
         if (!$1){
             $1 = new std::vector<std::unique_ptr<Variable>>();
         }
-
-
         if($3->isIdentifier()){
             $1->push_back(std::make_unique<Variable>($3->asIdentifier()));
         }else if($3->isNumber()){
-            yyerror(parsed_program, "Number declared as variable");
+            yyerror(parsedProgram, "Number declared as variable");
         }else{
-            yyerror(parsed_program, "Array accese declared as variable");
+            yyerror(parsedProgram, "Array accese declared as variable");
         }
-
         $$ = $1;
         if ($3){
             free($3);
@@ -310,12 +298,11 @@ declarations:
         if($3->isIdentifier()){
             $1->push_back(std::make_unique<Variable>($3->asIdentifier(), $5, $7));
         }else if($3->isNumber()){
-            yyerror(parsed_program, "Number declared as arrays identifier");
+            yyerror(parsedProgram, "Number declared as arrays identifier");
         }else{
-            yyerror(parsed_program, "Array accese declared as array identifier");
+            yyerror(parsedProgram, "Array accese declared as array identifier");
         }
         $$ = $1;
-        
         if ($3){
             free($3);
         }
@@ -325,26 +312,23 @@ declarations:
         if($1->isIdentifier()){
             $$->push_back(std::make_unique<Variable>($1->asIdentifier()));
         }else if($1->isNumber()){
-            yyerror(parsed_program, "Number declared as variable");
+            yyerror(parsedProgram, "Number declared as variable");
         }else{
-            yyerror(parsed_program, "Array accese declared as variable");
+            yyerror(parsedProgram, "Array accese declared as variable");
         }
-        
         if ($1){
             free($1);
         }
     }
     | pidentifier LBRACKET NUMBER COLON NUMBER RBRACKET {
         $$ = new std::vector<std::unique_ptr<Variable>>();
-
         if($1->isIdentifier()){
             $$->push_back(std::make_unique<Variable>($1->asIdentifier(), $3, $5));
         }else if($1->isNumber()){
-            yyerror(parsed_program, "Number declared as arrays identifier");
+            yyerror(parsedProgram, "Number declared as arrays identifier");
         }else{
-            yyerror(parsed_program, "Array accese declared as array identifier");
+            yyerror(parsedProgram, "Array accese declared as array identifier");
         }
-        
         if ($1){
             free($1);
         }
@@ -358,9 +342,9 @@ args_decl:
         if($3->isIdentifier()){
             $1->push_back(std::make_unique<Parameter>($3->asIdentifier()));
         }else if($3->isNumber()){
-            yyerror(parsed_program, "Number declared as procedure parameter");
+            yyerror(parsedProgram, "Number declared as procedure parameter");
         }else{
-            yyerror(parsed_program, "Array accese declared as procedure parameter");
+            yyerror(parsedProgram, "Array accese declared as procedure parameter");
         }        
         $$ = $1;
         if ($3) {
@@ -374,9 +358,9 @@ args_decl:
         if($4->isIdentifier()){
             $1->push_back(std::make_unique<Parameter>($4->asIdentifier(), true));
         }else if($4->isNumber()){
-            yyerror(parsed_program, "Number declared as procedure parameter");
+            yyerror(parsedProgram, "Number declared as procedure parameter");
         }else{
-            yyerror(parsed_program, "Array accese declared as procedure parameter");
+            yyerror(parsedProgram, "Array accese declared as procedure parameter");
         } 
         $$ = $1;
         if ($4) {
@@ -388,9 +372,9 @@ args_decl:
         if($1->isIdentifier()){
             $$->push_back(std::make_unique<Parameter>($1->asIdentifier()));
         }else if($1->isNumber()){
-            yyerror(parsed_program, "Number declared as procedure parameter");
+            yyerror(parsedProgram, "Number declared as procedure parameter");
         }else{
-            yyerror(parsed_program, "Array accese declared as procedure parameter");
+            yyerror(parsedProgram, "Array accese declared as procedure parameter");
         } 
         if ($1) {
             free($1);
@@ -401,9 +385,9 @@ args_decl:
         if($2->isIdentifier()){
             $$->push_back(std::make_unique<Parameter>($2->asIdentifier(), true));
         }else if($2->isNumber()){
-            yyerror(parsed_program, "Number declared as procedure parameter");
+            yyerror(parsedProgram, "Number declared as procedure parameter");
         }else{
-            yyerror(parsed_program, "Array accese declared as procedure parameter");
+            yyerror(parsedProgram, "Array accese declared as procedure parameter");
         } 
         if ($2) {
             free($2);
@@ -564,20 +548,31 @@ identifier:
 
 %%
 
-/* Error Handling */
-void yyerror(Program** parsed_program, const char* s) {
-    fprintf(stderr, "\033[1;31mSyntax error: %s at line number %d\033[0m\n", s, yylineno);
+void yyerror(Program** parsedProgram, const char* s) {
+    extern char* yytext;  // The current token text
+    extern int yylineno;  // The current line number
 
-    // Clean up allocated memory
-    delete *parsed_program;
-    *parsed_program = nullptr;
+    // Print the standard error message
+    fprintf(stderr, "%sSyntax Error: Unexpected token: '%s' at line %d %s\n", 
+            color_Red.c_str(), yytext ? yytext : "unknown", yylineno, color_Reset.c_str());
 
-    exit(1); // Stop parsing on error
+    if (yylineno > 0 && static_cast<size_t>(yylineno) <= inputLines.size()) {
+        fprintf(stderr, "%sLine %d: %s%s\n", 
+            color_Yellow.c_str(), yylineno, inputLines[static_cast<size_t>(yylineno) - 1].c_str(), color_Reset.c_str());
+    }
+
+    // Clean up the program if partially parsed
+    if (*parsedProgram) {
+        delete *parsedProgram;
+        *parsedProgram = nullptr;
+    }
+
+    // Stop parsing
+    exit(1);
 }
 
-
-void run_parser(std::FILE* input, std::unique_ptr<Program>& parsed_program) {
-    std::cout << "\033[1;34mParsing code.\033[0m" << std::endl;
+void runParser(std::FILE* input, std::unique_ptr<Program>& parsedProgram) {
+    std::cout << color_Blue << "Parsing code..." <<color_Reset << std::endl;
     Program* program = nullptr;
     
     // Reset input file pointer to beginning
@@ -585,17 +580,18 @@ void run_parser(std::FILE* input, std::unique_ptr<Program>& parsed_program) {
     
     // Set input file for lexer
     yyset_in(input);
+    initializeLineTracking(input);
+
+    int parseResult = yyparse(&program);
     
-    // Capture parse result
-    int parse_result = yyparse(&program);
-    
-    // Check parsing result
-    if (parse_result != 0 || program == nullptr) {
-        std::cerr << "\033[1;31mParsing failed!\033[0m" << std::endl;
-        if (program) delete program;
+    if (parseResult != 0 || program == nullptr) {
+        std::cerr << color_Red << "Parsing failed!" << color_Reset << std::endl;
+        if (program){
+            delete program;
+        }
         return;
     }
     
-    parsed_program.reset(program); // Transfer ownership to unique_ptr
-    std::cout << "\033[1;34mFinished parsing code.\033[0m" << std::endl;
+    parsedProgram.reset(program); 
+    std::cout << color_Cyan << "Finished parsing code." << color_Reset << std::endl;
 }

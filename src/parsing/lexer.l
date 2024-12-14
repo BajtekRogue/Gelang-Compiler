@@ -1,10 +1,42 @@
 %{
 #include <iostream>
+#include <sstream>
+#include <vector>
+#include <string>
 #include <cstring>
 #include "parser.hpp"
 
-int lineCounter = 1;
+// Store lines for error reporting
+std::vector<std::string> inputLines;
 
+void reportLexerError(const std::string& message, const std::string& token, size_t lineNumber) {
+    std::cerr << color_Red << "Lexical Error: " << message << " at line " << lineNumber << color_Reset << std::endl;
+    
+    if (lineNumber > 0 && lineNumber <= inputLines.size()) {
+        std::cerr << color_Yellow << "Line " << lineNumber << ": " << inputLines[lineNumber - 1] << color_Reset << std::endl;
+    }
+    
+    exit(1);
+}
+
+
+void initializeLineTracking(std::FILE* inputFile) {
+    inputLines.clear();
+    
+    // Rewind to start of file
+    rewind(inputFile);
+    
+    // Read line by line
+    char lineBuffer[1024];
+    while (fgets(lineBuffer, sizeof(lineBuffer), inputFile)) {
+        // Remove trailing newline if present
+        lineBuffer[strcspn(lineBuffer, "\n")] = 0;
+        inputLines.push_back(lineBuffer);
+    }
+    
+    // Rewind again for actual parsing
+    rewind(inputFile);
+}
 %}
 
 %option noyywrap
@@ -82,14 +114,13 @@ IDENTIFIER  [_a-z]+
 "#".*           { /* Ignore comments */ }
 
  /* Whitespace */
-[ \t]+          { /* Ignore whitespace */ }
-\n              { lineCounter++; }
+[ \t\n]+          { /* Ignore whitespace */ }
 
 
-
-. {
-    fprintf(stderr, "\033[1;31mLexical error: Unexpected character '%s' at line number %d\033[0m\n", yytext, lineCounter);
-    return ERROR;
+. { 
+    std::stringstream unexpected;
+    unexpected << "Unexpected character '" << yytext[0] << "'";
+    reportLexerError(unexpected.str(), yytext, yylineno);
 }
 
 
