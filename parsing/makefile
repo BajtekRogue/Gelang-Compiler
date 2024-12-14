@@ -1,45 +1,24 @@
-# Compiler settings
-CXX = g++
-CXXFLAGS = -std=c++17 -Wall -g
+FLAGS = -W -std=c++17 -O3
 
-# Bison and Flex
-YACC = bison
-YFLAGS = -d
-LEX = flex
+.PHONY = all clean cleanall
 
-# Source and output files
-SRCS = main.cpp
-PARSER = parser
-LEXER = lexer
+all: X
 
-# Target executable
-TARGET = X
+X: lexer.o parser.o main.o
+	$(CXX) $^ -o $@
+	strip $@
 
-all: $(TARGET)
+%.o: %.cpp
+	$(CXX) $(FLAGS) -c $^
 
-# Generate parser and lexer
-$(PARSER).tab.cpp $(PARSER).tab.hpp: $(PARSER).y languageStructs.hpp
-	$(YACC) $(YFLAGS) -o $(PARSER).tab.cpp $(PARSER).y
+lexer.cpp: lexer.l parser.hpp
+	flex -o $@ $<
 
-$(LEXER).cpp: $(LEXER).l $(PARSER).tab.hpp
-	$(LEX) -o $(LEXER).cpp $(LEXER).l
+parser.cpp parser.hpp: parser.y
+	bison -Wall -d -o parser.cpp $^
 
-# Compilation rules
-$(PARSER).tab.o: $(PARSER).tab.cpp $(PARSER).tab.hpp
-	$(CXX) $(CXXFLAGS) -c $(PARSER).tab.cpp
-
-$(LEXER).o: $(LEXER).cpp
-	$(CXX) $(CXXFLAGS) -c $(LEXER).cpp
-
-main.o: main.cpp languageStructs.hpp
-	$(CXX) $(CXXFLAGS) -c main.cpp
-
-# Linking
-$(TARGET): main.o $(PARSER).tab.o $(LEXER).o
-	$(CXX) $(CXXFLAGS) -o $(TARGET) main.o $(PARSER).tab.o $(LEXER).o -lfl
-
-# Clean up
 clean:
-	rm -f *.o $(PARSER).tab.cpp $(PARSER).tab.hpp $(LEXER).cpp $(TARGET)
+	rm -f *.o parser.cpp parser.hpp lexer.cpp X
 
-.PHONY: all clean
+cleanall: clean
+	rm -f X

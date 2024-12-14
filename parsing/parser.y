@@ -1,18 +1,25 @@
-%code requires{
-    #include <iostream>
-    #include <vector>
-    #include <string>
-    #include <memory>
-    #include <variant>
-    #include <optional>    
+%code requires {
+#include <iostream>
+#include <vector>
+#include <string>
+#include <memory>
+#include <variant>
+#include <optional>   
+#include <cstring>
+#include "languageStructs.hpp"
 }
-
 %{
+#include <iostream>
+#include <vector>
+#include <string>
+#include <memory>
+#include <variant>
+#include <optional>   
 #include <cstring>
 #include "languageStructs.hpp" // Include the C++ structs header
 
-extern "C" int yylineno;
-int yylex(void);
+extern int yylineno;
+extern int yylex(void);
 void yyerror(Program** parsed_program, const char *s);
 void yyset_in(std::FILE * in_str);
 
@@ -42,11 +49,6 @@ void yyset_in(std::FILE * in_str);
 
 /* Additional Tokens */
 %token ERROR
-
-/* Precedence and Associativity */
-%left PLUS MINUS
-%left MULTIPLY DIVIDE MODULO
-%nonassoc EQ NE LT GT LE GE
 
 /* Types */
 
@@ -577,8 +579,23 @@ void yyerror(Program** parsed_program, const char* s) {
 void run_parser(std::FILE* input, std::unique_ptr<Program>& parsed_program) {
     std::cout << "\033[1;34mParsing code.\033[0m" << std::endl;
     Program* program = nullptr;
+    
+    // Reset input file pointer to beginning
+    std::rewind(input);
+    
+    // Set input file for lexer
     yyset_in(input);
-    yyparse(&program);
+    
+    // Capture parse result
+    int parse_result = yyparse(&program);
+    
+    // Check parsing result
+    if (parse_result != 0 || program == nullptr) {
+        std::cerr << "\033[1;31mParsing failed!\033[0m" << std::endl;
+        if (program) delete program;
+        return;
+    }
+    
     parsed_program.reset(program); // Transfer ownership to unique_ptr
     std::cout << "\033[1;34mFinished parsing code.\033[0m" << std::endl;
 }

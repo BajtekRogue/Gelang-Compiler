@@ -1,16 +1,15 @@
-%option c++
-%option noyywrap
-%option yylineno
-%option nounput
-
 %{
 #include <iostream>
 #include <cstring>
-#include "parser.hh"
+#include "parser.hpp"
 
 int lineCounter = 1;
-int yylex();
+
 %}
+
+%option noyywrap
+%option yylineno
+%option nounput
 
 /* Definitions */
 DIGIT       [0-9]
