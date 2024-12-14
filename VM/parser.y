@@ -24,8 +24,8 @@ using namespace std;
 using namespace std;
 
 extern int yylineno;
-int yylex( void );
-void yyset_in( FILE * in_str );
+extern int yylex( void );
+extern void yyset_in( FILE * in_str );
 void yyerror( vector< pair<int,long long> > & program, char const *s );
 
 %}
