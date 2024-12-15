@@ -58,7 +58,7 @@ void yyset_in(std::FILE * inStr);
 
 /* Types */
 %union {
-    int int_val;
+    long long int_val;
     char* str_val;
     
     // Program types
@@ -76,8 +76,7 @@ void yyset_in(std::FILE * inStr);
     
     // Value types
     struct Value* value_val;
-    
-    // Variable and parameter types
+    struct Identifier* identifier_val;
     struct Variable* variable_val;
     struct Parameter* parameter_val;
     
@@ -102,7 +101,9 @@ void yyset_in(std::FILE * inStr);
 %type <proc_call_command_val> proc_call
 %type <expression_val> expression
 %type <condition_val> condition
-%type <value_val> value identifier pidentifier 
+%type <value_val> value 
+%type <identifier_val> identifier 
+%type <str_val> pidentifier 
 %type <int_val>  number
 
 %token <str_val> IDENTIFIER ARRAY
@@ -216,7 +217,7 @@ command:
     }
     | FOR pidentifier FROM value TO value DO commands ENDFOR {
         auto cmd = new ForToCommand();
-        cmd->iterator.reset($2);
+        cmd->iterator = std::string($2);
         cmd->fromValue.reset($4);
         cmd->toValue.reset($6);
         cmd->commands = std::move(*$8);
@@ -225,7 +226,7 @@ command:
     }
     | FOR pidentifier FROM value DOWNTO value DO commands ENDFOR {
         auto cmd = new ForDowntoCommand();
-        cmd->iterator.reset($2);
+        cmd->iterator = std::string($2);
         cmd->fromValue.reset($4);
         cmd->downtoValue.reset($6);
         cmd->commands = std::move(*$8);
@@ -249,7 +250,7 @@ command:
 proc_head: 
     pidentifier LPAREN args_decl RPAREN {
         auto proc = new Procedure();
-        proc->identifier = $1->asIdentifier();
+        proc->identifier = std::string($1);
         proc->parameters = $3 ? std::move(*$3) : std::vector<std::unique_ptr<Parameter>>();
         $$ = proc;
         if ($1) {
@@ -263,7 +264,7 @@ proc_head:
 proc_call: 
     pidentifier LPAREN args RPAREN {
         auto cmd = new ProcedureCallCommand();
-        cmd->identifier = $1->asIdentifier();
+        cmd->identifier = std::string($1);
         cmd->arguments = $3 ? std::move(*$3) : std::vector<std::unique_ptr<Value>>();
         $$ = cmd;
         if ($1) {
@@ -279,12 +280,8 @@ declarations:
         if (!$1){
             $1 = new std::vector<std::unique_ptr<Variable>>();
         }
-        if($3->isIdentifier()){
-            $1->push_back(std::make_unique<Variable>($3->asIdentifier()));
-        }else if($3->isNumber()){
-            yyerror(parsedProgram, "Number declared as variable");
-        }else{
-            yyerror(parsedProgram, "Array accese declared as variable");
+        if($3){
+            $1->push_back(std::make_unique<Variable>(std::string($3)));
         }
         $$ = $1;
         if ($3){
@@ -295,12 +292,8 @@ declarations:
         if (!$1) {
             $1 = new std::vector<std::unique_ptr<Variable>>();
         }
-        if($3->isIdentifier()){
-            $1->push_back(std::make_unique<Variable>($3->asIdentifier(), $5, $7));
-        }else if($3->isNumber()){
-            yyerror(parsedProgram, "Number declared as arrays identifier");
-        }else{
-            yyerror(parsedProgram, "Array accese declared as array identifier");
+        if($3){
+            $1->push_back(std::make_unique<Variable>(std::string($3), $5, $7));
         }
         $$ = $1;
         if ($3){
@@ -309,12 +302,8 @@ declarations:
     }
     | pidentifier {
         $$ = new std::vector<std::unique_ptr<Variable>>();
-        if($1->isIdentifier()){
-            $$->push_back(std::make_unique<Variable>($1->asIdentifier()));
-        }else if($1->isNumber()){
-            yyerror(parsedProgram, "Number declared as variable");
-        }else{
-            yyerror(parsedProgram, "Array accese declared as variable");
+        if($1){
+            $$->push_back(std::make_unique<Variable>(std::string($1)));
         }
         if ($1){
             free($1);
@@ -322,12 +311,8 @@ declarations:
     }
     | pidentifier LBRACKET NUMBER COLON NUMBER RBRACKET {
         $$ = new std::vector<std::unique_ptr<Variable>>();
-        if($1->isIdentifier()){
-            $$->push_back(std::make_unique<Variable>($1->asIdentifier(), $3, $5));
-        }else if($1->isNumber()){
-            yyerror(parsedProgram, "Number declared as arrays identifier");
-        }else{
-            yyerror(parsedProgram, "Array accese declared as array identifier");
+        if($1){
+            $$->push_back(std::make_unique<Variable>(std::string($1), $3, $5));
         }
         if ($1){
             free($1);
@@ -339,13 +324,9 @@ args_decl:
         if (!$1){
             $1 = new std::vector<std::unique_ptr<Parameter>>();
         }
-        if($3->isIdentifier()){
-            $1->push_back(std::make_unique<Parameter>($3->asIdentifier()));
-        }else if($3->isNumber()){
-            yyerror(parsedProgram, "Number declared as procedure parameter");
-        }else{
-            yyerror(parsedProgram, "Array accese declared as procedure parameter");
-        }        
+        if($3){
+            $1->push_back(std::make_unique<Parameter>(std::string($3)));
+        }
         $$ = $1;
         if ($3) {
             free($3);
@@ -355,13 +336,9 @@ args_decl:
         if (!$1){
             $1 = new std::vector<std::unique_ptr<Parameter>>();
         }        
-        if($4->isIdentifier()){
-            $1->push_back(std::make_unique<Parameter>($4->asIdentifier(), true));
-        }else if($4->isNumber()){
-            yyerror(parsedProgram, "Number declared as procedure parameter");
-        }else{
-            yyerror(parsedProgram, "Array accese declared as procedure parameter");
-        } 
+        if($4){
+            $1->push_back(std::make_unique<Parameter>(std::string($4), true));
+        }
         $$ = $1;
         if ($4) {
             free($4);
@@ -369,26 +346,18 @@ args_decl:
     }
     | pidentifier {
         $$ = new std::vector<std::unique_ptr<Parameter>>();        
-        if($1->isIdentifier()){
-            $$->push_back(std::make_unique<Parameter>($1->asIdentifier()));
-        }else if($1->isNumber()){
-            yyerror(parsedProgram, "Number declared as procedure parameter");
-        }else{
-            yyerror(parsedProgram, "Array accese declared as procedure parameter");
-        } 
+        if($1){
+            $$->push_back(std::make_unique<Parameter>(std::string($1)));
+        }
         if ($1) {
             free($1);
         }
     }
     | ARRAY pidentifier {
         $$ = new std::vector<std::unique_ptr<Parameter>>();
-        if($2->isIdentifier()){
-            $$->push_back(std::make_unique<Parameter>($2->asIdentifier(), true));
-        }else if($2->isNumber()){
-            yyerror(parsedProgram, "Number declared as procedure parameter");
-        }else{
-            yyerror(parsedProgram, "Array accese declared as procedure parameter");
-        } 
+        if($2){
+            $$->push_back(std::make_unique<Parameter>(std::string($2), true));
+        }
         if ($2) {
             free($2);
         }
@@ -399,13 +368,9 @@ args:
         if (!$1){
             $1 = new std::vector<std::unique_ptr<Value>>();
         }
-        if($3->isIdentifier()){
-            $1->push_back(std::make_unique<Value>($3->asIdentifier()));
-        }else if($3->isNumber()){
-            $1->push_back(std::make_unique<Value>($3->asNumber()));
-        }else{
-            $1->push_back(std::make_unique<Value>($3->asArrayAccess()));
-        }         
+        if($3){
+            $1->push_back(std::make_unique<Value>(std::string($3)));
+        }     
         $$ = $1;
         if ($3) {
             free($3);
@@ -413,13 +378,9 @@ args:
     }
     | pidentifier {
         $$ = new std::vector<std::unique_ptr<Value>>();
-        if($1->isIdentifier()){
-            $$->push_back(std::make_unique<Value>($1->asIdentifier()));
-        }else if($1->isNumber()){
-            $$->push_back(std::make_unique<Value>($1->asNumber()));
-        }else{
-            $$->push_back(std::make_unique<Value>($1->asArrayAccess()));
-        } 
+        if($1){
+            $$->push_back(std::make_unique<Value>(std::string($1)));
+        }
         if ($1) {
             free($1);
         }
@@ -517,12 +478,12 @@ value:
         $$ = new Value($1);
     }
     | identifier {
-        $$ = $1;
+        $$ = new Value(std::move(*$1));
     };
 
 pidentifier: 
     IDENTIFIER {
-        $$ = new Value(strdup($1));
+        $$ = strdup($1);
     };
 
 number: 
@@ -532,16 +493,16 @@ number:
 
 identifier: 
     pidentifier {
-        $$ = $1;
+        $$ = new Identifier(std::string($1));
     }
     | pidentifier LBRACKET pidentifier RBRACKET {
-        auto arr_access = new ArrayAccess($1->asIdentifier(), $3->asIdentifier());
-        $$ = new Value(*arr_access);
+        auto arr_access = new ArrayAccess(std::string($1), std::string($3));
+        $$ = new Identifier(std::string($1), *arr_access);
         delete arr_access;
     }
     | pidentifier LBRACKET NUMBER RBRACKET {
-        auto arr_access = new ArrayAccess($1->asIdentifier(), $3);
-        $$ = new Value(*arr_access);
+        auto arr_access = new ArrayAccess(std::string($1), $3);
+        $$ = new Identifier(std::string($1), *arr_access);
         delete arr_access;
 };
 

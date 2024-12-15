@@ -2,6 +2,7 @@
 #define UTILITY_HPP
 
 #include "languageStructs.hpp"
+#include "symbolsTable.hpp"
 #include <iostream>
 #include <vector>
 #include <string>
@@ -77,5 +78,8 @@ struct AssemblyInstruction {
 // codeGenerator.cpp
 std::vector<AssemblyInstruction> compile(std::unique_ptr<Program>& program);
 
+std::vector<AssemblyInstruction> compile_READ(SymbolsTable& symbolsTable, const std::unique_ptr<ReadCommand>& cmd);
+
+std::vector<AssemblyInstruction> compile_WRITE(SymbolsTable& symbolsTable, const std::unique_ptr<WriteCommand>& cmd);
 
 #endif // UTILITY_HPP

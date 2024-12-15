@@ -37,20 +37,43 @@ int main(int argc, char *argv[]) {
         parsedProgram->print();
     }
 
-    // Compile the program
-    std::vector<AssemblyInstruction> code = compile(parsedProgram);
+    try {
+        // Compile the program
+        std::vector<AssemblyInstruction> code = compile(parsedProgram);
+        std::cout << color_Green << "\nCompilation successful\n" << color_Reset;
 
-    // Open the output file
-    std::ofstream outputFile(argv[2]);
-    if (!outputFile) {
-        fprintf(stderr, "%sError: Could not open output file %s %s\n", color_Red.c_str(), argv[2], color_Reset.c_str());
+        // Open the output file
+        std::ofstream outputFile(argv[2]);
+        if (!outputFile) {
+            fprintf(stderr, "%sError: Could not open output file %s %s\n", color_Red.c_str(), argv[2], color_Reset.c_str());
+            return 1;
+        }
+
+        // Write the assembly code to the output file
+        for (const AssemblyInstruction& instruction : code) {
+            outputFile << instruction.print() << "\n";
+        }
+
+        return 0;
+
+    } catch (const std::runtime_error& e) {
+        // Handle specific runtime errors during compilation
+        fprintf(stderr, "%sCompilation Error: %s%s\n", color_Red.c_str(), e.what(), color_Reset.c_str());
+        return 1;
+
+    } catch (const std::bad_alloc& e) {
+        // Handle memory allocation errors
+        fprintf(stderr, "%sMemory Allocation Error: %s%s\n", color_Red.c_str(), e.what(), color_Reset.c_str());
+        return 1;
+
+    } catch (const std::exception& e) {
+        // Catch any other standard exceptions
+        fprintf(stderr, "%sUnexpected Error: %s%s\n", color_Red.c_str(), e.what(), color_Reset.c_str());
+        return 1;
+
+    } catch (...) {
+        // Catch any unknown exceptions
+        fprintf(stderr, "%sUnknown Critical Error Occurred%s\n", color_Red.c_str(), color_Reset.c_str());
         return 1;
     }
-
-    // Write the assembly code to the output file
-    for (const AssemblyInstruction& instruction : code) {
-        outputFile << instruction.print() << "\n";
-    }
-
-    return 0;
 }

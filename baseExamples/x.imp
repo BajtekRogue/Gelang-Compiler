@@ -1,47 +1,10 @@
-PROCEDURE function(T x, y, T z, q) IS
-  u, v, w[-5:5]
-BEGIN
-
-  IF x[1] > y THEN
-    u := 3 * 4;
-  ELSE
-    u := 20 / 5;
-  ENDIF
-
-  IF y <= z[-32] THEN
-      v := x[1] % 5;
-  ENDIF
-
-  v := 0; # comment
-
-  WHILE u != v DO
-      v := v + 1; 
-      u := u - 1;
-  ENDWHILE
-
-  WRITE u;
-  WRITE z[0];
-  # WRITE z[11]; # out of bounds
-END
-
 PROGRAM IS
-  a[1:10], b
+    a, b[-3:5]
 BEGIN
-    READ b;
-
-    FOR i FROM 1 TO 10 DO
-        a[i] := i;
-        b := b + 1;
-    ENDFOR
-
-    FOR i FROM b DOWNTO 1 DO
-        WRITE a[i];
-        b := b - 1;
-    ENDFOR
-
-    function(a, b, a);
-
-    REPEAT
-        a[1] := a[1] + 1;
-    UNTIL a[1] > b;
+    READ a;
+    READ b[-2];
+    READ b[a];
+    WRITE a;
+    WRITE b[-2];
+    WRITE b[a];
 END

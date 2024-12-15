@@ -85,6 +85,7 @@ struct Variable {
         }
         std::cout << " ";
     }
+
 };
 
 struct Parameter {
@@ -116,18 +117,18 @@ struct Parameter {
 // Represents an array access
 struct ArrayAccess {
     std::string identifier;
-    std::variant<std::string, int> index;
+    std::variant<std::string, long long> index;
 
     ArrayAccess(const std::string& id, const std::string& idx) 
         : identifier(id), index(idx) {}
     
-    ArrayAccess(const std::string& id, int idx) 
+    ArrayAccess(const std::string& id, long long idx) 
         : identifier(id), index(idx) {}
 
     void print() const {
         std::cout << identifier << "[";
-        if (std::holds_alternative<int>(index)) {
-            std::cout << std::get<int>(index);
+        if (std::holds_alternative<long long>(index)) {
+            std::cout << std::get<long long>(index);
         } else {
             std::cout << std::get<std::string>(index);
         }
@@ -135,29 +136,44 @@ struct ArrayAccess {
     }
 };
 
+struct Identifier{
+    std::string id;
+    std::optional<ArrayAccess> arrayAccess;
+
+    Identifier(const std::string& id) 
+        : id(id) {}
+
+    Identifier(const std::string& id, const ArrayAccess& access)
+        : id(id), arrayAccess(access) {}
+
+    void print() const {
+        if(arrayAccess.has_value()){
+            arrayAccess.value().print();
+        } else {
+            std::cout << id;
+        }
+    }
+
+};
+
 // Represents a value - can be a number or an identifier
 struct Value {
-    std::variant<int, std::string, ArrayAccess> data;
+    std::variant<long long, Identifier> data;
 
-    Value(int val) : data(val) {}
-    Value(const std::string& val) : data(val) {}
-    Value(const ArrayAccess& access) : data(access) {}
+    Value(long long val) : data(val) {}
+    Value(const Identifier& id) : data(Identifier(id)) {}
 
-    bool isNumber() const { return std::holds_alternative<int>(data); }
-    bool isIdentifier() const { return std::holds_alternative<std::string>(data); }
-    bool isArrayAccess() const { return std::holds_alternative<ArrayAccess>(data); }
+    bool isNumber() const { return std::holds_alternative<long long>(data); }
+    bool isIdentifier() const { return std::holds_alternative<Identifier>(data); }
 
-    int asNumber() const { return std::get<int>(data); }
-    std::string asIdentifier() const { return std::get<std::string>(data); }
-    ArrayAccess asArrayAccess() const { return std::get<ArrayAccess>(data); }
+    long long asNumber() const { return std::get<long long>(data); }
+    Identifier asIdentifier() const { return std::get<Identifier>(data); }
 
     void print() const {
         if (isNumber()) {
             std::cout << asNumber() << " ";
-        } else if (isIdentifier()) {
-            std::cout << asIdentifier() << " ";
-        } else if (isArrayAccess()) {
-            asArrayAccess().print();
+        } else {
+            asIdentifier().print();
         }
     }
 };
@@ -288,7 +304,7 @@ struct Command {
 
 // Assignment Command
 struct AssignCommand : public Command {
-    std::unique_ptr<Value> identifier;
+    std::unique_ptr<Identifier> identifier;
     std::unique_ptr<Expression> expression;
     
     AssignCommand() : Command(CommandType::Assign) {}
@@ -394,7 +410,7 @@ struct RepeatCommand : public Command {
 };
 
 struct ForToCommand : public Command {
-    std::unique_ptr<Value> iterator;
+    std::string iterator;
     std::unique_ptr<Value> fromValue;
     std::unique_ptr<Value> toValue;
     std::vector<std::unique_ptr<Command>> commands;
@@ -403,8 +419,8 @@ struct ForToCommand : public Command {
 
     void print() const override{
         std::cout << "For ";
-        if(iterator){
-            iterator->print();
+        if(!iterator.empty()){
+            std::cout<< iterator << " ";
         }
         std::cout << "from ";
         if(fromValue){
@@ -424,7 +440,7 @@ struct ForToCommand : public Command {
 };
 
 struct ForDowntoCommand : public Command {
-    std::unique_ptr<Value> iterator;
+    std::string iterator;
     std::unique_ptr<Value> fromValue;
     std::unique_ptr<Value> downtoValue;
     std::vector<std::unique_ptr<Command>> commands;
@@ -433,8 +449,8 @@ struct ForDowntoCommand : public Command {
 
     void print() const override{
         std::cout << "For ";
-        if(iterator){
-            iterator->print();
+        if(!iterator.empty()){
+            std::cout<< iterator << " ";
         }
         std::cout << "from ";
         if(fromValue){
@@ -473,7 +489,7 @@ struct ProcedureCallCommand : public Command {
 
 // I/O Commands
 struct ReadCommand : public Command {
-    std::unique_ptr<Value> identifier;
+    std::unique_ptr<Identifier> identifier;
 
     ReadCommand() : Command(CommandType::Read) {}
 
