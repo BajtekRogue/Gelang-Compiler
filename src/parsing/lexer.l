@@ -105,9 +105,14 @@ IDENTIFIER  [_a-z]+
 }
 
 
-[-]?{DIGIT}+        { 
-    yylval.int_val = atoi(yytext); 
-    return NUMBER; 
+[-]?{DIGIT}+      { 
+    try{
+        yylval.int_val = std::stoll(yytext);  
+        return NUMBER; 
+    }catch (const std::out_of_range&){
+        reportLexerError("Number out of range for long long", yytext, yylineno);
+    }
+
 }
 
  /* Comments */

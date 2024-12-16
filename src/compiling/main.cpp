@@ -1,6 +1,6 @@
+#include "assembling.hpp"
 #include "languageStructs.hpp"
 #include "colors.hpp"
-#include "utility.hpp"
 
 extern void runParser(std::FILE* data, std::unique_ptr<Program>& parsedProgram);
 
@@ -63,7 +63,7 @@ int main(int argc, char *argv[]) {
 
     } catch (const std::bad_alloc& e) {
         // Handle memory allocation errors
-        fprintf(stderr, "%sMemory Allocation Error: %s%s\n", color_Red.c_str(), e.what(), color_Reset.c_str());
+        fprintf(stderr, "%sMemory Allocation Error: Declared arrays are too large. Please decreace their sizes. %s\n", color_Red.c_str(), color_Reset.c_str());
         return 1;
 
     } catch (const std::exception& e) {

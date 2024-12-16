@@ -104,7 +104,10 @@ void SymbolsTable::__addVariable(const std::unique_ptr<Variable>& var, ll memory
 
     }else{
 
-        if(var->arrayBounds.value().first > var->arrayBounds.value().second){
+        ll start = var->arrayBounds.value().first;
+        ll end = var->arrayBounds.value().second;
+
+        if(start > end){
             throw std::runtime_error("Invalid array bounds for variable '" + var->identifier + "'");
         }
 
@@ -116,7 +119,7 @@ void SymbolsTable::__addVariable(const std::unique_ptr<Variable>& var, ll memory
             throw std::runtime_error("Variable with identifier '" + var->identifier + "' already exists");
         }
 
-        Array_offset arr(var->identifier, var->arrayBounds.value().first, var->arrayBounds.value().second);
+        Array_offset arr(var->identifier, start, end);
         
         arrays.insert(arr);
         initialized_arrays[arr] = std::vector<bool>(arr.size, false);

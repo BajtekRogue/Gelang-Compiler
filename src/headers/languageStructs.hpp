@@ -8,6 +8,8 @@
 #include <variant>
 #include <optional>
 
+typedef long long ll;
+
 enum class ExpressionType {
     Value,
     Plus,
@@ -54,23 +56,28 @@ enum class ParameterType {
 struct Variable {
     VariableType type;
     std::string identifier;
-    std::optional<std::pair<int, int>> arrayBounds;  // Only used for array declarations
+    std::optional<std::pair<ll, ll>> arrayBounds;  // Only used for array declarations
 
     // Constructor for integer variable
     explicit Variable(const std::string& id) 
         : type(VariableType::Integer), identifier(id) {}
 
     // Constructor for array variable with bounds
-    Variable(const std::string& id, int start, int end) 
+    Variable(const std::string& id, ll start, ll end) 
         : type(VariableType::Array), 
           identifier(id), 
           arrayBounds(std::make_pair(start, end)) {}
     
-    bool isArray() const { return type == VariableType::Array; }
-    bool hasBounds() const { return arrayBounds.has_value(); }
+    bool isArray() const { 
+        return type == VariableType::Array; 
+    }
+
+    bool hasBounds() const { 
+        return arrayBounds.has_value(); 
+    }
 
     // Utility method to get bounds, throws if no bounds
-    std::pair<int, int> getBounds() const {
+    std::pair<ll, ll> getBounds() const {
         if (!hasBounds()) {
             throw std::runtime_error("No array bounds specified");
         }
@@ -100,8 +107,13 @@ struct Parameter {
     Parameter(const std::string& id, bool) 
         : type(ParameterType::Array), identifier(id) {}
 
-    bool isArray() const { return type == ParameterType::Array; }
-    bool isInteger() const { return type == ParameterType::Integer; }
+    bool isArray() const { 
+        return type == ParameterType::Array; 
+    }
+
+    bool isInteger() const { 
+        return type == ParameterType::Integer; 
+    }
 
     void print() const {
         std::cout <<  identifier;
@@ -117,23 +129,40 @@ struct Parameter {
 // Represents an array access
 struct ArrayAccess {
     std::string identifier;
-    std::variant<std::string, long long> index;
+    std::variant<std::string, ll> index;
 
     ArrayAccess(const std::string& id, const std::string& idx) 
         : identifier(id), index(idx) {}
     
-    ArrayAccess(const std::string& id, long long idx) 
+    ArrayAccess(const std::string& id, ll idx) 
         : identifier(id), index(idx) {}
+
+    bool isByIndex() const { 
+        return std::holds_alternative<ll>(index); 
+    }
+
+    bool isByVariable() const { 
+        return std::holds_alternative<std::string>(index); 
+    }
+
+    ll getIndex() const { 
+        return std::get<ll>(index); 
+    }
+
+    std::string getIndexVariable() const { 
+        return std::get<std::string>(index); 
+    }
 
     void print() const {
         std::cout << identifier << "[";
-        if (std::holds_alternative<long long>(index)) {
-            std::cout << std::get<long long>(index);
+        if (std::holds_alternative<ll>(index)) {
+            std::cout << std::get<ll>(index);
         } else {
             std::cout << std::get<std::string>(index);
         }
         std::cout << "] ";
     }
+
 };
 
 struct Identifier{
@@ -145,6 +174,21 @@ struct Identifier{
 
     Identifier(const std::string& id, const ArrayAccess& access)
         : id(id), arrayAccess(access) {}
+
+    bool isVariable() const { 
+        return !arrayAccess.has_value(); 
+    }
+
+    bool isArray() const { 
+        return arrayAccess.has_value(); 
+    }
+
+    ArrayAccess getArrayAccess() const {
+        if (!arrayAccess.has_value()) {
+            throw std::runtime_error("Identifier is not an array");
+        }
+        return arrayAccess.value();
+    }
 
     void print() const {
         if(arrayAccess.has_value()){
@@ -158,16 +202,26 @@ struct Identifier{
 
 // Represents a value - can be a number or an identifier
 struct Value {
-    std::variant<long long, Identifier> data;
+    std::variant<ll, Identifier> data;
 
-    Value(long long val) : data(val) {}
+    Value(ll val) : data(val) {}
     Value(const Identifier& id) : data(Identifier(id)) {}
 
-    bool isNumber() const { return std::holds_alternative<long long>(data); }
-    bool isIdentifier() const { return std::holds_alternative<Identifier>(data); }
+    bool isNumber() const { 
+        return std::holds_alternative<ll>(data); 
+    }
 
-    long long asNumber() const { return std::get<long long>(data); }
-    Identifier asIdentifier() const { return std::get<Identifier>(data); }
+    bool isIdentifier() const { 
+        return std::holds_alternative<Identifier>(data); 
+    }
+
+    ll asNumber() const { 
+        return std::get<ll>(data); 
+    }
+
+    Identifier asIdentifier() const { 
+        return std::get<Identifier>(data); 
+    }
 
     void print() const {
         if (isNumber()) {

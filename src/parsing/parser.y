@@ -289,6 +289,7 @@ declarations:
         }
     }
     | declarations COMMA pidentifier LBRACKET NUMBER COLON NUMBER RBRACKET {
+        std::cout << "Array: " << $5 << " : " << $7 << std::endl;
         if (!$1) {
             $1 = new std::vector<std::unique_ptr<Variable>>();
         }
