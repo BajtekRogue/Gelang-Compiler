@@ -146,10 +146,16 @@ struct ArrayAccess {
     }
 
     ll getIndex() const { 
+        if(!isByIndex()){
+            throw std::runtime_error("Array " + identifier + " is accessed by variable " + std::get<std::string>(index));
+        }
         return std::get<ll>(index); 
     }
 
     std::string getIndexVariable() const { 
+        if(!isByVariable()){
+            throw std::runtime_error("Array " + identifier + " is accessed by index " + std::to_string(std::get<ll>(index)));
+        }
         return std::get<std::string>(index); 
     }
 
@@ -216,10 +222,16 @@ struct Value {
     }
 
     ll asNumber() const { 
+        if(!isNumber()){
+            throw std::runtime_error("Value is not a number");
+        }
         return std::get<ll>(data); 
     }
 
     Identifier asIdentifier() const { 
+        if(!isIdentifier()){
+            throw std::runtime_error("Value is not an identifier but a number " + std::to_string(std::get<ll>(data)));
+        }
         return std::get<Identifier>(data); 
     }
 

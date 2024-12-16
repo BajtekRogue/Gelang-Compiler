@@ -1,16 +1,9 @@
 PROGRAM IS 
-    a[1:100], b, c
+    a, b, c, d, e, f, g, h, x[1:100]
 BEGIN
-    b := 3;
-    a[12] := 10;
-    WRITE a[12];
-    WRITE b;
-    c := 4;
-    WRITE c;
-    a[c] := 121;
-    WRITE a[c];
-    a[b] := 100;
-    WRITE a[b];
-    a[c] := a[b];
-    WRITE a[c];
+    a := 6;
+    b := 11;
+    x[b] := 1111111;
+    x[a] := a - x[b];
+    WRITE x[a];
 END

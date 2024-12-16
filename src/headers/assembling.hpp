@@ -15,8 +15,10 @@
 
 typedef long long ll;
 
-const ll MEMORY_START = 1024;
-const ll MEMORY_CONST_ASSIGN = 1234577;
+const ll MEMORY_START = 1000;
+const ll MEMORY_CONST_ASSIGN = 641;
+const ll MEMORY_ARRAY_VARIABLE_ASSIGN = 404;
+const ll MEMORY_EXPRESSION_RESULT = 314;
 
 enum class AssemblyInstructionType{
     GET,
@@ -83,25 +85,24 @@ std::vector<AssemblyInstruction> compile(std::unique_ptr<Program>& program);
 
 // utility.cpp
 /**
- * @brief Get the Value To Destination Address object
+ * @brief Get the Value To Destination Address object. Assumes variable is used correctly
  * 
  * @param symbolsTable symbols table for the current scope
  * @param val value to get
  * @param destination address to store the value
- * @param commandName command name to display an error message
  * @return `std::vector<AssemblyInstruction>` instructions generated in the process
  */
-std::vector<AssemblyInstruction> getValueToDestinationAddress(SymbolsTable& symbolsTable, const std::unique_ptr<Value>& val, ll destination, const std::string commandName);
+std::vector<AssemblyInstruction> getValueToDestinationAddress(SymbolsTable& symbolsTable, const Value& val, ll destination);
 
 /**
  * @brief Checks if the variable is used correctly
  * 
  * @param symbolsTable symbols table for the current scope
- * @param val value to check
+ * @param identifier identifier to check
  * @param commandName command name to display an error message
  * @param mustBeInitialized enforces that the variable must be initialized
  */
-void validateUseOfVariable(SymbolsTable& symbolsTable, const std::unique_ptr<Value>& val, const std::string commandName, bool mustBeInitialized);
+void validateUseOfVariable(SymbolsTable& symbolsTable, const Identifier& identifier, const std::string commandName, bool mustBeInitialized);
 
 
 // compile_READ.cpp

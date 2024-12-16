@@ -8,13 +8,10 @@ std::vector<AssemblyInstruction> compile_READ(SymbolsTable& symbolsTable, const 
     Identifier* identifier = cmd->identifier.get();
     std::string id = identifier->id;
 
+    validateUseOfVariable(symbolsTable, *(cmd->identifier), "READ", false);
+
     // READ a variable
     if(identifier->isVariable()){
-
-        // If variable is not declared, throw an error
-        if(!symbolsTable.isVariableDeclared(id)){
-            throw std::runtime_error("Variable '" + id + "' not declared but is used in READ command");
-        }
 
         // Get its memory address and store the input there
         ll address = symbolsTable.getMemoryAddress_variable(id);
@@ -26,20 +23,10 @@ std::vector<AssemblyInstruction> compile_READ(SymbolsTable& symbolsTable, const 
     // READ an array
     ArrayAccess& arrayAccess = identifier->arrayAccess.value();
 
-    // If array is not declared, throw an error
-    if(!symbolsTable.isArrayDeclared(id)){
-        throw std::runtime_error("Array '" + id + "' not declared but is used in READ command");
-    }
-
     // If array is accessed by index
     if(arrayAccess.isByIndex()){
 
         ll index = arrayAccess.getIndex();
-
-        // If index is out of bounds, throw an error
-        if(!symbolsTable.isInsideArray(id, index)){
-            throw std::runtime_error("Trying to READ into '" + id + "' at index " + std::to_string(index) + " which is out of bounds");
-        }
 
         // Get memory address of array at the index and store the input there
         ll address = symbolsTable.getMemoryAddress_at(id, index);
@@ -53,16 +40,6 @@ std::vector<AssemblyInstruction> compile_READ(SymbolsTable& symbolsTable, const 
 
     // If array is accessed by variable
     std::string indexIdentifier = arrayAccess.getIndexVariable();
-
-    // If index is not declared, throw an error
-    if(!symbolsTable.isVariableDeclared(indexIdentifier)){
-        throw std::runtime_error("Variable '" + indexIdentifier + "' not declared but is used as index in READ command");
-    }
-
-    // If index is declared but not initialized, throw an error
-    if(!symbolsTable.isVariableInitialized(indexIdentifier)){
-        throw std::runtime_error("Variable '" + indexIdentifier + "' not initialized but is used as index in READ command");
-    }
 
     // Get memory address of index and store the input there. Account for the offset of the array
     ll indexAddress = symbolsTable.getMemoryAddress_variable(indexIdentifier);

@@ -3,13 +3,13 @@
 #include "languageStructs.hpp"
 
 // Loads value to the destination address
-std::vector<AssemblyInstruction> getValueToDestinationAddress(SymbolsTable& symbolsTable, const std::unique_ptr<Value>& val, ll destination, const std::string commandName){
+std::vector<AssemblyInstruction> getValueToDestinationAddress(SymbolsTable& symbolsTable, const Value& val, ll destination){
     std::vector<AssemblyInstruction> result;
 
     // If it is a number
-    if(val->isNumber()){
+    if(val.isNumber()){
 
-        ll num = val->asNumber();
+        ll num = val.asNumber();
         result.push_back(AssemblyInstruction(AssemblyInstructionType::SET, num));
 
         // If destination is not the accumulator, store it
@@ -21,7 +21,7 @@ std::vector<AssemblyInstruction> getValueToDestinationAddress(SymbolsTable& symb
     }
 
     // If it is an identifier
-    Identifier identifier = val->asIdentifier();
+    Identifier identifier = val.asIdentifier();
     std::string id = identifier.id;
 
     // Check if identifier is a variable
@@ -93,15 +93,9 @@ std::vector<AssemblyInstruction> getValueToDestinationAddress(SymbolsTable& symb
     return result;
 }
 
-void validateUseOfVariable(SymbolsTable& symbolsTable, const std::unique_ptr<Value>& val, const std::string commandName, bool mustBeInitialized){
+void validateUseOfVariable(SymbolsTable& symbolsTable, const Identifier& identifier, const std::string commandName, bool mustBeInitialized){
     
-    // If it is a number it is valid
-    if(val->isNumber()){
-        return;
-    }
-
     // If it is an identifier
-    Identifier identifier = val->asIdentifier();
     std::string id = identifier.id;
 
     // Check if identifier is a variable
