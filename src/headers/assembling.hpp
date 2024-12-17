@@ -104,6 +104,9 @@ std::vector<AssemblyInstruction> getValueToDestinationAddress(SymbolsTable& symb
  */
 void validateUseOfVariable(SymbolsTable& symbolsTable, const Identifier& identifier, const std::string commandName, bool mustBeInitialized);
 
+// compile_COMMAND.cpp
+std::vector<AssemblyInstruction> compile_COMMAND(SymbolsTable& symbolsTable, std::unique_ptr<Command>& cmd);
+std::vector<AssemblyInstruction> compile_ALL(SymbolsTable& symbolsTable, std::vector<std::unique_ptr<Command>>& commands);
 
 // compile_READ.cpp
 std::vector<AssemblyInstruction> compile_READ(SymbolsTable& symbolsTable, const std::unique_ptr<ReadCommand>& cmd);
@@ -116,5 +119,10 @@ std::vector<AssemblyInstruction> compile_ASSIGN(SymbolsTable& symbolsTable, cons
 
 // compile_EXPRESSION.cpp
 std::pair<std::vector<AssemblyInstruction>, ll> compile_EXPRESSION(SymbolsTable& symbolsTable, const std::unique_ptr<Expression>& expr);
+
+// compile_CONDITION.cpp
+std::pair<std::vector<AssemblyInstruction>, std::optional<bool>> compile_CONDITION(SymbolsTable& symbolsTable, const std::unique_ptr<Condition>& cond, ll jumpAddress);
+
+
 
 #endif // ASSEMBLING_HPP

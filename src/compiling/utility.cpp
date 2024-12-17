@@ -2,7 +2,6 @@
 #include "symbolsTable.hpp"
 #include "languageStructs.hpp"
 
-// Loads value to the destination address
 std::vector<AssemblyInstruction> getValueToDestinationAddress(SymbolsTable& symbolsTable, const Value& val, ll destination){
     std::vector<AssemblyInstruction> result;
 
@@ -130,11 +129,6 @@ void validateUseOfVariable(SymbolsTable& symbolsTable, const Identifier& identif
         // If index is out of bounds, throw an error
         if(!symbolsTable.isInsideArray(id, index)){
             throw std::runtime_error("Index '" + std::to_string(index) + "' which is out of bounds for the array '" + id + "' used in " + commandName);
-        }
-
-        // If array is not initialized, throw an error
-        if(mustBeInitialized && !symbolsTable.isArrayInitialized_at(id, index)){
-            throw std::runtime_error("Array '" + id + "' at index " + std::to_string(index) + " not initialized but is used in " + commandName);
         }
 
         return;

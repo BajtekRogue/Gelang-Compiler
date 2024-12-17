@@ -85,6 +85,11 @@ std::pair<std::vector<AssemblyInstruction>, ll> compile_EXPRESSION(SymbolsTable&
                 break;
             case ExpressionType::Divide:
                 resultNum = (rightNum == 0 ? 0 : leftNum / rightNum);
+                if(leftNum < 0 && rightNum > 0){
+                    resultNum -= 1;
+                }else if(leftNum > 0 && rightNum < 0){
+                    resultNum -= 1;
+                }
                 break;
             case ExpressionType::Modulo:
                 resultNum = (rightNum == 0 ? 0 : leftNum % rightNum);

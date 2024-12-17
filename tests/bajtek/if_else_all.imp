@@ -1,0 +1,44 @@
+# in; out = 1, 1, 2, 1, 2, 2, 2
+PROGRAM IS
+    a, b
+BEGIN
+    a := 12;
+    b := -3;
+
+    IF a >= b THEN
+        WRITE 1;
+    ELSE
+        WRITE 2;
+    ENDIF
+
+    IF a > b THEN
+        WRITE 1;
+    ELSE
+        WRITE 2;
+    ENDIF
+
+    IF a = b THEN
+        WRITE 1;
+    ELSE
+        WRITE 2;
+    ENDIF
+
+    IF a != b THEN
+        WRITE 1;
+    ELSE
+        WRITE 2;
+    ENDIF
+
+
+    IF a < b THEN
+        WRITE 1;
+    ELSE
+        WRITE 2;
+    ENDIF
+
+    IF a <= b THEN
+        WRITE 1;
+    ELSE
+        WRITE 2;
+    ENDIF
+END

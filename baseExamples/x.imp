@@ -1,9 +1,0 @@
-PROGRAM IS 
-    a, b, c, d, e, f, g, h, x[1:100]
-BEGIN
-    a := 6;
-    b := 11;
-    x[b] := 1111111;
-    x[a] := a - x[b];
-    WRITE x[a];
-END

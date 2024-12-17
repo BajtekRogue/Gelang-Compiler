@@ -1,0 +1,19 @@
+COMMANDS:
+    -READ [done]
+    -WRITE [done]
+    -ASSIGN [done]
+    -IF [done]
+    -IF ELSE [done]
+    -WHILE [done]
+    -REPEAT
+    -FOR UP
+    -FOR DOWN
+    -PROC CALL
+
+EXPRESSION:
+    -nothing [done]
+    -addition [done]
+    -subtraction [done]
+    -multiply
+    -divide
+    -modulo

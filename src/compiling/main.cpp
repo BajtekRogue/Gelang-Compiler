@@ -40,7 +40,7 @@ int main(int argc, char *argv[]) {
     try {
         // Compile the program
         std::vector<AssemblyInstruction> code = compile(parsedProgram);
-        std::cout << color_Green << "\nCompilation successful\n" << color_Reset;
+        std::cout << color_Green << "Compilation successful\n" << color_Reset;
 
         // Open the output file
         std::ofstream outputFile(argv[2]);
