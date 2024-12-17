@@ -1,0 +1,42 @@
+PROGRAM IS
+    i, j, n, tmp, a[1:10], min
+BEGIN
+    # Fill array with random numbers
+    a[1] := 5;
+    a[2] := 3;
+    a[3] := -8;
+    a[4] := 1;
+    a[5] := -2;
+    a[6] := -9;
+    a[7] := 4;
+    a[8] := 7;
+    a[9] := 6;
+    a[10] := -10;
+
+    n := 10;
+    i := 1;
+    WHILE i <= n DO
+        min := i;
+        j := i + 1;
+
+        WHILE j <= n DO
+            IF a[j] < a[min] THEN
+                min := j;
+            ENDIF
+            j := j + 1;
+        ENDWHILE
+        
+        tmp := a[i];
+        a[i] := a[min];
+        a[min] := tmp;
+
+        i := i + 1;
+    ENDWHILE
+
+    # Print the array
+    i := 1;
+    WHILE i <= n DO
+        WRITE a[i];
+        i := i + 1;
+    ENDWHILE
+END

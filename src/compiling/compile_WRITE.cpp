@@ -10,7 +10,14 @@ std::vector<AssemblyInstruction> compile_WRITE(SymbolsTable& symbolsTable, const
     if(val.isNumber()){
 
         ll num = val.asNumber();
-        result.push_back(AssemblyInstruction(AssemblyInstructionType::SET, num));
+
+        // if 0 clear the accumulator because it is cheaper
+        if(num == 0){
+            result.push_back(AssemblyInstruction(AssemblyInstructionType::SUB, 0));
+        }else{
+            result.push_back(AssemblyInstruction(AssemblyInstructionType::SET, num));
+        }
+
         result.push_back(AssemblyInstruction(AssemblyInstructionType::PUT, 0));
         return result;
     }

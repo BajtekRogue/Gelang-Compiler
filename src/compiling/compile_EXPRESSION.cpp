@@ -55,12 +55,12 @@ std::pair<std::vector<AssemblyInstruction>, ll> compile_EXPRESSION(SymbolsTable&
         ll indexAddres = symbolsTable.getMemoryAddress_variable(indexIdentifier);
         ll arrayStartAddres = symbolsTable.getMemoryAddress_start(identifier.id) + symbolsTable.get_offset(identifier.id);
 
+        // MEMORY_CONST_ASSIGN = array[index]
         result.push_back(AssemblyInstruction(AssemblyInstructionType::SET, arrayStartAddres));
         result.push_back(AssemblyInstruction(AssemblyInstructionType::ADD, indexAddres));
-        result.push_back(AssemblyInstruction(AssemblyInstructionType::LOADI, MEMORY_CONST_ASSIGN));
-        address = MEMORY_CONST_ASSIGN;
-        // MEMORY_CONST_ASSIGN = array[index]
-        return {result, address};
+        result.push_back(AssemblyInstruction(AssemblyInstructionType::LOADI, 0));
+        result.push_back(AssemblyInstruction(AssemblyInstructionType::STORE, MEMORY_CONST_ASSIGN));
+        return {result, MEMORY_CONST_ASSIGN};
     }
 
     // If there is a right expression

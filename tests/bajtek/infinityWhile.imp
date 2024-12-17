@@ -1,0 +1,8 @@
+PROGRAM IS
+    x
+BEGIN
+    x := 4;
+    WHILE 1 = 1 DO
+        x := 1 + x;
+    ENDWHILE
+END

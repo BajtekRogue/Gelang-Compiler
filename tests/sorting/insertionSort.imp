@@ -1,0 +1,54 @@
+PROGRAM IS
+    i, j, n, key, a[1:10], y, done
+BEGIN
+    # Initialize array
+    a[1] := 5;
+    a[2] := 3;
+    a[3] := -8;
+    a[4] := 1;
+    a[5] := -2;
+    a[6] := -9;
+    a[7] := 4;
+    a[8] := 7;
+    a[9] := 6;
+    a[10] := -10;
+
+    n := 10;
+    i := 2;
+
+    # Outer loop - iterate through array
+    WHILE i <= n DO
+        key := a[i];
+        j := i - 1;
+        done := 0;
+
+        # Inner loop - shift elements and find insertion point
+        WHILE j >= 1 DO
+            IF done = 0 THEN
+                IF a[j] > key THEN
+                    # Shift element right
+                    y := j + 1;
+                    a[y] := a[j];
+                    j := j - 1;
+                ELSE
+                    # Found insertion point
+                    done := 1;
+                ENDIF
+            ELSE
+                j := 0;
+            ENDIF
+        ENDWHILE
+
+        # Insert key at correct position
+        y := j + 1;
+        a[y] := key;
+        i := i + 1;
+    ENDWHILE
+
+    # Print sorted array
+    i := 1;
+    WHILE i <= n DO
+        WRITE a[i];
+        i := i + 1;
+    ENDWHILE
+END

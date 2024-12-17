@@ -3,11 +3,10 @@
 compiler=./build/ge
 vm=./build/vm/vm
 
-# Define input and output paths
-relative_input=$1
-input="./tests$relative_input"
+# Extract parts from the input path
+input=$1
 base_name=$(basename "$input" .imp)
-dir_name="./compiled$(dirname "$relative_input")"
+dir_name=$(dirname "$input" | sed "s|./tests|./compiled|")
 
 # Create the output directory if it doesn't exist
 mkdir -p "$dir_name"
@@ -16,7 +15,7 @@ mkdir -p "$dir_name"
 output="$dir_name/$base_name.mr"
 
 # Compile the input file
-$compiler "$input" "$output"
+$compiler "$input" "$output" 
 
 # Run the output if compilation succeeded
 if [ $? -eq 0 ]; then

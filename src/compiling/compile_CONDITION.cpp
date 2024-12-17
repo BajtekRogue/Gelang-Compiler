@@ -42,87 +42,51 @@ std::pair<std::vector<AssemblyInstruction>, std::optional<bool>> compile_CONDITI
         validateUseOfVariable(symbolsTable, right.asIdentifier(), "condition", true);
     }
 
-    std::vector<AssemblyInstruction> loadRight_code;
-    std::vector<AssemblyInstruction> loadLeft_code;
+    // Load values to registers to be ready for comparison
+    std::vector<AssemblyInstruction> loadRight_code = getValueToDestinationAddress(symbolsTable, right, 1);
+    result.insert(result.end(), loadRight_code.begin(), loadRight_code.end());
+    std::vector<AssemblyInstruction> loadLeft_code = getValueToDestinationAddress(symbolsTable, left, 0);
+    result.insert(result.end(), loadLeft_code.begin(), loadLeft_code.end());
+
+    // accu = x - y
+    result.push_back(AssemblyInstruction(AssemblyInstructionType::SUB, 1));
 
     switch(cond->type){
         case ConditionType::Equal:
-            loadRight_code = getValueToDestinationAddress(symbolsTable, right, 1);
-            result.insert(result.end(), loadRight_code.begin(), loadRight_code.end());
-
-            loadLeft_code = getValueToDestinationAddress(symbolsTable, left, 0);
-            result.insert(result.end(), loadLeft_code.begin(), loadLeft_code.end());
-
             // x = y  iff  ~(x - y > 0 AND x - y < 0)
-            result.push_back(AssemblyInstruction(AssemblyInstructionType::SUB, 1));
             result.push_back(AssemblyInstruction(AssemblyInstructionType::JPOS, jumpAddress + 1));
             result.push_back(AssemblyInstruction(AssemblyInstructionType::JNEG, jumpAddress));
 
             return {result, std::nullopt};
             break;
         case ConditionType::NotEqual:
-            loadRight_code = getValueToDestinationAddress(symbolsTable, right, 1);
-            result.insert(result.end(), loadRight_code.begin(), loadRight_code.end());
-
-            loadLeft_code = getValueToDestinationAddress(symbolsTable, left, 0);
-            result.insert(result.end(), loadLeft_code.begin(), loadLeft_code.end());
-
             // x != y  iff  ~ (x - y = 0)
-            result.push_back(AssemblyInstruction(AssemblyInstructionType::SUB, 1));
             result.push_back(AssemblyInstruction(AssemblyInstructionType::JZERO, jumpAddress));
 
             return {result, std::nullopt};
             break;
         case ConditionType::GreaterThan:
-            loadRight_code = getValueToDestinationAddress(symbolsTable, right, 1);
-            result.insert(result.end(), loadRight_code.begin(), loadRight_code.end());
-
-            loadLeft_code = getValueToDestinationAddress(symbolsTable, left, 0);
-            result.insert(result.end(), loadLeft_code.begin(), loadLeft_code.end());
-
             // x > y  iff  ~(x - y <= 0)
-            result.push_back(AssemblyInstruction(AssemblyInstructionType::SUB, 1));
             result.push_back(AssemblyInstruction(AssemblyInstructionType::JNEG, jumpAddress + 1));
             result.push_back(AssemblyInstruction(AssemblyInstructionType::JZERO, jumpAddress));
 
             return {result, std::nullopt};
             break;
         case ConditionType::LessThan:
-            loadRight_code = getValueToDestinationAddress(symbolsTable, right, 1);
-            result.insert(result.end(), loadRight_code.begin(), loadRight_code.end());
-
-            loadLeft_code = getValueToDestinationAddress(symbolsTable, left, 0);
-            result.insert(result.end(), loadLeft_code.begin(), loadLeft_code.end());
-
             // x < y  iff  ~(x - y >= 0)
-            result.push_back(AssemblyInstruction(AssemblyInstructionType::SUB, 1));
             result.push_back(AssemblyInstruction(AssemblyInstructionType::JPOS, jumpAddress + 1));
             result.push_back(AssemblyInstruction(AssemblyInstructionType::JZERO, jumpAddress));
 
             return {result, std::nullopt};
             break;
         case ConditionType::GreaterEqual:
-            loadRight_code = getValueToDestinationAddress(symbolsTable, right, 1);
-            result.insert(result.end(), loadRight_code.begin(), loadRight_code.end());
-
-            loadLeft_code = getValueToDestinationAddress(symbolsTable, left, 0);
-            result.insert(result.end(), loadLeft_code.begin(), loadLeft_code.end());
-
             // x >= y  iff  ~(x - y < 0)
-            result.push_back(AssemblyInstruction(AssemblyInstructionType::SUB, 1));
             result.push_back(AssemblyInstruction(AssemblyInstructionType::JNEG, jumpAddress));
 
             return {result, std::nullopt};
             break;
         case ConditionType::LessEqual:
-            loadRight_code = getValueToDestinationAddress(symbolsTable, right, 1);
-            result.insert(result.end(), loadRight_code.begin(), loadRight_code.end());
-
-            loadLeft_code = getValueToDestinationAddress(symbolsTable, left, 0);
-            result.insert(result.end(), loadLeft_code.begin(), loadLeft_code.end());
-
             // x <= y  iff  ~(x - y > 0)
-            result.push_back(AssemblyInstruction(AssemblyInstructionType::SUB, 1));
             result.push_back(AssemblyInstruction(AssemblyInstructionType::JPOS, jumpAddress));
 
             return {result, std::nullopt};

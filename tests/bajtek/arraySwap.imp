@@ -1,0 +1,21 @@
+# in =; out = 5, 777, 777, 5
+PROGRAM IS
+    i, j, a[-33:44], tmp
+BEGIN
+    i := 12;
+    j := 35;
+    a[i] := 5;
+    a[j] := 777;
+    WRITE a[i];
+    WRITE a[j];
+
+    tmp := a[i];
+    a[i] := a[j];
+    i := j + tmp;
+    a[j] := tmp;
+    
+    i := 12;
+    j := 35;
+    WRITE a[i];
+    WRITE a[j];
+END

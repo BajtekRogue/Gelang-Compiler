@@ -271,7 +271,7 @@ struct Expression {
                 if(left) {
                     left->print();
                 }
-                std::cout << " +  ";
+                std::cout << " ADD  ";
                 if(right){
                     right->print();
                 }
@@ -280,7 +280,7 @@ struct Expression {
                 if(left) {
                     left->print();
                 }
-                std::cout << " -  ";
+                std::cout << " SUB  ";
                 if(right){
                     right->print();
                 }
@@ -289,7 +289,7 @@ struct Expression {
                 if(left) {
                     left->print();
                 }
-                std::cout << " *  ";
+                std::cout << " MUL  ";
                 if(right){
                     right->print();
                 }
@@ -298,7 +298,7 @@ struct Expression {
                 if(left) {
                     left->print();
                 }
-                std::cout << " /  ";
+                std::cout << " DIV  ";
                 if(right){
                     right->print();
                 }
@@ -307,7 +307,7 @@ struct Expression {
                 if(left) {
                     left->print();
                 }
-                std::cout << " %  ";
+                std::cout << " MOD  ";
                 if(right){
                     right->print();
                 }

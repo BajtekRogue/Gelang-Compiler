@@ -300,6 +300,42 @@ declarations:
             free($3);
         }
     }
+    | declarations COMMA pidentifier LBRACKET MINUS NUMBER COLON NUMBER RBRACKET {
+        if (!$1) {
+            $1 = new std::vector<std::unique_ptr<Variable>>();
+        }
+        if($3){
+            $1->push_back(std::make_unique<Variable>(std::string($3), -$6, $8));
+        }
+        $$ = $1;
+        if ($3){
+            free($3);
+        }
+    }
+    | declarations COMMA pidentifier LBRACKET NUMBER COLON MINUS NUMBER RBRACKET {
+        if (!$1) {
+            $1 = new std::vector<std::unique_ptr<Variable>>();
+        }
+        if($3){
+            $1->push_back(std::make_unique<Variable>(std::string($3), $5, -$8));
+        }
+        $$ = $1;
+        if ($3){
+            free($3);
+        }
+    }
+    | declarations COMMA pidentifier LBRACKET MINUS NUMBER COLON MINUS NUMBER RBRACKET {
+        if (!$1) {
+            $1 = new std::vector<std::unique_ptr<Variable>>();
+        }
+        if($3){
+            $1->push_back(std::make_unique<Variable>(std::string($3), -$6, -$9));
+        }
+        $$ = $1;
+        if ($3){
+            free($3);
+        }
+    }
     | pidentifier {
         $$ = new std::vector<std::unique_ptr<Variable>>();
         if($1){
@@ -309,10 +345,37 @@ declarations:
             free($1);
         }
     }
-    | pidentifier LBRACKET NUMBER COLON NUMBER RBRACKET {
+    |pidentifier LBRACKET NUMBER COLON NUMBER RBRACKET {
         $$ = new std::vector<std::unique_ptr<Variable>>();
         if($1){
             $$->push_back(std::make_unique<Variable>(std::string($1), $3, $5));
+        }
+        if ($1){
+            free($1);
+        }
+    }
+    |pidentifier LBRACKET MINUS NUMBER COLON NUMBER RBRACKET {
+        $$ = new std::vector<std::unique_ptr<Variable>>();
+        if($1){
+            $$->push_back(std::make_unique<Variable>(std::string($1), -$4, $6));
+        }
+        if ($1){
+            free($1);
+        }
+    }
+    |pidentifier LBRACKET NUMBER COLON MINUS NUMBER RBRACKET {
+        $$ = new std::vector<std::unique_ptr<Variable>>();
+        if($1){
+            $$->push_back(std::make_unique<Variable>(std::string($1), $3, -$6));
+        }
+        if ($1){
+            free($1);
+        }
+    }
+    |pidentifier LBRACKET MINUS NUMBER COLON MINUS NUMBER RBRACKET {
+        $$ = new std::vector<std::unique_ptr<Variable>>();
+        if($1){
+            $$->push_back(std::make_unique<Variable>(std::string($1), -$4, -$7));
         }
         if ($1){
             free($1);
@@ -490,6 +553,9 @@ number:
     NUMBER {
         $$ = $1;
     };
+    | MINUS NUMBER {
+        $$ = -$2;
+    };
 
 identifier: 
     pidentifier {
@@ -502,6 +568,11 @@ identifier:
     }
     | pidentifier LBRACKET NUMBER RBRACKET {
         auto arr_access = new ArrayAccess(std::string($1), $3);
+        $$ = new Identifier(std::string($1), *arr_access);
+        delete arr_access;
+    }
+    | pidentifier LBRACKET MINUS NUMBER RBRACKET {
+        auto arr_access = new ArrayAccess(std::string($1), -$4);
         $$ = new Identifier(std::string($1), *arr_access);
         delete arr_access;
 };

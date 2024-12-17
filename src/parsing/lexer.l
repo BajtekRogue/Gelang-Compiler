@@ -44,10 +44,19 @@ void initializeLineTracking(std::FILE* inputFile) {
 %option nounput
 
 /* Definitions */
-DIGIT       [0-9]
 IDENTIFIER  [_a-z]+
 
 %%
+
+[0-9]+      { 
+    try{
+        yylval.int_val = std::stoll(yytext);  
+        return NUMBER; 
+    }catch (const std::out_of_range&){
+        reportLexerError("Number out of range for long long", yytext, yylineno);
+    }
+
+}
 
  /* Keywords */
 "PROGRAM"       { return PROGRAM; }
@@ -104,16 +113,6 @@ IDENTIFIER  [_a-z]+
     return IDENTIFIER; 
 }
 
-
-[-]?{DIGIT}+      { 
-    try{
-        yylval.int_val = std::stoll(yytext);  
-        return NUMBER; 
-    }catch (const std::out_of_range&){
-        reportLexerError("Number out of range for long long", yytext, yylineno);
-    }
-
-}
 
  /* Comments */
 "#".*           { /* Ignore comments */ }

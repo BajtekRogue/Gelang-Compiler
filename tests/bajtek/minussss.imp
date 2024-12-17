@@ -1,0 +1,10 @@
+PROGRAM IS
+    x, y, z, a[-100:-20]
+BEGIN
+    y := -3;
+    x := 4-5;
+    WRITE x;
+    WRITE y;
+    a[-90] := 1 - x;
+    WRITE a[-90];
+END
