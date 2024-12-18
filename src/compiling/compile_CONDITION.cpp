@@ -56,39 +56,33 @@ std::pair<std::vector<AssemblyInstruction>, std::optional<bool>> compile_CONDITI
             // x = y  iff  ~(x - y > 0 AND x - y < 0)
             result.push_back(AssemblyInstruction(AssemblyInstructionType::JPOS, jumpAddress + 1));
             result.push_back(AssemblyInstruction(AssemblyInstructionType::JNEG, jumpAddress));
-
             return {result, std::nullopt};
             break;
         case ConditionType::NotEqual:
             // x != y  iff  ~ (x - y = 0)
             result.push_back(AssemblyInstruction(AssemblyInstructionType::JZERO, jumpAddress));
-
             return {result, std::nullopt};
             break;
         case ConditionType::GreaterThan:
             // x > y  iff  ~(x - y <= 0)
             result.push_back(AssemblyInstruction(AssemblyInstructionType::JNEG, jumpAddress + 1));
             result.push_back(AssemblyInstruction(AssemblyInstructionType::JZERO, jumpAddress));
-
             return {result, std::nullopt};
             break;
         case ConditionType::LessThan:
             // x < y  iff  ~(x - y >= 0)
             result.push_back(AssemblyInstruction(AssemblyInstructionType::JPOS, jumpAddress + 1));
             result.push_back(AssemblyInstruction(AssemblyInstructionType::JZERO, jumpAddress));
-
             return {result, std::nullopt};
             break;
         case ConditionType::GreaterEqual:
             // x >= y  iff  ~(x - y < 0)
             result.push_back(AssemblyInstruction(AssemblyInstructionType::JNEG, jumpAddress));
-
             return {result, std::nullopt};
             break;
         case ConditionType::LessEqual:
             // x <= y  iff  ~(x - y > 0)
             result.push_back(AssemblyInstruction(AssemblyInstructionType::JPOS, jumpAddress));
-
             return {result, std::nullopt};
             break;
         default:

@@ -27,24 +27,6 @@ bool SymbolsTable::isArrayDeclared(const std::string& identifier) const{
     return false;
 }
 
-bool SymbolsTable::isArrayInitialized_at(const std::string& identifier, ll index) const {
-    for(const auto& arr : arrays){
-        if(arr.identifier == identifier){
-            return initialized_arrays.at(arr)[index + arr.offset];
-        }
-    }
-    return false;
-}
-
-void SymbolsTable::markAsInitialized_at(const std::string& identifier, ll index) {
-    for(const auto& arr : arrays){
-        if(arr.identifier == identifier){
-            initialized_arrays[arr][index + arr.offset] = true;
-            return;
-        }
-    }
-}
-
 ll SymbolsTable::getMemoryAddress_at(const std::string& identifier, ll index) const {
     for(const auto& arr : arrays){
         if(arr.identifier == identifier){
@@ -122,7 +104,6 @@ void SymbolsTable::__addVariable(const std::unique_ptr<Variable>& var, ll memory
         Array_offset arr(var->identifier, start, end);
         
         arrays.insert(arr);
-        initialized_arrays[arr] = std::vector<bool>(arr.size, false);
         memoryAddresses_arrays[arr] = {memoryAddress, memoryAddress + arr.size - 1};
         lastMemoryAddress = memoryAddress + arr.size - 1;
     }

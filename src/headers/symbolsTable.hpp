@@ -67,8 +67,6 @@ public:
     ll getMemoryAddress_variable(const std::string& identifier) const;
 
     bool isArrayDeclared(const std::string& identifier) const;
-    bool isArrayInitialized_at(const std::string& identifier, ll index) const;
-    void markAsInitialized_at(const std::string& identifier, ll index);
     ll getMemoryAddress_at(const std::string& identifier, ll index) const;
     ll getMemoryAddress_start(const std::string& identifier) const;
     bool isInsideArray(const std::string& identifier, ll index) const;
@@ -83,7 +81,6 @@ private:
     std::unordered_map<std::string, ll> memoryAddresses_variables;
 
     std::set<Array_offset> arrays;
-    std::unordered_map<Array_offset, std::vector<bool>> initialized_arrays;
     std::unordered_map<Array_offset, std::pair<ll, ll>> memoryAddresses_arrays;
 
     ll lastMemoryAddress;

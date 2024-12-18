@@ -16,9 +16,8 @@
 typedef long long ll;
 
 const ll MEMORY_START = 1000;
-const ll MEMORY_CONST_ASSIGN = 641;
 const ll MEMORY_ARRAY_VARIABLE_ASSIGN = 404;
-const ll MEMORY_EXPRESSION_RESULT = 314;
+
 
 enum class AssemblyInstructionType{
     GET,
@@ -118,7 +117,14 @@ std::vector<AssemblyInstruction> compile_WRITE(SymbolsTable& symbolsTable, const
 std::vector<AssemblyInstruction> compile_ASSIGN(SymbolsTable& symbolsTable, const std::unique_ptr<AssignCommand>& cmd);
 
 // compile_EXPRESSION.cpp
-std::pair<std::vector<AssemblyInstruction>, ll> compile_EXPRESSION(SymbolsTable& symbolsTable, const std::unique_ptr<Expression>& expr);
+/**
+ * @brief Compiles an expression and stores the result in the accumulator
+ * 
+ * @param symbolsTable symbols table for the current scope
+ * @param expr given expression
+ * @return std::vector<AssemblyInstruction>> 
+ */
+std::vector<AssemblyInstruction> compile_EXPRESSION(SymbolsTable& symbolsTable, const std::unique_ptr<Expression>& expr);
 
 // compile_CONDITION.cpp
 std::pair<std::vector<AssemblyInstruction>, std::optional<bool>> compile_CONDITION(SymbolsTable& symbolsTable, const std::unique_ptr<Condition>& cond, ll jumpAddress);

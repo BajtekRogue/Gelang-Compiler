@@ -2,7 +2,7 @@
 #include "symbolsTable.hpp"
 #include "languageStructs.hpp"
 
-std::pair<std::vector<AssemblyInstruction>, ll> compile_EXPRESSION(SymbolsTable& symbolsTable, const std::unique_ptr<Expression>& expr){
+std::vector<AssemblyInstruction> compile_EXPRESSION(SymbolsTable& symbolsTable, const std::unique_ptr<Expression>& expr){
     std::vector<AssemblyInstruction> result;
     ll address = 0;
 
@@ -12,13 +12,18 @@ std::pair<std::vector<AssemblyInstruction>, ll> compile_EXPRESSION(SymbolsTable&
     // If there is no right expression, return the left one
     if(!expr->right){
 
-        // If the expression is a number, just set some memory to it
+        // If the expression is a number just set accumulator to it
         if(left.isNumber()){
             ll num = left.asNumber();
-            result.push_back(AssemblyInstruction(AssemblyInstructionType::SET, num));
-            result.push_back(AssemblyInstruction(AssemblyInstructionType::STORE, MEMORY_CONST_ASSIGN));
-            address = MEMORY_CONST_ASSIGN;
-            return {result, address};
+
+            // If 0 clear the accumulator because it is cheaper
+            if(num == 0){
+                result.push_back(AssemblyInstruction(AssemblyInstructionType::SUB, 0));
+            }else{
+                result.push_back(AssemblyInstruction(AssemblyInstructionType::SET, num));
+            }
+
+            return result;
         }
 
         // If the expression is an identifier
@@ -30,9 +35,10 @@ std::pair<std::vector<AssemblyInstruction>, ll> compile_EXPRESSION(SymbolsTable&
         // If the identifier is a variable
         if(identifier.isVariable()){
 
-            // Don't need to load the value of the variable, just return its memory address
+            // Just load it from memory
             address = symbolsTable.getMemoryAddress_variable(id);
-            return {result, address};
+            result.push_back(AssemblyInstruction(AssemblyInstructionType::LOAD, address));
+            return result;
         }
 
         // If its an array access by index
@@ -43,9 +49,10 @@ std::pair<std::vector<AssemblyInstruction>, ll> compile_EXPRESSION(SymbolsTable&
 
             ll index = arrayAccess.getIndex();
 
-            // Get memory address of array at the index
+            // Just load it from memory
             address = symbolsTable.getMemoryAddress_at(id, index);
-            return {result, address};
+            result.push_back(AssemblyInstruction(AssemblyInstructionType::LOAD, address));
+            return result;
         }
 
         //Array access by variable
@@ -55,12 +62,11 @@ std::pair<std::vector<AssemblyInstruction>, ll> compile_EXPRESSION(SymbolsTable&
         ll indexAddres = symbolsTable.getMemoryAddress_variable(indexIdentifier);
         ll arrayStartAddres = symbolsTable.getMemoryAddress_start(identifier.id) + symbolsTable.get_offset(identifier.id);
 
-        // MEMORY_CONST_ASSIGN = array[index]
+        // Load into the accumulator the value at the index of the array
         result.push_back(AssemblyInstruction(AssemblyInstructionType::SET, arrayStartAddres));
         result.push_back(AssemblyInstruction(AssemblyInstructionType::ADD, indexAddres));
         result.push_back(AssemblyInstruction(AssemblyInstructionType::LOADI, 0));
-        result.push_back(AssemblyInstruction(AssemblyInstructionType::STORE, MEMORY_CONST_ASSIGN));
-        return {result, MEMORY_CONST_ASSIGN};
+        return result;
     }
 
     // If there is a right expression
@@ -102,11 +108,14 @@ std::pair<std::vector<AssemblyInstruction>, ll> compile_EXPRESSION(SymbolsTable&
             default:
                 throw std::runtime_error("Unknown expression type");
         }
-
-        result.push_back(AssemblyInstruction(AssemblyInstructionType::SET, resultNum));
-        result.push_back(AssemblyInstruction(AssemblyInstructionType::STORE, MEMORY_CONST_ASSIGN));
-        address = MEMORY_CONST_ASSIGN;
-        return {result, address};
+            
+        // If 0 clear the accumulator because it is cheaper
+        if(resultNum == 0){
+            result.push_back(AssemblyInstruction(AssemblyInstructionType::SUB, 0));
+        }else{
+            result.push_back(AssemblyInstruction(AssemblyInstructionType::SET, resultNum));
+        }
+        return result;
     }
 
     // Check if the variables are declared and initialized before arithmetic operations
@@ -129,14 +138,12 @@ std::pair<std::vector<AssemblyInstruction>, ll> compile_EXPRESSION(SymbolsTable&
         case ExpressionType::Plus:
             // Add the value of the right expression to the accumulator and store the result safely
             result.push_back(AssemblyInstruction(AssemblyInstructionType::ADD, 1));            
-            result.push_back(AssemblyInstruction(AssemblyInstructionType::STORE, MEMORY_EXPRESSION_RESULT));
-            return {result, MEMORY_EXPRESSION_RESULT};
+            return result;
             break;
         case ExpressionType::Minus:
             // Subtract the value of the right expression from the accumulator and store the result safely
             result.push_back(AssemblyInstruction(AssemblyInstructionType::SUB, 1));
-            result.push_back(AssemblyInstruction(AssemblyInstructionType::STORE, MEMORY_EXPRESSION_RESULT));
-            return {result, MEMORY_EXPRESSION_RESULT};
+            return result;
             break;
         default:
             std::cout << "Expression not implemented" << std::endl;

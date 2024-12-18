@@ -19,3 +19,9 @@ EXPRESSION:
     -multiply
     -divide
     -modulo
+
+
+OPTIMIZATION
+    - READ [FULL]
+    - WRITE [FULL]
+    - CONDITION [FULL]

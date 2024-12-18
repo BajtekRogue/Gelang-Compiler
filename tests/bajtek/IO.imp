@@ -1,0 +1,10 @@
+PROGRAM IS
+    a[-12:34], b
+BEGIN
+    READ a[3];
+    READ b;
+    READ a[b];
+    WRITE a[3];
+    WRITE b;
+    WRITE a[b];
+END

@@ -1,4 +1,4 @@
-FLAGS = -W -std=c++17 -O3
+FLAGS = -W -Wall -Wextra -pedantic -std=c++17
 BUILD_DIR = build
 OBJ_DIR = $(BUILD_DIR)/obj
 SRC_DIR = src

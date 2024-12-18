@@ -9,7 +9,7 @@
 // Store lines for error reporting
 std::vector<std::string> inputLines;
 
-void reportLexerError(const std::string& message, const std::string& token, size_t lineNumber) {
+void reportLexerError(const std::string& message, size_t lineNumber) {
     std::cerr << color_Red << "Lexical Error: " << message << " at line " << lineNumber << color_Reset << std::endl;
     
     if (lineNumber > 0 && lineNumber <= inputLines.size()) {
@@ -53,7 +53,7 @@ IDENTIFIER  [_a-z]+
         yylval.int_val = std::stoll(yytext);  
         return NUMBER; 
     }catch (const std::out_of_range&){
-        reportLexerError("Number out of range for long long", yytext, yylineno);
+        reportLexerError("Number out of range for long long", yylineno);
     }
 
 }
@@ -124,7 +124,7 @@ IDENTIFIER  [_a-z]+
 . { 
     std::stringstream unexpected;
     unexpected << "Unexpected character '" << yytext[0] << "'";
-    reportLexerError(unexpected.str(), yytext, yylineno);
+    reportLexerError(unexpected.str(), yylineno);
 }
 
 

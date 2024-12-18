@@ -5,12 +5,8 @@
 std::vector<AssemblyInstruction> compile_ASSIGN(SymbolsTable& symbolsTable, const std::unique_ptr<AssignCommand>& cmd){
     std::vector<AssemblyInstruction> result;
 
+    // Check if the variable is used correctly
     validateUseOfVariable(symbolsTable, *(cmd->identifier), "ASSIGN", false);
-
-    // addressOfResult is the memory address where the result of the expression will be stored
-    // MAKE SURE IT IS NOT THE ACCUMULATOR
-    auto [instructions, addressOfResult] = compile_EXPRESSION(symbolsTable, cmd->expression);
-    result.insert(result.end(), instructions.begin(), instructions.end());
 
     Identifier& identifier = *(cmd->identifier);
     std::string id = identifier.id;
@@ -20,7 +16,10 @@ std::vector<AssemblyInstruction> compile_ASSIGN(SymbolsTable& symbolsTable, cons
 
         // Get memory address of the variable and store the result of the expression there
         ll address = symbolsTable.getMemoryAddress_variable(id);
-        result.push_back(AssemblyInstruction(AssemblyInstructionType::LOAD, addressOfResult));
+
+        std::vector<AssemblyInstruction> expressionInstructions = compile_EXPRESSION(symbolsTable, cmd->expression);
+        result.insert(result.end(), expressionInstructions.begin(), expressionInstructions.end());
+
         result.push_back(AssemblyInstruction(AssemblyInstructionType::STORE, address));
 
         // Mark the variable as initialized
@@ -39,11 +38,11 @@ std::vector<AssemblyInstruction> compile_ASSIGN(SymbolsTable& symbolsTable, cons
 
         // Get memory address of array at the index and store the result of the expression there
         ll address = symbolsTable.getMemoryAddress_at(id, index);
-        result.push_back(AssemblyInstruction(AssemblyInstructionType::LOAD, addressOfResult));
-        result.push_back(AssemblyInstruction(AssemblyInstructionType::STORE, address));
 
-        // Mark the array as initialized at that index
-        symbolsTable.markAsInitialized_at(id, index);
+        std::vector<AssemblyInstruction> expressionInstructions = compile_EXPRESSION(symbolsTable, cmd->expression);
+        result.insert(result.end(), expressionInstructions.begin(), expressionInstructions.end());
+
+        result.push_back(AssemblyInstruction(AssemblyInstructionType::STORE, address));
 
         return result;
     }
@@ -58,9 +57,11 @@ std::vector<AssemblyInstruction> compile_ASSIGN(SymbolsTable& symbolsTable, cons
     result.push_back(AssemblyInstruction(AssemblyInstructionType::SET, arrayStartAddress));
     result.push_back(AssemblyInstruction(AssemblyInstructionType::ADD, indexAddress));
     result.push_back(AssemblyInstruction(AssemblyInstructionType::STORE,  MEMORY_ARRAY_VARIABLE_ASSIGN));
-    result.push_back(AssemblyInstruction(AssemblyInstructionType::LOAD, addressOfResult));
+
+    std::vector<AssemblyInstruction> expressionInstructions = compile_EXPRESSION(symbolsTable, cmd->expression);
+    result.insert(result.end(), expressionInstructions.begin(), expressionInstructions.end());
+    
     result.push_back(AssemblyInstruction(AssemblyInstructionType::STOREI,  MEMORY_ARRAY_VARIABLE_ASSIGN));
 
-    // Can't mark the array as initialized here, as we don't know the index yet
     return result;
 }

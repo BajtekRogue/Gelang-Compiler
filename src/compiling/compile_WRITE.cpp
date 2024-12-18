@@ -11,7 +11,7 @@ std::vector<AssemblyInstruction> compile_WRITE(SymbolsTable& symbolsTable, const
 
         ll num = val.asNumber();
 
-        // if 0 clear the accumulator because it is cheaper
+        // If 0 clear the accumulator because it is cheaper
         if(num == 0){
             result.push_back(AssemblyInstruction(AssemblyInstructionType::SUB, 0));
         }else{

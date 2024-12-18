@@ -1,0 +1,11 @@
+PROGRAM IS
+    i, s
+BEGIN
+    i := 0;
+    s := 0;
+    WHILE i <= 100 DO
+        s := s + i;
+        i := i + 1;
+    ENDWHILE
+    WRITE s;
+END

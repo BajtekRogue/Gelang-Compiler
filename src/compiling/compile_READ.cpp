@@ -32,9 +32,6 @@ std::vector<AssemblyInstruction> compile_READ(SymbolsTable& symbolsTable, const 
         ll address = symbolsTable.getMemoryAddress_at(id, index);
         result.push_back(AssemblyInstruction(AssemblyInstructionType::GET, address));
 
-        // Mark the array as initialized at that index
-        symbolsTable.markAsInitialized_at(id, index);
-
         return result;
     }
 
@@ -51,6 +48,5 @@ std::vector<AssemblyInstruction> compile_READ(SymbolsTable& symbolsTable, const 
     result.push_back(AssemblyInstruction(AssemblyInstructionType::GET, 0));
     result.push_back(AssemblyInstruction(AssemblyInstructionType::STOREI, 1));
     
-    // Can't mark the array as initialized here, as we don't know the index yet
     return result;
 }

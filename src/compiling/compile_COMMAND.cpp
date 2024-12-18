@@ -8,7 +8,6 @@ std::vector<AssemblyInstruction> compile_COMMAND(SymbolsTable& symbolsTable, std
 
     switch (cmd->type) {
         case CommandType::Read: {
-
             std::vector<AssemblyInstruction> readCode = compile_READ(symbolsTable, 
                     std::move(std::unique_ptr<ReadCommand>(
                         dynamic_cast<ReadCommand*>(cmd.release())
@@ -18,7 +17,6 @@ std::vector<AssemblyInstruction> compile_COMMAND(SymbolsTable& symbolsTable, std
             break;
         }
         case CommandType::Write: {
-                
             std::vector<AssemblyInstruction> writeCode = compile_WRITE(
                     symbolsTable, 
                     std::move(std::unique_ptr<WriteCommand>(
@@ -39,7 +37,7 @@ std::vector<AssemblyInstruction> compile_COMMAND(SymbolsTable& symbolsTable, std
             break;
         }
         case CommandType::If:{
-            auto* ifCmd = dynamic_cast<IfCommand*>(cmd.release());
+            IfCommand* ifCmd = dynamic_cast<IfCommand*>(cmd.release());
             std::vector<AssemblyInstruction> thenCode = compile_ALL(symbolsTable, ifCmd->thenCommands);
             ll jumpAddress = thenCode.size() + 1;
             std::pair<std::vector<AssemblyInstruction>, std::optional<bool>> conditionCode = compile_CONDITION(symbolsTable, ifCmd->condition, jumpAddress);
@@ -59,7 +57,7 @@ std::vector<AssemblyInstruction> compile_COMMAND(SymbolsTable& symbolsTable, std
 
         }
         case CommandType::IfElse:{
-            auto* ifElseCmd = dynamic_cast<IfElseCommand*>(cmd.release());
+            IfElseCommand* ifElseCmd = dynamic_cast<IfElseCommand*>(cmd.release());
             std::vector<AssemblyInstruction> thenCode = compile_ALL(symbolsTable, ifElseCmd->thenCommands);
             std::vector<AssemblyInstruction> elseCode = compile_ALL(symbolsTable, ifElseCmd->elseCommands);
             ll jumpAddress = thenCode.size() + 1;
@@ -84,7 +82,7 @@ std::vector<AssemblyInstruction> compile_COMMAND(SymbolsTable& symbolsTable, std
             break;
         }
         case CommandType::While:{
-            auto* whileCmd = dynamic_cast<WhileCommand*>(cmd.release());
+            WhileCommand* whileCmd = dynamic_cast<WhileCommand*>(cmd.release());
             std::vector<AssemblyInstruction> whileCode = compile_ALL(symbolsTable, whileCmd->commands);
             ll jumpAddress = whileCode.size() + 1;
             std::pair<std::vector<AssemblyInstruction>, std::optional<bool>> conditionCode = compile_CONDITION(symbolsTable, whileCmd->condition, jumpAddress + 1);
