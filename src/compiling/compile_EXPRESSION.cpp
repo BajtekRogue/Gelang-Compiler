@@ -4,7 +4,6 @@
 
 std::vector<AssemblyInstruction> compile_EXPRESSION(SymbolsTable& symbolsTable, const std::unique_ptr<Expression>& expr){
     std::vector<AssemblyInstruction> result;
-    ll address = 0;
 
     // Grammar assures that left is always initialized
     Value& left = *(expr->left);
@@ -14,6 +13,7 @@ std::vector<AssemblyInstruction> compile_EXPRESSION(SymbolsTable& symbolsTable, 
 
         // If the expression is a number just set accumulator to it
         if(left.isNumber()){
+
             ll num = left.asNumber();
 
             // If 0 clear the accumulator because it is cheaper
@@ -36,7 +36,7 @@ std::vector<AssemblyInstruction> compile_EXPRESSION(SymbolsTable& symbolsTable, 
         if(identifier.isVariable()){
 
             // Just load it from memory
-            address = symbolsTable.getMemoryAddress_variable(id);
+            ll address = symbolsTable.getMemoryAddress_variable(id);
             result.push_back(AssemblyInstruction(AssemblyInstructionType::LOAD, address));
             return result;
         }
@@ -50,12 +50,12 @@ std::vector<AssemblyInstruction> compile_EXPRESSION(SymbolsTable& symbolsTable, 
             ll index = arrayAccess.getIndex();
 
             // Just load it from memory
-            address = symbolsTable.getMemoryAddress_at(id, index);
+            ll address = symbolsTable.getMemoryAddress_at(id, index);
             result.push_back(AssemblyInstruction(AssemblyInstructionType::LOAD, address));
             return result;
         }
 
-        //Array access by variable
+        // Array access by variable
         std::string indexIdentifier = arrayAccess.getIndexVariable();
 
         // Get memory address of index and load value of the array at it into memory. Account for the offset of the array
@@ -126,6 +126,69 @@ std::vector<AssemblyInstruction> compile_EXPRESSION(SymbolsTable& symbolsTable, 
         validateUseOfVariable(symbolsTable, right.asIdentifier(), "expression", true);
     }
 
+    // Check special cases of arithmetic identities
+    // 0 + x = 0
+    if(expr->type == ExpressionType::Plus && left.isNumber() && left.asNumber() == 0){
+        std::vector<AssemblyInstruction> loadRight_code = getValueToDestinationAddress(symbolsTable, right, 0);
+        result.insert(result.end(), loadRight_code.begin(), loadRight_code.end());
+        return result;
+    }
+    // x + 0 = 0
+    if(expr->type == ExpressionType::Plus &&  right.isNumber() && right.asNumber() == 0){
+        std::vector<AssemblyInstruction> loadLeft_code = getValueToDestinationAddress(symbolsTable, left, 0);
+        result.insert(result.end(), loadLeft_code.begin(), loadLeft_code.end());
+        return result;
+    }
+    // x - x = 0
+    if(expr->type == ExpressionType::Minus && left == right){
+        result.push_back(AssemblyInstruction(AssemblyInstructionType::SUB, 0));
+        return result;
+    }
+    // x - 0 = 0
+    if(expr->type == ExpressionType::Minus && right.isNumber() && right.asNumber() == 0){
+        std::vector<AssemblyInstruction> loadLeft_code = getValueToDestinationAddress(symbolsTable, left, 0);
+        result.insert(result.end(), loadLeft_code.begin(), loadLeft_code.end());
+        return result;
+    }
+    // 1 * x = x
+    if(expr->type == ExpressionType::Multiply && left.isNumber() && left.asNumber() == 1){
+        std::vector<AssemblyInstruction> loadRight_code = getValueToDestinationAddress(symbolsTable, right, 0);
+        result.insert(result.end(), loadRight_code.begin(), loadRight_code.end());
+        return result;
+    }
+    // x * 1 = 1
+    if(expr->type == ExpressionType::Multiply && right.isNumber() && right.asNumber() == 1){
+        std::vector<AssemblyInstruction> loadLeft_code = getValueToDestinationAddress(symbolsTable, left, 0);
+        result.insert(result.end(), loadLeft_code.begin(), loadLeft_code.end());
+        return result;
+    }
+    // x / 1 = x
+    if(expr->type == ExpressionType::Divide && right.isNumber() && right.asNumber() == 1){
+        std::vector<AssemblyInstruction> loadLeft_code = getValueToDestinationAddress(symbolsTable, left, 0);
+        result.insert(result.end(), loadLeft_code.begin(), loadLeft_code.end());
+        return result;
+    }
+    // x / 0 = 0
+    if( expr->type == ExpressionType::Divide && right.isNumber() && right.asNumber() == 0){
+        result.push_back(AssemblyInstruction(AssemblyInstructionType::SUB, 0));
+        return result;
+    }
+    // x % 1 = 0
+    if(expr->type == ExpressionType::Modulo && right.isNumber() && right.asNumber() == 1){
+        result.push_back(AssemblyInstruction(AssemblyInstructionType::SUB, 0));
+        return result;
+    }
+    // x % -1 = 0
+    if(expr->type == ExpressionType::Modulo && right.isNumber() && right.asNumber() == -1){
+        result.push_back(AssemblyInstruction(AssemblyInstructionType::SUB, 0));
+        return result;
+    }
+    // x % 0 = 0
+    if(expr->type == ExpressionType::Modulo && right.isNumber() && right.asNumber() == 0){
+        result.push_back(AssemblyInstruction(AssemblyInstructionType::SUB, 0));
+        return result;
+    }
+
     // If at least one is a number load left into the accumulator and right to memory[1] and preform the operation
     std::vector<AssemblyInstruction> loadRight_code = getValueToDestinationAddress(symbolsTable, right, 1);
     result.insert(result.end(), loadRight_code.begin(), loadRight_code.end());
@@ -133,15 +196,14 @@ std::vector<AssemblyInstruction> compile_EXPRESSION(SymbolsTable& symbolsTable, 
     std::vector<AssemblyInstruction> loadLeft_code = getValueToDestinationAddress(symbolsTable, left, 0);
     result.insert(result.end(), loadLeft_code.begin(), loadLeft_code.end());
 
-
     switch(expr->type){
         case ExpressionType::Plus:
-            // Add the value of the right expression to the accumulator and store the result safely
+            // Add the value of the right expression to the accumulator and store the result
             result.push_back(AssemblyInstruction(AssemblyInstructionType::ADD, 1));            
             return result;
             break;
         case ExpressionType::Minus:
-            // Subtract the value of the right expression from the accumulator and store the result safely
+            // Subtract the value of the right expression from the accumulator and store the result
             result.push_back(AssemblyInstruction(AssemblyInstructionType::SUB, 1));
             return result;
             break;

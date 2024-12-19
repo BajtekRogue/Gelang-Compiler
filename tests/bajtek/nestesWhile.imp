@@ -1,0 +1,24 @@
+PROGRAM IS
+    a, b, c, d, e
+BEGIN
+    a := 100;
+    WHILE a > -10 DO
+        b := -23;
+        WHILE b <= 10 DO
+            c := 0;
+            WHILE c < 17 DO
+                d := 20;
+                WHILE d >= 10 DO
+                    e := 0;
+                    WHILE e != 10 DO
+                        e := e + 1;
+                    ENDWHILE
+                    d := d - 1;
+                ENDWHILE
+                c := c + 1;
+            ENDWHILE
+            b := b + 1;
+        ENDWHILE
+        a := a - 1;
+    ENDWHILE
+END

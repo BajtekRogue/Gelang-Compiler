@@ -4,12 +4,14 @@
 
 std::vector<AssemblyInstruction> compile_ASSIGN(SymbolsTable& symbolsTable, const std::unique_ptr<AssignCommand>& cmd){
     std::vector<AssemblyInstruction> result;
-
-    // Check if the variable is used correctly
-    validateUseOfVariable(symbolsTable, *(cmd->identifier), "ASSIGN", false);
-
     Identifier& identifier = *(cmd->identifier);
     std::string id = identifier.id;
+
+    // Check if the variable is used correctly
+    validateUseOfVariable(symbolsTable, identifier, "ASSIGN", false);
+
+    result.push_back(AssemblyInstruction(AssemblyInstructionType::NULL_INSTRUCTION, identifier.toString() + " := " + cmd->expression->toString()));
+
 
     // If the identifier is a variable
     if(identifier.isVariable()){

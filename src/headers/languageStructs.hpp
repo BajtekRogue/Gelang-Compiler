@@ -84,13 +84,13 @@ struct Variable {
         return *arrayBounds;
     }
 
-    void print() const {
-        std::cout << identifier;
+    std::string toString() const {
+        std::string result = identifier;
         if (isArray()) {
             auto bounds = getBounds();
-            std::cout << "[" << bounds.first << ":" << bounds.second << "]";
+            result += "[" + std::to_string(bounds.first) + ":" + std::to_string(bounds.second) + "]";
         }
-        std::cout << " ";
+        return result;
     }
 
 };
@@ -115,14 +115,14 @@ struct Parameter {
         return type == ParameterType::Integer; 
     }
 
-    void print() const {
-        std::cout <<  identifier;
+    std::string toString() const {
+        std::string result = identifier;
         if (isArray()) {
-            std::cout << " (Array)";
+            result += " (Array)";
         } else {
-            std::cout << " (Integer)";
+            result += " (Integer)";
         }
-        std::cout << " ";
+        return result;
     }
 };
 
@@ -159,14 +159,19 @@ struct ArrayAccess {
         return std::get<std::string>(index); 
     }
 
-    void print() const {
-        std::cout << identifier << "[";
+    std::string toString() const {
+        std::string result = identifier + "[";
         if (std::holds_alternative<ll>(index)) {
-            std::cout << std::get<ll>(index);
+            result += std::to_string(std::get<ll>(index));
         } else {
-            std::cout << std::get<std::string>(index);
+            result += std::get<std::string>(index);
         }
-        std::cout << "] ";
+        result += "]";
+        return result;
+    }
+
+    bool operator==(const ArrayAccess& other) const {
+        return identifier == other.identifier && index == other.index;
     }
 
 };
@@ -196,14 +201,25 @@ struct Identifier{
         return arrayAccess.value();
     }
 
-    void print() const {
-        if(arrayAccess.has_value()){
-            arrayAccess.value().print();
+    std::string toString() const {
+        if (arrayAccess.has_value()) {
+            return arrayAccess.value().toString();
         } else {
-            std::cout << id;
+            return id;
         }
     }
 
+    bool operator==(const Identifier& other) const {
+        if (id != other.id) {
+            return false;
+        }else if (arrayAccess.has_value() != other.arrayAccess.has_value()) {
+            return false;
+        }else if (arrayAccess.has_value() && other.arrayAccess.has_value()) {
+            return arrayAccess.value() == other.arrayAccess.value();
+        }else{
+            return true;
+        }
+    }
 };
 
 // Represents a value - can be a number or an identifier
@@ -235,12 +251,16 @@ struct Value {
         return std::get<Identifier>(data); 
     }
 
-    void print() const {
+    std::string toString() const {
         if (isNumber()) {
-            std::cout << asNumber() << " ";
+            return std::to_string(asNumber());
         } else {
-            asIdentifier().print();
+            return asIdentifier().toString();
         }
+    }
+
+    bool operator==(const Value& other) const {
+        return data == other.data;
     }
 };
 
@@ -260,59 +280,38 @@ struct Expression {
     Expression(Value* val) 
         : type(ExpressionType::Value), left(val), right(nullptr) {}
 
-    void print() const {
+    std::string toString() const {
+        std::string result;
+
+        if(left){
+            result += left->toString();
+        }
+
         switch (type) {
             case ExpressionType::Value:
-                if(left) {
-                    left->print();
-                }
+                return result;
                 break;
             case ExpressionType::Plus:
-                if(left) {
-                    left->print();
-                }
-                std::cout << " ADD  ";
-                if(right){
-                    right->print();
-                }
+                result += " + ";
                 break;
             case ExpressionType::Minus:
-                if(left) {
-                    left->print();
-                }
-                std::cout << " SUB  ";
-                if(right){
-                    right->print();
-                }
+                result += " - ";
                 break;
             case ExpressionType::Multiply:
-                if(left) {
-                    left->print();
-                }
-                std::cout << " MUL  ";
-                if(right){
-                    right->print();
-                }
+                result += " * ";
                 break;
             case ExpressionType::Divide:
-                if(left) {
-                    left->print();
-                }
-                std::cout << " DIV  ";
-                if(right){
-                    right->print();
-                }
+                result += " / ";
                 break;
             case ExpressionType::Modulo:
-                if(left) {
-                    left->print();
-                }
-                std::cout << " MOD  ";
-                if(right){
-                    right->print();
-                }
+                result += " % ";
                 break;
         }
+
+        if(right){
+            result += right->toString();
+        }
+        return result;
     }
 };
 
@@ -328,32 +327,60 @@ struct Condition {
     Condition(ConditionType t, Value* l, Value* r)
         : type(t), left(l), right(r) {}
 
-    void print() const {
-        if(left) {
-            left->print();
+    std::string toString() const {
+        std::string result;
+
+        if(left){
+            result += left->toString();
         }
+
         switch (type) {
             case ConditionType::Equal:
-                std::cout << " ==  ";
+                result += " = ";
                 break;
             case ConditionType::NotEqual:
-                std::cout << " !=  ";
+                result += " != ";
                 break;
             case ConditionType::GreaterThan:
-                std::cout << " >  ";
+                result += " > ";
                 break;
             case ConditionType::LessThan:
-                std::cout << " <  ";
+                result += " < ";
                 break;
             case ConditionType::GreaterEqual:
-                std::cout << " >=  ";
+                result += " >= ";
                 break;
             case ConditionType::LessEqual:
-                std::cout << " <=  ";
+                result += " <= ";
                 break;
         }
+
         if(right){
-            right->print();
+            result += right->toString();
+        }
+        return result;
+    }
+
+    void negate(){
+        switch (type) {
+            case ConditionType::Equal:
+                type = ConditionType::NotEqual;
+                break;
+            case ConditionType::NotEqual:
+                type = ConditionType::Equal;
+                break;
+            case ConditionType::GreaterThan:
+                type = ConditionType::LessEqual;
+                break;
+            case ConditionType::LessThan:
+                type = ConditionType::GreaterEqual;
+                break;
+            case ConditionType::GreaterEqual:
+                type = ConditionType::LessThan;
+                break;
+            case ConditionType::LessEqual:
+                type = ConditionType::GreaterThan;
+                break;
         }
     }
 };
@@ -364,7 +391,7 @@ struct Command {
     
     Command(CommandType t) : type(t) {}
     virtual ~Command() = default;
-    virtual void print() const = 0;
+    virtual std::string toString() const = 0;
     
 };
 
@@ -375,15 +402,16 @@ struct AssignCommand : public Command {
     
     AssignCommand() : Command(CommandType::Assign) {}
 
-    void print() const override{
+    std::string toString() const override{
+        std::string result;
         if(identifier){
-            identifier->print();
+            result += identifier->toString();
         }
-        std::cout << " :=  ";
+        result += " :=  ";
         if(expression){
-            expression->print();
+            result += expression->toString();
         }
-        std::cout << " ";
+        return result;
     }
 };
 
@@ -394,17 +422,18 @@ struct IfCommand : public Command {
 
     IfCommand() : Command(CommandType::If) {}
 
-    void print() const override{
-        std::cout << "If ";
+    std::string toString() const override{
+        std::string result = "IF ";
         if(condition){
-            condition->print();
+            result += condition->toString();
         }
-        std::cout << " then\n";
+        result += " THEN\n";
         for (const auto& cmd : thenCommands) {
-            cmd->print();
-            std::cout << "\n";
+            result += cmd->toString();
+            result += "\n";
         }
-        std::cout << "EndIf ";
+        result += "ENDIF ";
+        return result;
     }
 };
 
@@ -415,22 +444,23 @@ struct IfElseCommand : public Command {
 
     IfElseCommand() : Command(CommandType::IfElse) {}
 
-    void print() const override{
-        std::cout << "If ";
+    std::string toString() const override{
+        std::string result = "IF ";
         if(condition){
-            condition->print();
+            result += condition->toString();
         }
-        std::cout << " then\n";
+        result += " THEN\n";
         for (const auto& cmd : thenCommands) {
-            cmd->print();
-            std::cout << "\n";
+            result += cmd->toString();
+            result += "\n";
         }
-        std::cout << "Else\n";
+        result += "ELSE\n";
         for (const auto& cmd : elseCommands) {
-            cmd->print();
-            std::cout << "\n";
+            result += cmd->toString();
+            result += "\n";
         }
-        std::cout << "EndIf ";
+        result += "ENDIF ";
+        return result;
     }
 };
 
@@ -441,17 +471,18 @@ struct WhileCommand : public Command {
 
     WhileCommand() : Command(CommandType::While) {}
 
-    void print() const override{
-        std::cout << "While ";
+    std::string toString() const override{
+        std::string result = "WHILE ";
         if(condition){
-            condition->print();
+            result += condition->toString();
         }
-        std::cout << " do\n";
+        result += " DO\n";
         for (const auto& cmd : commands) {
-            cmd->print();
-            std::cout << "\n";
+            result += cmd->toString();
+            result += "\n";
         }
-        std::cout << "EndWhile ";
+        result += "ENDWHILE ";
+        return result;
     }
 };
 
@@ -461,17 +492,17 @@ struct RepeatCommand : public Command {
 
     RepeatCommand() : Command(CommandType::Repeat) {}
 
-    void print() const override{
-        std::cout << "Repeat\n";
+    std::string toString() const override{
+        std::string result = "REPEAT\n";
         for (const auto& cmd : commands) {
-            cmd->print();
-            std::cout << "\n";
+            result += cmd->toString();
+            result += "\n";
         }
-        std::cout << "Until ";
+        result += "UNTIL ";
         if(condition){
-            condition->print();
+            result += condition->toString();
         }
-        std::cout << " \n";
+        return result;
     }
 };
 
@@ -483,25 +514,26 @@ struct ForToCommand : public Command {
 
     ForToCommand() : Command(CommandType::ForTo) {}
 
-    void print() const override{
-        std::cout << "For ";
+    std::string toString() const override{
+        std::string result = "FOR ";
         if(!iterator.empty()){
-            std::cout<< iterator << " ";
+            result += iterator + " ";
         }
-        std::cout << "from ";
+        result += "FROM ";
         if(fromValue){
-            fromValue->print();
+            result += fromValue->toString();
         }
-        std::cout << "to ";
+        result += " TO ";
         if(toValue){
-            toValue->print();
+            result += toValue->toString();
         }
-        std::cout << "do\n";
+        result += " DO\n";
         for (const auto& cmd : commands) {
-            cmd->print();
-            std::cout << "\n";
+            result += cmd->toString();
+            result += "\n";
         }
-        std::cout << "EndFor ";
+        result += "ENDFOR ";
+        return result;
     }
 };
 
@@ -513,25 +545,26 @@ struct ForDowntoCommand : public Command {
 
     ForDowntoCommand() : Command(CommandType::ForDownto) {}
 
-    void print() const override{
-        std::cout << "For ";
+    std::string toString() const override{
+        std::string result = "FOR ";
         if(!iterator.empty()){
-            std::cout<< iterator << " ";
+            result += iterator + " ";
         }
-        std::cout << "from ";
+        result += "FROM ";
         if(fromValue){
-            fromValue->print();
+            result += fromValue->toString();
         }
-        std::cout << "downto ";
+        result += " DOWNTO ";
         if(downtoValue){
-            downtoValue->print();
+            result += downtoValue->toString();
         }
-        std::cout << "do\n";
+        result += " DO\n";
         for (const auto& cmd : commands) {
-            cmd->print();
-            std::cout << "\n";
+            result += cmd->toString();
+            result += "\n";
         }
-        std::cout << "EndFor ";
+        result += "ENDFOR ";
+        return result;
     }
 };
 
@@ -542,14 +575,18 @@ struct ProcedureCallCommand : public Command {
 
     ProcedureCallCommand() : Command(CommandType::ProcedureCall) {}
 
-    void print() const override{
-        std::cout << "Call " + identifier + " ";
-        std::cout << "(";
+    std::string toString() const override{
+        std::string result = "CALL " + identifier + " (";
         for (const auto& arg : arguments) {
-            arg->print();
-            std::cout << ", ";
+            result += arg->toString();
+            result += ", ";
         }
-        std::cout << ") ";
+        if (!arguments.empty()) {
+            result.pop_back();
+            result.pop_back();
+        }
+        result += ")";
+        return result;
     }
 };
 
@@ -559,12 +596,12 @@ struct ReadCommand : public Command {
 
     ReadCommand() : Command(CommandType::Read) {}
 
-    void print() const override{
-        std::cout << "Read ";
+    std::string toString() const override{
+        std::string result = "READ ";
         if(identifier){
-            identifier->print();
+            result += identifier->toString();
         }
-        std::cout << " ";
+        return result;
     }
 };
 
@@ -573,12 +610,12 @@ struct WriteCommand : public Command {
 
     WriteCommand() : Command(CommandType::Write) {}
 
-    void print() const override{
-        std::cout << "Write ";
+    std::string toString() const override{
+        std::string result = "WRITE ";
         if(value){
-            value->print();
+            result += value->toString();
         }
-        std::cout << " ";
+        return result;
     }
 };
 
@@ -590,23 +627,24 @@ struct Procedure {
     std::vector<std::unique_ptr<Variable>> declarations;  
     std::vector<std::unique_ptr<Command>> commands;
 
-    void print() const {
-        std::cout << "Procedure: " << identifier << "\n";
-        std::cout << "Parameters:\n";
+    std::string toString() const {
+        std::string result = "PROCEDURE: " + identifier + "\n";
+        result += "Parameters:\n";
         for (const auto& param : parameters) {
-            param->print();
-            std::cout << "\n";
+            result += param->toString();
+            result += "\n";
         }
-        std::cout << "Declarations:\n";
+        result += "Declarations:\n";
         for (const auto& decl : declarations) {
-            decl->print();
-            std::cout << "\n";
+            result += decl->toString();
+            result += "\n";
         }
-        std::cout << "Commands:\n";
+        result += "Commands:\n";
         for (const auto& cmd : commands) {
-            cmd->print();
-            std::cout << "\n";
+            result += cmd->toString();
+            result += "\n";
         }
+        return result;
     }
 };
 
@@ -615,18 +653,19 @@ struct Main{
     std::vector<std::unique_ptr<Variable>> declarations;
     std::vector<std::unique_ptr<Command>> commands;
 
-    void print() const {
-        std::cout << "Main:\n";
-        std::cout << "Declarations:\n";
+    std::string toString() const{
+        std::string result = "MAIN: \n";
+        result += "Declarations:\n";
         for (const auto& decl : declarations) {
-            decl->print();
-            std::cout << "\n";
+            result += decl->toString();
+            result += "\n";
         }
-        std::cout << "Commands:\n";
+        result += "Commands:\n";
         for (const auto& cmd : commands) {
-            cmd->print();
-            std::cout << "\n";
+            result += cmd->toString();
+            result += "\n";
         }
+        return result;
     }
 };
 
@@ -636,23 +675,23 @@ struct Program {
     std::vector<std::unique_ptr<Variable>> declarations;  
     std::vector<std::unique_ptr<Command>> mainCommands;
 
-    void print() const {
-        std::cout << "Program:\n";
-        std::cout << "Procedures:\n";
+    std::string toString() const{
+        std::string result = "PROGRAM:\nProcedures:\n";
         for (const auto& proc : procedures) {
-            proc->print();
-            std::cout << "\n";
+            result += proc->toString();
+            result += "\n";
         }
-        std::cout << "Main Declarations:\n";
+        result += "MAIN Declarations:\n";
         for (const auto& decl : declarations) {
-            decl->print();
-            std::cout << "\n";
+            result += decl->toString();
+            result += "\n";
         }
-        std::cout << "Main Commands:\n";
+        result += "MAIN Commands:\n";
         for (const auto& cmd : mainCommands) {
-            cmd->print();
-            std::cout << "\n";
+            result += cmd->toString();
+            result += "\n";
         }
+        return result;
     }
 };
 

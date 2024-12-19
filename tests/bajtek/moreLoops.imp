@@ -1,0 +1,19 @@
+# in =; out = 1005720, 145;
+PROGRAM IS
+    sum, i, j, k
+BEGIN
+    sum := 0;
+    i := 0;
+    REPEAT
+        j := i;
+        k := 0;
+        WHILE j > 0 DO
+            k := k + i;
+            j := j - 1;
+        ENDWHILE
+        sum := sum + k;
+        i := i + 1;
+    UNTIL sum > 1000000;
+    WRITE sum;
+    WRITE i;
+END

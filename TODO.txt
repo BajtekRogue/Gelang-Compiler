@@ -1,4 +1,3 @@
-fix assign with arrays ???
 
 COMMANDS:
     -READ [done]
@@ -7,7 +6,7 @@ COMMANDS:
     -IF [done]
     -IF ELSE [done]
     -WHILE [done]
-    -REPEAT
+    -REPEAT [done]
     -FOR UP
     -FOR DOWN
     -PROC CALL
@@ -25,3 +24,5 @@ OPTIMIZATION
     - READ [FULL]
     - WRITE [FULL]
     - CONDITION [FULL]
+    - ARITHMETIC IDENTETIES [FULL]
+    - load constant values to memory when they are used in a loop or more than once. Remember to fix jump addresses using custom label 

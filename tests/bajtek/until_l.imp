@@ -1,0 +1,15 @@
+PROGRAM IS
+    x, y
+BEGIN
+    x := 0;
+    y := 10;
+
+    REPEAT
+        x := x + 1;
+        y := y - 1;
+        WRITE x;
+        WRITE y;
+    UNTIL x > y;
+    WRITE x;
+    WRITE y;
+END

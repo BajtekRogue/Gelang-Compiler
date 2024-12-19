@@ -1,9 +1,10 @@
-# in; out = 1, 1, 2, 1, 2, 2
+# in; out = 1, 1, 2, 1, 2, 2, -1, -2, -2, -1, -2, -1
 PROGRAM IS
-    a, b
+    a, b, c
 BEGIN
     a := 12;
     b := -3;
+    c := a + b;
 
     IF a >= b THEN
         WRITE 1;
@@ -29,7 +30,6 @@ BEGIN
         WRITE 2;
     ENDIF
 
-
     IF a < b THEN
         WRITE 1;
     ELSE
@@ -40,5 +40,52 @@ BEGIN
         WRITE 1;
     ELSE
         WRITE 2;
+    ENDIF
+    IF a >= b THEN
+        WRITE 1;
+    ELSE
+        WRITE 2;
+    ENDIF
+
+    IF a > b THEN
+        WRITE 1;
+    ELSE
+        WRITE 2;
+    ENDIF
+
+    IF c = c THEN
+        WRITE -1;
+    ELSE
+        WRITE -2;
+    ENDIF
+
+    IF c != c THEN
+        WRITE -1;
+    ELSE
+        WRITE -2;
+    ENDIF
+
+    IF c < c THEN
+        WRITE -1;
+    ELSE
+        WRITE -2;
+    ENDIF
+
+    IF c <= c THEN
+        WRITE -1;
+    ELSE
+        WRITE -2;
+    ENDIF
+
+    IF c > c THEN
+        WRITE -1;
+    ELSE
+        WRITE -2;
+    ENDIF
+
+    IF c >= c THEN
+        WRITE -1;
+    ELSE
+        WRITE -2;
     ENDIF
 END

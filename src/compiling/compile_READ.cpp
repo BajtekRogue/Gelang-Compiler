@@ -10,6 +10,8 @@ std::vector<AssemblyInstruction> compile_READ(SymbolsTable& symbolsTable, const 
 
     validateUseOfVariable(symbolsTable, *(cmd->identifier), "READ", false);
 
+    result.push_back(AssemblyInstruction(AssemblyInstructionType::NULL_INSTRUCTION, "READ " + id));
+
     // READ a variable
     if(identifier->isVariable()){
 

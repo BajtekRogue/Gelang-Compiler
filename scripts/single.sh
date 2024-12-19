@@ -15,7 +15,7 @@ mkdir -p "$dir_name"
 output="$dir_name/$base_name.mr"
 
 # Compile the input file
-$compiler "$input" "$output" 
+$compiler "$input" "$output" "-g"
 
 # Run the output if compilation succeeded
 if [ $? -eq 0 ]; then

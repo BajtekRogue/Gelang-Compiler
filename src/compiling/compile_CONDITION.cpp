@@ -42,6 +42,26 @@ std::pair<std::vector<AssemblyInstruction>, std::optional<bool>> compile_CONDITI
         validateUseOfVariable(symbolsTable, right.asIdentifier(), "condition", true);
     }
 
+    // If both values are the same, we can skip the comparison and return the result as second std::optional argument
+    if(left == right){
+        switch(cond->type){
+            case ConditionType::Equal:
+                return {result, true};
+            case ConditionType::NotEqual:
+                return {result, false};
+            case ConditionType::GreaterThan:
+                return {result, false};
+            case ConditionType::LessThan:
+                return {result, false};
+            case ConditionType::GreaterEqual:
+                return {result, true};
+            case ConditionType::LessEqual:
+                return {result, true};
+            default:
+                throw std::runtime_error("Unknown condition type");
+        }
+    }
+
     // Load values to registers to be ready for comparison
     std::vector<AssemblyInstruction> loadRight_code = getValueToDestinationAddress(symbolsTable, right, 1);
     result.insert(result.end(), loadRight_code.begin(), loadRight_code.end());
@@ -59,7 +79,7 @@ std::pair<std::vector<AssemblyInstruction>, std::optional<bool>> compile_CONDITI
             return {result, std::nullopt};
             break;
         case ConditionType::NotEqual:
-            // x != y  iff  ~ (x - y = 0)
+            // x != y  iff  ~(x - y = 0)
             result.push_back(AssemblyInstruction(AssemblyInstructionType::JZERO, jumpAddress));
             return {result, std::nullopt};
             break;

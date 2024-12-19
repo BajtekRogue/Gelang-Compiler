@@ -580,7 +580,7 @@ identifier:
 
 %%
 
-void yyerror(Program** parsedProgram, const char* s) {
+void yyerror([[maybe_unused]]Program** parsedProgram, [[maybe_unused]]const char* s) {
     extern char* yytext;  // The current token text
     extern int yylineno;  // The current line number
 

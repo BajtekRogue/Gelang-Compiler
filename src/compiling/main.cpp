@@ -7,12 +7,12 @@ extern void runParser(std::FILE* data, std::unique_ptr<Program>& parsedProgram);
 int main(int argc, char *argv[]) {
 
     if (argc < 3 || argc > 4) {
-        fprintf(stderr, "%sUsage: %s <input_file_path> <output_file_path> [--AST]\n%s",
+        fprintf(stderr, "%sUsage: %s <input_file_path> <output_file_path> [-g]\n%s",
                 color_White.c_str(), argv[0], color_Reset.c_str());
         return 1;
     }
 
-    bool printAST = (argc == 4 && std::string(argv[3]) == "--AST"); // Flag to print AST
+    bool debugging = argc == 4 && std::string(argv[3]) == "-g";
     std::FILE* data = nullptr;
     std::unique_ptr<Program> parsedProgram;
 
@@ -31,11 +31,9 @@ int main(int argc, char *argv[]) {
         std::fclose(data);
     }
 
-    // Conditionally print the AST if --AST flag is set
-    if (printAST) {
-        std::cout << color_Magenta << "\nAST: " << color_Reset << "\n";
-        parsedProgram->print();
-    }
+    // std::cout << color_Magenta << "\nAST: " << color_Reset << "\n";
+    // std::cout << parsedProgram->toString() << "\n";
+    
 
     try {
         // Compile the program
@@ -51,7 +49,11 @@ int main(int argc, char *argv[]) {
 
         // Write the assembly code to the output file
         for (const AssemblyInstruction& instruction : code) {
-            outputFile << instruction.print() << "\n";
+            std::string s = instruction.toString();
+            if(!debugging && s[0] == '#') {
+                continue;
+            }
+            outputFile << s << "\n";
         }
 
         return 0;

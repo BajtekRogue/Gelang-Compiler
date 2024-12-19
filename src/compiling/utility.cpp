@@ -2,6 +2,14 @@
 #include "symbolsTable.hpp"
 #include "languageStructs.hpp"
 
+namespace LabelCounters {
+    ll ifCounter = 0;
+    ll whileCounter = 0;
+    ll repeatCounter = 0;
+    ll forCounter = 0;
+    ll procedureCounter = 0;
+}
+
 std::vector<AssemblyInstruction> getValueToDestinationAddress(SymbolsTable& symbolsTable, const Value& val, ll destination){
     std::vector<AssemblyInstruction> result;
 
@@ -9,7 +17,13 @@ std::vector<AssemblyInstruction> getValueToDestinationAddress(SymbolsTable& symb
     if(val.isNumber()){
 
         ll num = val.asNumber();
-        result.push_back(AssemblyInstruction(AssemblyInstructionType::SET, num));
+        
+        // If 0 clear the accumulator because it is cheaper
+        if(num == 0){
+            result.push_back(AssemblyInstruction(AssemblyInstructionType::SUB, 0));
+        }else{
+            result.push_back(AssemblyInstruction(AssemblyInstructionType::SET, num));
+        }
 
         // If destination is not the accumulator, store it
         if(destination != 0){
@@ -143,4 +157,62 @@ void validateUseOfVariable(SymbolsTable& symbolsTable, const Identifier& identif
     }
 
     return;
+}
+
+ll countRealInstructions(const std::vector<AssemblyInstruction>& instructions){
+    ll count = 0;
+    for (const AssemblyInstruction& instruction : instructions) {
+        switch (instruction.type) {
+            case AssemblyInstructionType::GET:
+            case AssemblyInstructionType::PUT:
+            case AssemblyInstructionType::LOAD:
+            case AssemblyInstructionType::STORE:
+            case AssemblyInstructionType::LOADI:
+            case AssemblyInstructionType::STOREI:
+            case AssemblyInstructionType::ADD:
+            case AssemblyInstructionType::SUB:
+            case AssemblyInstructionType::ADDI:
+            case AssemblyInstructionType::SUBI:
+            case AssemblyInstructionType::SET:
+            case AssemblyInstructionType::HALF:
+            case AssemblyInstructionType::JUMP:
+            case AssemblyInstructionType::JPOS:
+            case AssemblyInstructionType::JZERO:
+            case AssemblyInstructionType::JNEG:
+            case AssemblyInstructionType::RTRN:
+            case AssemblyInstructionType::HALT:
+                count++;
+                break;
+            default:
+                break;
+        }
+    }
+    return count;
+}
+
+std::string getStartLabel(std::string label){
+    return "_" + label + "_: ";
+}
+
+std::string getEndLabel(std::string label){
+    return label + "_.";
+}
+
+void fixUntilJump(std::vector<AssemblyInstruction>& code, ll loopSize, ll conditonSize){
+    ll jumpSize = -loopSize - conditonSize + 1;
+    ll lastIndex = code.size() - 1;
+    ll supLastIndex = code.size() - 2;
+
+    switch(code[supLastIndex].type){
+        case AssemblyInstructionType::JUMP:
+        case AssemblyInstructionType::JPOS:
+        case AssemblyInstructionType::JZERO:
+        case AssemblyInstructionType::JNEG:
+            code[supLastIndex].address = jumpSize +1;
+            code[lastIndex].address = jumpSize;
+            break;
+        default:
+            code[lastIndex].address= jumpSize;
+            break;
+    }
 }

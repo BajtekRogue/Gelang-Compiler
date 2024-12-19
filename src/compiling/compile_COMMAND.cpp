@@ -38,14 +38,20 @@ std::vector<AssemblyInstruction> compile_COMMAND(SymbolsTable& symbolsTable, std
         }
         case CommandType::If:{
             IfCommand* ifCmd = dynamic_cast<IfCommand*>(cmd.release());
+            LabelCounters::ifCounter++;
+            std::string labelStart = getStartLabel(std::to_string(LabelCounters::ifCounter));
+            std::string labelEnd = getEndLabel(std::to_string(LabelCounters::ifCounter));
+            code.push_back(AssemblyInstruction(AssemblyInstructionType::LABEL_IF, labelStart + ifCmd->condition->toString()));
+
             std::vector<AssemblyInstruction> thenCode = compile_ALL(symbolsTable, ifCmd->thenCommands);
-            ll jumpAddress = thenCode.size() + 1;
+            ll jumpAddress = countRealInstructions(thenCode) + 1;
             std::pair<std::vector<AssemblyInstruction>, std::optional<bool>> conditionCode = compile_CONDITION(symbolsTable, ifCmd->condition, jumpAddress);
 
             // Check if condition is known during compile time
             if(conditionCode.second.has_value()){
                 if(conditionCode.second.value()){
                     code.insert(code.end(), thenCode.begin(), thenCode.end());
+                    code.push_back(AssemblyInstruction(AssemblyInstructionType::LABEL_ENDIF, labelEnd));
                 }
                 break;
             }
@@ -53,23 +59,34 @@ std::vector<AssemblyInstruction> compile_COMMAND(SymbolsTable& symbolsTable, std
             // Check the condition and then jump to the end of the if block
             code.insert(code.end(), conditionCode.first.begin(), conditionCode.first.end());
             code.insert(code.end(), thenCode.begin(), thenCode.end());
-            break;
 
+            code.push_back(AssemblyInstruction(AssemblyInstructionType::LABEL_ENDIF, labelEnd));
+            break;
         }
         case CommandType::IfElse:{
             IfElseCommand* ifElseCmd = dynamic_cast<IfElseCommand*>(cmd.release());
+            LabelCounters::ifCounter++;
+            std::string labelStart = getStartLabel(std::to_string(LabelCounters::ifCounter));
+            std::string labelEnd = getEndLabel(std::to_string(LabelCounters::ifCounter));
+            code.push_back(AssemblyInstruction(AssemblyInstructionType::LABEL_IF, labelStart + ifElseCmd->condition->toString()));
+
             std::vector<AssemblyInstruction> thenCode = compile_ALL(symbolsTable, ifElseCmd->thenCommands);
             std::vector<AssemblyInstruction> elseCode = compile_ALL(symbolsTable, ifElseCmd->elseCommands);
-            ll jumpAddress = thenCode.size() + 1;
-            ll jumpAddressElse = elseCode.size() + 1;
+            ll jumpAddress = countRealInstructions(thenCode) + 1;
+            ll jumpAddressElse = countRealInstructions(elseCode) + 1;
             std::pair<std::vector<AssemblyInstruction>, std::optional<bool>> conditionCode = compile_CONDITION(symbolsTable, ifElseCmd->condition, jumpAddress + 1);
 
             // Check if condition is known during compile time
             if(conditionCode.second.has_value()){
                 if(conditionCode.second.value()){
                     code.insert(code.end(), thenCode.begin(), thenCode.end());
+                    code.push_back(AssemblyInstruction(AssemblyInstructionType::LABEL_ELSE, labelStart));
+                    code.push_back(AssemblyInstruction(AssemblyInstructionType::LABEL_ENDIF, labelEnd));
+                        
                 }else{
+                    code.push_back(AssemblyInstruction(AssemblyInstructionType::LABEL_ELSE, labelStart));
                     code.insert(code.end(), elseCode.begin(), elseCode.end());
+                    code.push_back(AssemblyInstruction(AssemblyInstructionType::LABEL_ENDIF, labelEnd));
                 }
                 break;
             }
@@ -77,22 +94,32 @@ std::vector<AssemblyInstruction> compile_COMMAND(SymbolsTable& symbolsTable, std
             // Check the condition and then jump to the end of the if block
             code.insert(code.end(), conditionCode.first.begin(), conditionCode.first.end());
             code.insert(code.end(), thenCode.begin(), thenCode.end());
+
             code.push_back(AssemblyInstruction(AssemblyInstructionType::JUMP, jumpAddressElse));
+            code.push_back(AssemblyInstruction(AssemblyInstructionType::LABEL_ELSE, labelStart));
+
             code.insert(code.end(), elseCode.begin(), elseCode.end());
+            code.push_back(AssemblyInstruction(AssemblyInstructionType::LABEL_ENDIF, labelEnd));
             break;
         }
         case CommandType::While:{
             WhileCommand* whileCmd = dynamic_cast<WhileCommand*>(cmd.release());
+            LabelCounters::whileCounter++;
+            std::string labelStart = getStartLabel(std::to_string(LabelCounters::whileCounter));
+            std::string labelEnd = getEndLabel(std::to_string(LabelCounters::whileCounter));
+            code.push_back(AssemblyInstruction(AssemblyInstructionType::LABEL_WHILE, labelStart + whileCmd->condition->toString()));
+
             std::vector<AssemblyInstruction> whileCode = compile_ALL(symbolsTable, whileCmd->commands);
-            ll jumpAddress = whileCode.size() + 1;
+            ll jumpAddress = countRealInstructions(whileCode) + 1;
             std::pair<std::vector<AssemblyInstruction>, std::optional<bool>> conditionCode = compile_CONDITION(symbolsTable, whileCmd->condition, jumpAddress + 1);
 
             // Get these to check back the condition
-            ll jumBackToCond = -whileCode.size() - conditionCode.first.size();
+            ll jumBackToCond = -countRealInstructions(whileCode) - countRealInstructions(conditionCode.first);
 
             // Check if condition is known during compile time
             if(conditionCode.second.has_value()){
                 if(!conditionCode.second.value()){
+                    code.push_back(AssemblyInstruction(AssemblyInstructionType::LABEL_ENDWHILE, labelEnd));
                     break;
                 }
                 std::cout << color_Magenta << "Warning: Infinite WHILE loop detected!" << color_Reset << std::endl;
@@ -101,7 +128,48 @@ std::vector<AssemblyInstruction> compile_COMMAND(SymbolsTable& symbolsTable, std
             // Check the condition and then jump to the end of the while block
             code.insert(code.end(), conditionCode.first.begin(), conditionCode.first.end());
             code.insert(code.end(), whileCode.begin(), whileCode.end());
+
             code.push_back(AssemblyInstruction(AssemblyInstructionType::JUMP, jumBackToCond));
+            code.push_back(AssemblyInstruction(AssemblyInstructionType::LABEL_ENDWHILE, labelStart));
+            break;
+        }
+        case CommandType::Repeat:{
+            RepeatCommand* repeatCmd = dynamic_cast<RepeatCommand*>(cmd.release());
+            LabelCounters::repeatCounter++;
+            std::string labelStart = getStartLabel(std::to_string(LabelCounters::repeatCounter));
+            std::string labelEnd = getEndLabel(std::to_string(LabelCounters::repeatCounter));
+            std::string originalCondition = repeatCmd->condition->toString();
+            code.push_back(AssemblyInstruction(AssemblyInstructionType::LABEL_REPEAT, labelStart));
+
+            std::vector<AssemblyInstruction> repeatCode = compile_ALL(symbolsTable, repeatCmd->commands);
+            // The loop will be repeated at least once
+            code.insert(code.end(), repeatCode.begin(), repeatCode.end());
+
+            ll loopSize = countRealInstructions(repeatCode);
+            std::pair<std::vector<AssemblyInstruction>, std::optional<bool>> conditionCode = compile_CONDITION(symbolsTable, repeatCmd->condition, -1);
+
+            // Check if condition is known during compile time
+            bool finiteLoop = true;
+            if(conditionCode.second.has_value()){
+                if(conditionCode.second.value()){
+                    code.push_back(AssemblyInstruction(AssemblyInstructionType::LABEL_UNTIL, labelEnd + originalCondition));
+                    break;
+                }
+                finiteLoop = false;
+                std::cout << color_Magenta << "Warning: Infinite UNTIL loop detected!" << color_Reset << std::endl;
+            }
+
+            // Check the condition and then jump to the end of the while block
+            ll conditonSize = countRealInstructions(conditionCode.first);
+            code.insert(code.end(), conditionCode.first.begin(), conditionCode.first.end());
+
+            // Fix the jump addresses
+            if(finiteLoop){
+                fixUntilJump(code, loopSize, conditonSize);
+            }else{
+                code.push_back(AssemblyInstruction(AssemblyInstructionType::JUMP, -loopSize));
+            }
+            code.push_back(AssemblyInstruction(AssemblyInstructionType::LABEL_UNTIL, labelStart + originalCondition));
             break;
         }
         default:

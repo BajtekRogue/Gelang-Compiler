@@ -2,7 +2,16 @@ PROGRAM IS
     x
 BEGIN
     x := 4;
+
+    REPEAT
+        x := -1 - x;
+    UNTIL 3 < 0;
+
     WHILE 1 = 1 DO
         x := 1 + x;
+    ENDWHILE
+
+    WHILE x = x DO
+        x := 1 + 777;
     ENDWHILE
 END

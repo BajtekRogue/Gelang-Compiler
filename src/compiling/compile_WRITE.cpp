@@ -6,6 +6,8 @@ std::vector<AssemblyInstruction> compile_WRITE(SymbolsTable& symbolsTable, const
     std::vector<AssemblyInstruction> result;
     Value& val = *(cmd->value);
     
+    result.push_back(AssemblyInstruction(AssemblyInstructionType::NULL_INSTRUCTION, "WRITE " + val.toString()));
+    
     // WRITE a number
     if(val.isNumber()){
 
