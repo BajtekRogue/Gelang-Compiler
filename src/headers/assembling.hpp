@@ -16,7 +16,10 @@
 typedef long long ll;
 
 const ll MEMORY_START = 1000;
-const ll MEMORY_ARRAY_VARIABLE_ASSIGN = 404;
+const ll MEMORY_ARRAY_VARIABLE_ASSIGN = 28;
+const ll MEMORY_ONE = 69;
+const ll MEMORY_CONSTANTS = 500;
+
 
 // utility.cpp
 // counter to display in the labels
@@ -65,7 +68,7 @@ enum class AssemblyInstructionType{
     LABEL_PROCEDURE,
     LABEL_ENDPROCEDURE,
     LABEL_MAIN,
-    NULL_INSTRUCTION
+    LABEL_INSTRUCTION
 };
 
 static const std::unordered_map<AssemblyInstructionType, std::string> instructionNames = {
@@ -103,23 +106,38 @@ static const std::unordered_map<AssemblyInstructionType, std::string> instructio
         {AssemblyInstructionType::LABEL_PROCEDURE, "# PROCEDURE"},
         {AssemblyInstructionType::LABEL_ENDPROCEDURE, "# ENDPROCEDURE"},
         {AssemblyInstructionType::LABEL_MAIN, "# MAIN"},
-        {AssemblyInstructionType::NULL_INSTRUCTION, "#"}
+        {AssemblyInstructionType::LABEL_INSTRUCTION, "#"}
 };
 
 /**
  * @brief Represents a single assembly instruction.
  * 
- * This struct models an assembly instruction with a type and an optional address. 
+ * This struct models an assembly instruction with a type and an address. 
  * The address can either be a numeric value (for real instructions) or a string 
  * (for labels in the generated code).
  */
 struct AssemblyInstruction {
     AssemblyInstructionType type;
-    std::optional<std::variant<ll, std::string>> address; 
+    std::variant<ll, std::string> address; 
 
-    AssemblyInstruction(AssemblyInstructionType t) : type(t) {}
     AssemblyInstruction(AssemblyInstructionType t, ll addr) : type(t), address(addr) {}
     AssemblyInstruction(AssemblyInstructionType t, const std::string& addr) : type(t), address(addr) {}
+
+    bool hasAddress() const {
+        return std::holds_alternative<ll>(address);
+    }
+
+    bool hasLabel() const {
+        return std::holds_alternative<std::string>(address);
+    }
+
+    ll getAddress() const {
+        return std::get<ll>(address);
+    }
+
+    std::string getLabel() const {
+        return std::get<std::string>(address);
+    }
 
     std::string toString() const {
         auto it = instructionNames.find(type);
@@ -128,12 +146,14 @@ struct AssemblyInstruction {
         }
         
         std::string result = it->second;
-        if (address) {
-            if (std::holds_alternative<ll>(*address)) {
-                result += " " + std::to_string(std::get<ll>(*address));
-            } else if (std::holds_alternative<std::string>(*address)) {
-                result += " " + std::get<std::string>(*address);
+        if (hasAddress()) {
+            if (type == AssemblyInstructionType::HALT || type == AssemblyInstructionType::HALF) {
+                return result;
+            }else{
+                result += " " + std::to_string(getAddress());
             }
+        } else {
+            result += " " + getLabel();
         }
         return result;
     }
@@ -196,6 +216,14 @@ std::string getStartLabel(std::string label);
 std::string getEndLabel(std::string label);
 
 /**
+ * @brief Extracts the loop counter from loop label
+ * 
+ * @param label the loop label
+ * @return `ll` number of the loop
+ */
+ll extractLoopLabel(const std::string& label);
+
+/**
  * @brief Fixes jump addresses when compiling UNTIL loops
  * 
  * @param code code of the loop
@@ -204,7 +232,7 @@ std::string getEndLabel(std::string label);
  */
 void fixUntilJump(std::vector<AssemblyInstruction>& code, ll loopSize, ll conditonSize);
 
-// compile_COMMAND.cpp
+// compileCommand.cpp
 /**
  * @brief Compiles a command and returns the generated assembly code
  * 
@@ -212,7 +240,7 @@ void fixUntilJump(std::vector<AssemblyInstruction>& code, ll loopSize, ll condit
  * @param cmd command to compile
  * @return `std::vector<AssemblyInstruction>` instructions generated in the process 
  */
-std::vector<AssemblyInstruction> compile_COMMAND(SymbolsTable& symbolsTable, std::unique_ptr<Command>& cmd);
+std::vector<AssemblyInstruction> compileCommand(SymbolsTable& symbolsTable, std::unique_ptr<Command>& cmd);
 
 /**
  * @brief Helper function to compile a vector of commands
@@ -221,9 +249,9 @@ std::vector<AssemblyInstruction> compile_COMMAND(SymbolsTable& symbolsTable, std
  * @param commands commands to compile
  * @return `std::vector<AssemblyInstruction>` instructions generated in the process 
  */
-std::vector<AssemblyInstruction> compile_ALL(SymbolsTable& symbolsTable, std::vector<std::unique_ptr<Command>>& commands);
+std::vector<AssemblyInstruction> compileAll(SymbolsTable& symbolsTable, std::vector<std::unique_ptr<Command>>& commands);
 
-// compile_READ.cpp
+// compileRead.cpp
 /**
  * @brief Compiles READ command
  * 
@@ -231,9 +259,9 @@ std::vector<AssemblyInstruction> compile_ALL(SymbolsTable& symbolsTable, std::ve
  * @param cmd command to compile
  * @return `std::vector<AssemblyInstruction>` instructions generated in the process 
  */
-std::vector<AssemblyInstruction> compile_READ(SymbolsTable& symbolsTable, const std::unique_ptr<ReadCommand>& cmd);
+std::vector<AssemblyInstruction> compileRead(SymbolsTable& symbolsTable, const std::unique_ptr<ReadCommand>& cmd);
 
-// compile_WRITE.cpp
+// compileWrite.cpp
 /**
  * @brief Compiles WRITE command
  * 
@@ -241,9 +269,9 @@ std::vector<AssemblyInstruction> compile_READ(SymbolsTable& symbolsTable, const 
  * @param cmd command to compile
  * @return `std::vector<AssemblyInstruction>` instructions generated in the process 
  */
-std::vector<AssemblyInstruction> compile_WRITE(SymbolsTable& symbolsTable, const std::unique_ptr<WriteCommand>& cmd);
+std::vector<AssemblyInstruction> compileWrite(SymbolsTable& symbolsTable, const std::unique_ptr<WriteCommand>& cmd);
 
-// compile_ASSIGN.cpp
+// compileAssign.cpp
 /**
  * @brief Compiles ASSIGN command
  * 
@@ -251,9 +279,9 @@ std::vector<AssemblyInstruction> compile_WRITE(SymbolsTable& symbolsTable, const
  * @param cmd command to compile
  * @return `std::vector<AssemblyInstruction>` instructions generated in the process 
  */
-std::vector<AssemblyInstruction> compile_ASSIGN(SymbolsTable& symbolsTable, const std::unique_ptr<AssignCommand>& cmd);
+std::vector<AssemblyInstruction> compileAssign(SymbolsTable& symbolsTable, const std::unique_ptr<AssignCommand>& cmd);
 
-// compile_EXPRESSION.cpp
+// compileExpression.cpp
 /**
  * @brief Compiles an expression and stores the result in the accumulator
  * 
@@ -261,9 +289,9 @@ std::vector<AssemblyInstruction> compile_ASSIGN(SymbolsTable& symbolsTable, cons
  * @param expr given expression
  * @return `std::vector<AssemblyInstruction>` instructions generated in the process 
  */
-std::vector<AssemblyInstruction> compile_EXPRESSION(SymbolsTable& symbolsTable, const std::unique_ptr<Expression>& expr);
+std::vector<AssemblyInstruction> compileExpression(SymbolsTable& symbolsTable, const std::unique_ptr<Expression>& expr);
 
-// compile_CONDITION.cpp
+// compileCondition.cpp
 /**
  * @brief Compiles a condition and returns the generated assembly code
  * 
@@ -272,8 +300,25 @@ std::vector<AssemblyInstruction> compile_EXPRESSION(SymbolsTable& symbolsTable, 
  * @param jumpAddress address to jump to if the condition is false
  * @return `std::pair<std::vector<AssemblyInstruction>, std::optional<bool>>` instructions generated in the process and the value of the condition if it is known during compile time
  */
-std::pair<std::vector<AssemblyInstruction>, std::optional<bool>> compile_CONDITION(SymbolsTable& symbolsTable, const std::unique_ptr<Condition>& cond, ll jumpAddress);
+std::pair<std::vector<AssemblyInstruction>, std::optional<bool>> compileCondition(SymbolsTable& symbolsTable, const std::unique_ptr<Condition>& cond, ll jumpAddress);
 
+// optimalization.cpp
+/**
+ * @brief Checks if the program contains a FOR loop
+ * 
+ * @param program program to check
+ * @return if the program contains a FOR loop, false otherwise
+ */
+bool isThereForLoop(std::unique_ptr<Program>& program);
+
+/**
+ * @brief Detects all "SET x" instructions that will be used more than once or in a loop. Then it initializes them at the beginning of the program and sotres the constants in the memory. Allowed number of constants is 500.
+ * 
+ * @param code compiled code to optimize
+ * @param isOnePresent if the constant 1 is present in the code due to FOR loops
+ * @return `std::vector<AssemblyInstruction>` optimized code 
+ */
+std::vector<AssemblyInstruction> initilizedConstants(std::vector<AssemblyInstruction> code, bool isOnePresent);
 
 
 #endif // ASSEMBLING_HPP

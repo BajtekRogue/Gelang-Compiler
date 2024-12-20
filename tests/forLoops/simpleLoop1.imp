@@ -1,0 +1,11 @@
+# in =; out = 5050
+PROGRAM IS
+    s
+BEGIN
+    s := 0;
+    FOR i FROM 1 TO 100 DO
+        s := s + i;
+    ENDFOR
+
+    WRITE s;
+END

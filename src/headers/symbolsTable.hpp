@@ -3,7 +3,7 @@
 
 #include "languageStructs.hpp"
 #include <unordered_map>
-#include <set>
+#include <unordered_set>
 #include <memory>
 #include <optional>
 #include <stdexcept>
@@ -73,15 +73,27 @@ public:
     ll get_offset(const std::string& identifier) const;
     
     void addVariable(const std::unique_ptr<Variable>& var);
+
+    void validateIterator(const std::string& identifier) const;
+    void addIterator(const std::string& identifier);
+    void removeIterator(const std::string& identifier);
+    bool isIterator(const std::string& identifier) const;
+    void addForLoopBound(const std::string& identifier, const std::string& boundIdentifier);
+    ll getMemoryAddress_forLoopBound(const std::string& identifier) const;
+    
     void printSymbols() const;
 
 private:
-    std::set<std::string> variables;
+    std::unordered_set<std::string> variables;
     std::unordered_map<std::string, bool> initialized_variables;
     std::unordered_map<std::string, ll> memoryAddresses_variables;
 
-    std::set<Array_offset> arrays;
+    std::unordered_set<Array_offset> arrays;
     std::unordered_map<Array_offset, std::pair<ll, ll>> memoryAddresses_arrays;
+
+    std::unordered_set<std::string> iterators;
+    std::unordered_map<std::string, std::string> forLoopBounds;
+    std::unordered_map<std::string, ll> memoryAddresses_forLoopBounds;
 
     ll lastMemoryAddress;
 

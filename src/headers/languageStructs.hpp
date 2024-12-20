@@ -514,6 +514,10 @@ struct ForToCommand : public Command {
 
     ForToCommand() : Command(CommandType::ForTo) {}
 
+    std::string bounds() const {
+        return fromValue->toString() + " TO " + toValue->toString();
+    }
+
     std::string toString() const override{
         std::string result = "FOR ";
         if(!iterator.empty()){
@@ -544,6 +548,10 @@ struct ForDowntoCommand : public Command {
     std::vector<std::unique_ptr<Command>> commands;
 
     ForDowntoCommand() : Command(CommandType::ForDownto) {}
+
+    std::string bounds() const {
+        return fromValue->toString() + " DOWNTO " + downtoValue->toString();
+    }
 
     std::string toString() const override{
         std::string result = "FOR ";

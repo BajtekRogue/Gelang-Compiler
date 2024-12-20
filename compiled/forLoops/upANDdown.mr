@@ -1,0 +1,58 @@
+# Store const = 1 at p[69]
+SET 1
+STORE 69
+# Store const = 3 at p[502]
+SET 3
+STORE 502
+# Store const = -10 at p[503]
+SET -10
+STORE 503
+# Store const = -100 at p[504]
+SET -100
+STORE 504
+# p := 200
+SET 200
+STORE 1001
+# q := p + 800
+SET 800
+STORE 1
+LOAD 1001
+ADD 1
+STORE 1002
+# Initializing FOR_UP _1_: 
+LOAD 1001
+STORE 1003
+LOAD 1002
+STORE 1004
+# FOR_UP _1_: p TO q
+# Initializing FOR_DOWN _2_: 
+LOAD 503
+STORE 1005
+LOAD 504
+STORE 1006
+# FOR_DOWN _2_: -10 DOWNTO -100
+# p := p - 3
+LOAD 502
+STORE 1
+LOAD 1001
+SUB 1
+STORE 1001
+# __itera__tor___--
+LOAD 1005
+SUB 69
+STORE 1005
+SUB 1006
+JPOS -9
+JZERO -10
+# ENDFOR _2_.
+# iterator__++
+LOAD 1003
+ADD 69
+STORE 1003
+SUB 1004
+JNEG -19
+JZERO -20
+# ENDFOR _1_.
+# WRITE p
+PUT 1001
+HALT

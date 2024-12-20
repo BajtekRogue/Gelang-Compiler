@@ -1,0 +1,14 @@
+# in=; out=-218473
+PROGRAM IS
+    p, q
+BEGIN
+    p := 200;
+    q := p + 800;
+
+    FOR iterator__ FROM p TO q DO
+        FOR __itera__tor___ FROM -10 DOWNTO -100 DO
+            p := p - 3;
+        ENDFOR
+    ENDFOR
+    WRITE p;
+END

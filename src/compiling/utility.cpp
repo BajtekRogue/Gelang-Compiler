@@ -44,7 +44,7 @@ std::vector<AssemblyInstruction> getValueToDestinationAddress(SymbolsTable& symb
 
         // If destination is current address, do nothing
         if(destination == currentAddress){
-            return {};
+            return result;
         }
 
         // If destination is the accumulator, load it
@@ -72,7 +72,7 @@ std::vector<AssemblyInstruction> getValueToDestinationAddress(SymbolsTable& symb
 
         // If destination is current address, do nothing
         if(destination == currentAddress){
-            return {};
+            return result;
         }
 
         // If destination is the accumulator, load it
@@ -159,6 +159,7 @@ void validateUseOfVariable(SymbolsTable& symbolsTable, const Identifier& identif
     return;
 }
 
+
 ll countRealInstructions(const std::vector<AssemblyInstruction>& instructions){
     ll count = 0;
     for (const AssemblyInstruction& instruction : instructions) {
@@ -195,8 +196,16 @@ std::string getStartLabel(std::string label){
 }
 
 std::string getEndLabel(std::string label){
-    return label + "_.";
+    return "_" + label + "_.";
 }
+
+ll extractLoopLabel(const std::string& label) {
+    size_t first = label.find('_');
+    size_t second = label.find('_', first + 1);
+    std::string number = label.substr(first + 1, second - first - 1);
+    return std::stoll(number);
+}
+
 
 void fixUntilJump(std::vector<AssemblyInstruction>& code, ll loopSize, ll conditonSize){
     ll jumpSize = -loopSize - conditonSize + 1;

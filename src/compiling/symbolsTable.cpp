@@ -67,6 +67,50 @@ void SymbolsTable::addVariable(const std::unique_ptr<Variable>& var) {
     __addVariable(var, lastMemoryAddress + 1);
 }
 
+void SymbolsTable::validateIterator(const std::string& identifier) const{
+    if (isVariableDeclared(identifier)) {
+        throw std::runtime_error("Variable '" + identifier + "' already exists but is being used as iterator");
+    }
+
+    if(isArrayDeclared(identifier)){
+        throw std::runtime_error("Array with identifier '" + identifier + "' already exists but is being used as iterator");
+    }
+}
+void SymbolsTable::addIterator(const std::string& identifier) {
+    validateIterator(identifier);
+    variables.insert(identifier);
+    initialized_variables[identifier] = true;
+    memoryAddresses_variables[identifier] = lastMemoryAddress + 1;
+    lastMemoryAddress++;
+    iterators.insert(identifier);
+}
+
+void SymbolsTable::removeIterator(const std::string& identifier) {
+    if (!isVariableDeclared(identifier)) {
+        throw std::runtime_error("Iterator '" + identifier + "' does not exist");
+    }
+
+    variables.erase(identifier);
+    initialized_variables.erase(identifier);
+    memoryAddresses_variables.erase(identifier);
+    iterators.erase(identifier);
+    memoryAddresses_forLoopBounds.erase(identifier);
+}
+
+bool SymbolsTable::isIterator(const std::string& identifier) const {
+    return iterators.find(identifier) != iterators.end();
+}
+
+void SymbolsTable::addForLoopBound(const std::string& identifier, const std::string& boundIdentifier) {
+    lastMemoryAddress++;
+    forLoopBounds[identifier] = boundIdentifier;
+    memoryAddresses_forLoopBounds[identifier] = memoryAddresses_variables.at(identifier) + 1;
+}
+
+ll SymbolsTable::getMemoryAddress_forLoopBound(const std::string& identifier) const {
+    return memoryAddresses_forLoopBounds.at(identifier);
+}
+
 void SymbolsTable::__addVariable(const std::unique_ptr<Variable>& var, ll memoryAddress) {
 
     if(var->type == VariableType::Integer){

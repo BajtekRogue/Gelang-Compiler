@@ -1,0 +1,6 @@
+#  Store const = 1
+SET 1
+STORE 69
+# FOR_DOWN _1_: -100 DOWNTO -10
+# ENDFOR 1_.
+HALT

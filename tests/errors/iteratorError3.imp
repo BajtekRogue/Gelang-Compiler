@@ -1,0 +1,8 @@
+PROGRAM IS
+    i, x
+BEGIN
+    FOR yylex FROM 0 TO 10 DO
+        READ yylex;
+        x := yylex - 2144141;
+    ENDFOR
+END

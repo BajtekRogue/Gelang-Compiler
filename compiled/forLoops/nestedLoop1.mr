@@ -1,0 +1,69 @@
+# Store const = 200 at p[501]
+SET 200
+STORE 501
+# Store const = -100 at p[502]
+SET -100
+STORE 502
+# Store const = 344 at p[503]
+SET 344
+STORE 503
+# Store const = -10 at p[504]
+SET -10
+STORE 504
+# Store const = 1 at p[69]
+SET 1
+STORE 69
+# xyz := -1
+SET -1
+STORE 1001
+# Initializing FOR_UP _1_: 
+LOAD 69
+STORE 1002
+SET 100
+STORE 1003
+# FOR_UP _1_: 1 TO 100
+# Initializing FOR_UP _2_: 
+LOAD 504
+STORE 1004
+LOAD 503
+STORE 1005
+# FOR_UP _2_: -10 TO 344
+# Initializing FOR_UP _3_: 
+LOAD 502
+STORE 1006
+LOAD 501
+STORE 1007
+# FOR_UP _3_: -100 TO 200
+# xyz := xyz + 1
+LOAD 69
+STORE 1
+LOAD 1001
+ADD 1
+STORE 1001
+# k++
+LOAD 1006
+ADD 69
+STORE 1006
+SUB 1007
+JNEG -9
+JZERO -10
+# ENDFOR _3_.
+# j++
+LOAD 1004
+ADD 69
+STORE 1004
+SUB 1005
+JNEG -19
+JZERO -20
+# ENDFOR _2_.
+# i++
+LOAD 1002
+ADD 69
+STORE 1002
+SUB 1003
+JNEG -29
+JZERO -30
+# ENDFOR _1_.
+# WRITE xyz
+PUT 1001
+HALT

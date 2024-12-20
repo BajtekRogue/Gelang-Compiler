@@ -1,0 +1,13 @@
+PROGRAM IS
+    x, y, a[-100:-80]
+BEGIN
+    x := -97;
+    y := 0;
+    a[x] := -3;
+    a[-100] := 100;
+    FOR i FROM a[x] TO a[-100] DO
+        y := y + i;
+    ENDFOR
+
+    WRITE y;
+END

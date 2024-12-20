@@ -7,7 +7,7 @@ extern void runParser(std::FILE* data, std::unique_ptr<Program>& parsedProgram);
 int main(int argc, char *argv[]) {
 
     if (argc < 3 || argc > 4) {
-        fprintf(stderr, "%sUsage: %s <input_file_path> <output_file_path> [-g]\n%s",
+        fprintf(stderr, "%sUsage: %s <inputFilePath> <outputFilePath> [-g]\n%s",
                 color_White.c_str(), argv[0], color_Reset.c_str());
         return 1;
     }

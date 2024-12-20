@@ -1,0 +1,7 @@
+PROGRAM IS
+    x, y, z[1:333]
+BEGIN
+    FOR i FROM z[-777] TO 100 DO
+        y := 3;
+    ENDFOR
+END

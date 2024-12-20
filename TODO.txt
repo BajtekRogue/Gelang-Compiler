@@ -7,8 +7,8 @@ COMMANDS:
     -IF ELSE [done]
     -WHILE [done]
     -REPEAT [done]
-    -FOR UP
-    -FOR DOWN
+    -FOR UP [done]
+    -FOR DOWN [done]
     -PROC CALL
 
 EXPRESSION:
@@ -19,10 +19,3 @@ EXPRESSION:
     -divide
     -modulo
 
-
-OPTIMIZATION
-    - READ [FULL]
-    - WRITE [FULL]
-    - CONDITION [FULL]
-    - ARITHMETIC IDENTETIES [FULL]
-    - load constant values to memory when they are used in a loop or more than once. Remember to fix jump addresses using custom label 

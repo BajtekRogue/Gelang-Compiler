@@ -1,0 +1,16 @@
+# in=; out=10685499
+PROGRAM IS
+    xyz
+BEGIN
+    xyz := - 1;
+
+    FOR i FROM 1 TO 100 DO
+        FOR j FROM -10 TO 344 DO
+            FOR k FROM -100 TO 200 DO
+                xyz := xyz + 1;
+            ENDFOR
+        ENDFOR
+    ENDFOR
+
+    WRITE xyz;
+END

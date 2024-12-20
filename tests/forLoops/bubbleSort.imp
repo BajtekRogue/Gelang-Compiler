@@ -1,0 +1,23 @@
+PROGRAM IS
+    tmp, a[0:10], next_index, inner_bound
+BEGIN
+    FOR i FROM 0 TO 10 DO
+        a[i] := 50 - i;  
+    ENDFOR
+
+    FOR i FROM 0 TO 9 DO  
+        inner_bound := 9 - i;
+        FOR j FROM 0 TO inner_bound DO  
+            next_index := j + 1;  
+            IF a[j] > a[next_index] THEN
+                tmp := a[j];
+                a[j] := a[next_index];
+                a[next_index] := tmp;
+            ENDIF
+        ENDFOR
+    ENDFOR
+
+    FOR i FROM 0 TO 10 DO
+        WRITE a[i];
+    ENDFOR
+END
