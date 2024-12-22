@@ -1,4 +1,4 @@
-FLAGS = -W -Wall -Wextra -pedantic -std=c++17
+FLAGS = -W -Wall -Wextra -pedantic -std=c++17 -g
 BUILD_DIR = build
 OBJ_DIR = $(BUILD_DIR)/obj
 SRC_DIR = src
@@ -14,16 +14,22 @@ OBJ_FILES := $(patsubst $(COMPILING_DIR)/%.cpp, $(OBJ_DIR)/%.o, $(CPP_FILES))
 # Create the build and obj directories if they don't exist
 $(shell mkdir -p $(OBJ_DIR))
 
-.PHONY: all clean cleanall
+.PHONY: all debug release clean cleanall
 
-# Default target
-# all: $(BUILD_DIR)/ge
-# 	$(MAKE) -C $(VIRTUAL_MACHINE_DIR)
+# Default target (debug build)
+all: debug
+
+# Debug target
+debug: $(BUILD_DIR)/ge
+
+# Release target
+release: FLAGS += -O2
+release: $(BUILD_DIR)/ge
+	strip $@
 
 # Rule for the final executable
 $(BUILD_DIR)/ge: $(OBJ_FILES) $(OBJ_DIR)/lexer.o $(OBJ_DIR)/parser.o
 	$(CXX) $(FLAGS) $^ -o $@
-	strip $@
 
 # Generic rule to compile all .cpp files in the compiling directory
 $(OBJ_DIR)/%.o: $(COMPILING_DIR)/%.cpp

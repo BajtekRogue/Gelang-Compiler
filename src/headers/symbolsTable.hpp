@@ -9,6 +9,7 @@
 #include <stdexcept>
 #include <utility>
 #include <vector>
+#include <algorithm>
 
 typedef long long ll;
 
@@ -59,7 +60,8 @@ namespace std {
 
 class SymbolsTable {
 public:
-    SymbolsTable(ll startingMemoryAddres);
+    SymbolsTable();
+    SymbolsTable(std::string procedureIdentifier, ll startingMemoryAddres);
 
     bool isVariableDeclared(const std::string& identifier) const;
     bool isVariableInitialized(const std::string& identifier) const;
@@ -81,9 +83,32 @@ public:
     void addForLoopBound(const std::string& identifier, const std::string& boundIdentifier);
     ll getMemoryAddress_forLoopBound(const std::string& identifier) const;
     
+    void addProcedure(const std::string& identifier, const std::vector<ParameterType>& parameters, const std::vector<ll>& parametersMemoryAddresses, ll returnAddress);
+    bool isProcedureDeclared(const std::string& identifier) const;
+    const std::vector<ParameterType>& getProcedureParameters(const std::string& identifier) const;
+    const std::vector<ll>& getProcedureParametersMemoryAddresses(const std::string& identifier) const;
+    ll getProcedureReturnAddress(const std::string& identifier) const;
+
+    void addParameter(const std::string& identifier, ParameterType type);
+    ParameterType getParameterType(const std::string& identifier) const;
+    ll getMemoryAddressPointer_parameter(const std::string& identifier) const;
+
+    ll getLastMemoryAddress() const;
+    
+    bool isLocalVariable(const std::string& identifier) const;
+    bool isParameter(const std::string& identifier) const;
+
     void printSymbols() const;
 
+    void setReturnAddress();
+    ll getReturnAddress() const;
+
+    std::vector<ll> getOwnParametersMemoryAddresses() const;
+    std::string getOwnIdentifier() const;
+
 private:
+    std::string procedureIdentifier;
+
     std::unordered_set<std::string> variables;
     std::unordered_map<std::string, bool> initialized_variables;
     std::unordered_map<std::string, ll> memoryAddresses_variables;
@@ -95,7 +120,15 @@ private:
     std::unordered_map<std::string, std::string> forLoopBounds;
     std::unordered_map<std::string, ll> memoryAddresses_forLoopBounds;
 
+    std::unordered_map<std::string, std::vector<ParameterType>> procedures_toCall;
+    std::unordered_map<std::string, std::vector<ll>> proceduresParametersMemoryAddresses_toCall;
+    std::unordered_map<std::string, ll> proceduresReturnAddresses_toCall;
+
+    std::vector<std::pair<std::string, ParameterType>> parameters;
+    std::unordered_map<std::string, ll> memoryAddressesPointers_parameters;
+
     ll lastMemoryAddress;
+    ll returnAddress;
 
     void __addVariable(const std::unique_ptr<Variable>& var, ll memoryAddress);
 

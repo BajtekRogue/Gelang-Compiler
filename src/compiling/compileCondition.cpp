@@ -1,6 +1,9 @@
 #include "assembling.hpp"
 #include "symbolsTable.hpp"
 #include "languageStructs.hpp"
+#include "compiling.hpp"
+#include "utlity.hpp"
+
 
 std::pair<std::vector<AssemblyInstruction>, std::optional<bool>> compileCondition(SymbolsTable& symbolsTable, const std::unique_ptr<Condition>& cond, ll jumpAddress){
     std::vector<AssemblyInstruction> result;

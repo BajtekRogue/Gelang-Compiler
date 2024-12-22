@@ -2,6 +2,9 @@
 #include "symbolsTable.hpp"
 #include "languageStructs.hpp"
 #include "colors.hpp"
+#include "compiling.hpp"
+#include "utlity.hpp"
+
 
 std::vector<AssemblyInstruction> compileCommand(SymbolsTable& symbolsTable, std::unique_ptr<Command>& cmd) {
     std::vector<AssemblyInstruction> code;
@@ -284,10 +287,59 @@ std::vector<AssemblyInstruction> compileCommand(SymbolsTable& symbolsTable, std:
             symbolsTable.removeIterator(forDowntoCmd->iterator);
             break;
         }
+        case CommandType::ProcedureCall:{
+            ProcedureCallCommand* procCallCmd = dynamic_cast<ProcedureCallCommand*>(cmd.release());
+
+            if(!symbolsTable.isProcedureDeclared(procCallCmd->identifier)){
+                throw std::logic_error("Procedure `" + procCallCmd->identifier + "` was not declared but is called in " + symbolsTable.getOwnIdentifier());
+            }
+
+            std::vector<ParameterType> procParamTypes = symbolsTable.getProcedureParameters(procCallCmd->identifier);
+            size_t expectedNumArgs = procParamTypes.size();
+            size_t givenNumArgs = procCallCmd->arguments.size();
+
+            if(expectedNumArgs != givenNumArgs){
+                throw std::logic_error("Invalid number of arguments for procedure call " + procCallCmd->identifier);
+            }
+
+            code.push_back(AssemblyInstruction(AssemblyInstructionType::LABEL_INSTRUCTION, procCallCmd->toString()));
+
+            std::vector<ll> argumentsAddresses = symbolsTable.getProcedureParametersMemoryAddresses(procCallCmd->identifier);
+            ll returnAddress = symbolsTable.getProcedureReturnAddress(procCallCmd->identifier);
+
+            for(size_t i = 0; i < givenNumArgs; i++){
+
+                // Check if the argument is valid
+                if(procCallCmd->arguments[i]->isNumber()){
+                    throw std::logic_error("A number `" + std::to_string(procCallCmd->arguments[i]->asNumber()) + "` cannot be passed as an argument to a procedure");
+                }
+
+                Identifier paramId = procCallCmd->arguments[i]->asIdentifier();
+
+                validateUseOfVariable(symbolsTable, paramId, "Procedure call", false, procParamTypes[i] == ParameterType::Array);
+
+                if(symbolsTable.isVariableDeclared(paramId.id) && procParamTypes[i] == ParameterType::Array){
+                    throw std::logic_error("Variable `" + procCallCmd->arguments[i]->asIdentifier().toString() + "` cannot be passed as "  + std::to_string(i) + "-th argument to a procedure as it expects an array");
+                }
+                else if(symbolsTable.isArrayDeclared(paramId.id) && procParamTypes[i] == ParameterType::Integer){
+                    throw std::logic_error("Array `" + procCallCmd->arguments[i]->asIdentifier().toString() + "` cannot be passed as "  + std::to_string(i) + "-th argument to a procedure as it expects a variable");
+                }
+                
+                // Load the pointers where the procedure expects them
+                std::vector<AssemblyInstruction> loadArgCode = getAddressToDestinationAddress(symbolsTable, *(procCallCmd->arguments[i]), argumentsAddresses[i]);
+                code.insert(code.end(), loadArgCode.begin(), loadArgCode.end());
+            }
+
+            // Set the return address and jump to the procedure. These addresses will be fixed later
+            code.push_back(AssemblyInstruction(AssemblyInstructionType::SET, procCallCmd->identifier));
+            code.push_back(AssemblyInstruction(AssemblyInstructionType::STORE, returnAddress));
+            code.push_back(AssemblyInstruction(AssemblyInstructionType::JUMP, procCallCmd->identifier));
+            return code;
+            break;
+        }
         default:
             throw std::runtime_error("Non-implemented command type");
     }
-
     return code;
 }
 

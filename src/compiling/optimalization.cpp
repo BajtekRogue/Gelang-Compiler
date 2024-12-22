@@ -1,6 +1,9 @@
 #include "assembling.hpp"
 #include "symbolsTable.hpp"
 #include "languageStructs.hpp"
+#include "compiling.hpp"
+#include "utlity.hpp"
+
 
 bool isThereForLoop(std::unique_ptr<Program>& program){
     std::string s = program.get()->toString();
@@ -82,7 +85,8 @@ std::vector<AssemblyInstruction> initilizedConstants(std::vector<AssemblyInstruc
     // Load constants
     ll memoryAddress = MEMORY_CONSTANTS + 1;
     std::unordered_map<ll, ll> constantsMemoryAddresses;
-    
+    bool isPreprocessing = false;
+
     for(const auto& [constant, occurence] : constantsOccurences){
         if(occurence > 1){
             ll destination = (isOnePresent && constant == 1 ? MEMORY_ONE : memoryAddress);
@@ -91,7 +95,12 @@ std::vector<AssemblyInstruction> initilizedConstants(std::vector<AssemblyInstruc
             newCode.push_back(AssemblyInstruction(AssemblyInstructionType::STORE, destination));
             constantsMemoryAddresses[constant] = destination;
             memoryAddress++;
+            isPreprocessing = true;
         }
+    }
+
+    if(isPreprocessing){
+        newCode.push_back(AssemblyInstruction(AssemblyInstructionType::LABEL_INSTRUCTION, "Finished preprocessing\n"));
     }
 
     // Replace constants with memory addresses
@@ -112,5 +121,6 @@ std::vector<AssemblyInstruction> initilizedConstants(std::vector<AssemblyInstruc
         }
     }
 
+    newCode.insert(newCode.begin(), AssemblyInstruction(AssemblyInstructionType::LABEL_INSTRUCTION, "Preprocessing..."));
     return newCode;
 }

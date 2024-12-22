@@ -1,6 +1,9 @@
 #include "assembling.hpp"
 #include "symbolsTable.hpp"
 #include "languageStructs.hpp"
+#include "compiling.hpp"
+#include "utlity.hpp"
+
 
 std::vector<AssemblyInstruction> compileExpression(SymbolsTable& symbolsTable, const std::unique_ptr<Expression>& expr){
     std::vector<AssemblyInstruction> result;
@@ -10,63 +13,7 @@ std::vector<AssemblyInstruction> compileExpression(SymbolsTable& symbolsTable, c
 
     // If there is no right expression, return the left one
     if(!expr->right){
-
-        // If the expression is a number just set accumulator to it
-        if(left.isNumber()){
-
-            ll num = left.asNumber();
-
-            // If 0 clear the accumulator because it is cheaper
-            if(num == 0){
-                result.push_back(AssemblyInstruction(AssemblyInstructionType::SUB, 0));
-            }else{
-                result.push_back(AssemblyInstruction(AssemblyInstructionType::SET, num));
-            }
-
-            return result;
-        }
-
-        // If the expression is an identifier
-        Identifier identifier = left.asIdentifier();
-        std::string id = identifier.id;
-
-        validateUseOfVariable(symbolsTable, identifier, "expression", true);
-
-        // If the identifier is a variable
-        if(identifier.isVariable()){
-
-            // Just load it from memory
-            ll address = symbolsTable.getMemoryAddress_variable(id);
-            result.push_back(AssemblyInstruction(AssemblyInstructionType::LOAD, address));
-            return result;
-        }
-
-        // If its an array access by index
-        ArrayAccess arrayAccess = identifier.arrayAccess.value();
-
-        // If array is accessed by index
-        if(arrayAccess.isByIndex()){
-
-            ll index = arrayAccess.getIndex();
-
-            // Just load it from memory
-            ll address = symbolsTable.getMemoryAddress_at(id, index);
-            result.push_back(AssemblyInstruction(AssemblyInstructionType::LOAD, address));
-            return result;
-        }
-
-        // Array access by variable
-        std::string indexIdentifier = arrayAccess.getIndexVariable();
-
-        // Get memory address of index and load value of the array at it into memory. Account for the offset of the array
-        ll indexAddres = symbolsTable.getMemoryAddress_variable(indexIdentifier);
-        ll arrayStartAddres = symbolsTable.getMemoryAddress_start(identifier.id) + symbolsTable.get_offset(identifier.id);
-
-        // Load into the accumulator the value at the index of the array
-        result.push_back(AssemblyInstruction(AssemblyInstructionType::SET, arrayStartAddres));
-        result.push_back(AssemblyInstruction(AssemblyInstructionType::ADD, indexAddres));
-        result.push_back(AssemblyInstruction(AssemblyInstructionType::LOADI, 0));
-        return result;
+        return getValueToDestinationAddress(symbolsTable, left, 0);
     }
 
     // If there is a right expression
@@ -127,13 +74,13 @@ std::vector<AssemblyInstruction> compileExpression(SymbolsTable& symbolsTable, c
     }
 
     // Check special cases of arithmetic identities
-    // 0 + x = 0
+    // 0 + x = x
     if(expr->type == ExpressionType::Plus && left.isNumber() && left.asNumber() == 0){
         std::vector<AssemblyInstruction> loadRight_code = getValueToDestinationAddress(symbolsTable, right, 0);
         result.insert(result.end(), loadRight_code.begin(), loadRight_code.end());
         return result;
     }
-    // x + 0 = 0
+    // x + 0 = x
     if(expr->type == ExpressionType::Plus &&  right.isNumber() && right.asNumber() == 0){
         std::vector<AssemblyInstruction> loadLeft_code = getValueToDestinationAddress(symbolsTable, left, 0);
         result.insert(result.end(), loadLeft_code.begin(), loadLeft_code.end());
@@ -144,7 +91,7 @@ std::vector<AssemblyInstruction> compileExpression(SymbolsTable& symbolsTable, c
         result.push_back(AssemblyInstruction(AssemblyInstructionType::SUB, 0));
         return result;
     }
-    // x - 0 = 0
+    // x - 0 = x
     if(expr->type == ExpressionType::Minus && right.isNumber() && right.asNumber() == 0){
         std::vector<AssemblyInstruction> loadLeft_code = getValueToDestinationAddress(symbolsTable, left, 0);
         result.insert(result.end(), loadLeft_code.begin(), loadLeft_code.end());
@@ -189,7 +136,7 @@ std::vector<AssemblyInstruction> compileExpression(SymbolsTable& symbolsTable, c
         return result;
     }
 
-    // If at least one is a number load left into the accumulator and right to memory[1] and preform the operation
+    // If at least one is a number load left into the accumulator and right to p[1] and preform the operation
     std::vector<AssemblyInstruction> loadRight_code = getValueToDestinationAddress(symbolsTable, right, 1);
     result.insert(result.end(), loadRight_code.begin(), loadRight_code.end());
 

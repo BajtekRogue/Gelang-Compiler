@@ -635,6 +635,14 @@ struct Procedure {
     std::vector<std::unique_ptr<Variable>> declarations;  
     std::vector<std::unique_ptr<Command>> commands;
 
+    std::vector<ParameterType> getParameterTypes() const {
+        std::vector<ParameterType> result;
+        for (const auto& param : parameters) {
+            result.push_back(param->type);
+        }
+        return result;
+    }
+
     std::string toString() const {
         std::string result = "PROCEDURE: " + identifier + "\n";
         result += "Parameters:\n";

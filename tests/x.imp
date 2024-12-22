@@ -1,7 +1,41 @@
-PROGRAM IS
-    x, y, z[1:333]
+PROCEDURE jas_fasola(x, T y, p, q, r) IS
+    z, w[-1:4], j
 BEGIN
-    FOR i FROM z[-777] TO 100 DO
-        y := 3;
+    j := -11;
+    z := x;
+    z := y[0];
+    z := y[2];
+    z := w[x];
+    z := y[j];
+    z := y[x];
+END
+
+PROCEDURE guten_morgen(t) IS
+    f, g, h, k[1:97]
+BEGIN
+    FOR i FROM 1 TO 10 DO
+        WRITE i;
     ENDFOR
+END
+
+PROCEDURE sigma(s, T u, v) IS
+    a, b, c[-11:56]
+BEGIN
+    a := 4;
+    c[a] := v;
+    WRITE c[a];
+    u[s] := s + 7;
+END
+
+PROGRAM IS
+    a, b[0:100], c[0:100], f, g, h
+BEGIN
+    a := 23;
+    c[a] := 1;
+    b[30] := -1;
+    WRITE a;
+    WRITE b[30];
+    jas_fasola(a, b, f, g, h);
+    WRITE a;
+    WRITE b[30];
 END

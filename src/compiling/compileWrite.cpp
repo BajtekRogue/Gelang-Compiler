@@ -1,6 +1,9 @@
 #include "assembling.hpp"
 #include "symbolsTable.hpp"
 #include "languageStructs.hpp"
+#include "compiling.hpp"
+#include "utlity.hpp"
+
 
 std::vector<AssemblyInstruction> compileWrite(SymbolsTable& symbolsTable, const std::unique_ptr<WriteCommand>& cmd){      
     std::vector<AssemblyInstruction> result;
@@ -31,12 +34,23 @@ std::vector<AssemblyInstruction> compileWrite(SymbolsTable& symbolsTable, const 
     Identifier identifier = val.asIdentifier();
     std::string id = identifier.id;
 
+
     // Check if identifier is a variable
     if(identifier.isVariable()){
         
-        ll address = symbolsTable.getMemoryAddress_variable(id);
-        result.push_back(AssemblyInstruction(AssemblyInstructionType::PUT, address));
-        symbolsTable.markAsInitialized(id);  
+        // If variable is local
+        if(!symbolsTable.isParameter(id)){
+            ll address = symbolsTable.getMemoryAddress_variable(id);
+            result.push_back(AssemblyInstruction(AssemblyInstructionType::PUT, address));
+            symbolsTable.markAsInitialized(id);  
+            return result;
+        }
+
+        // If variable is a parameter
+        ll parameterAddress = symbolsTable.getMemoryAddressPointer_parameter(id);
+
+        result.push_back(AssemblyInstruction(AssemblyInstructionType::LOADI, parameterAddress));
+        result.push_back(AssemblyInstruction(AssemblyInstructionType::PUT, 0));
         return result;
     }
 
@@ -47,23 +61,85 @@ std::vector<AssemblyInstruction> compileWrite(SymbolsTable& symbolsTable, const 
     if(arrayAccess.isByIndex()){
 
         ll index = arrayAccess.getIndex();
-      
-        // Get memory address of array at the index and ouput the value there
-        ll address = symbolsTable.getMemoryAddress_at(id, index);
-        result.push_back(AssemblyInstruction(AssemblyInstructionType::PUT, address));
+
+        // If the array is local
+        if(!symbolsTable.isParameter(id)){
+            // Get memory address of array at the index and ouput the value there
+            ll address = symbolsTable.getMemoryAddress_at(id, index);
+            result.push_back(AssemblyInstruction(AssemblyInstructionType::PUT, address));
+            return result;
+        }
+
+        // If the array is a parameter
+        ll address = symbolsTable.getMemoryAddressPointer_parameter(id);
+
+        // If index is 0
+        if(index == 0){
+            result.push_back(AssemblyInstruction(AssemblyInstructionType::LOADI, address));
+            result.push_back(AssemblyInstruction(AssemblyInstructionType::PUT, 0));
+            return result;
+        }
+
+        result.push_back(AssemblyInstruction(AssemblyInstructionType::SET, index));
+        result.push_back(AssemblyInstruction(AssemblyInstructionType::ADDI, address));
+        result.push_back(AssemblyInstruction(AssemblyInstructionType::LOAD, 0));
+        result.push_back(AssemblyInstruction(AssemblyInstructionType::PUT, 0));
         return result;
     }
 
     // If the array is accessed by a variable             
     std::string indexIdentifier = arrayAccess.getIndexVariable();
 
-    // Get memory address of index and output the value there. Account for the offset of the array
-    ll indexAddress = symbolsTable.getMemoryAddress_variable(indexIdentifier);
-    ll arrayStartAddress = symbolsTable.getMemoryAddress_start(id) + symbolsTable.get_offset(id);
+    // If both array and the variable are local
+    if(!symbolsTable.isParameter(id) && !symbolsTable.isParameter(indexIdentifier)){
+        // Get memory address of index and output the value there. Account for the offset of the array
+        ll indexAddress = symbolsTable.getMemoryAddress_variable(indexIdentifier);
+        ll arrayStartAddress = symbolsTable.getMemoryAddress_start(id) + symbolsTable.get_offset(id);
 
-    result.push_back(AssemblyInstruction(AssemblyInstructionType::SET, arrayStartAddress));
-    result.push_back(AssemblyInstruction(AssemblyInstructionType::ADD, indexAddress));
-    result.push_back(AssemblyInstruction(AssemblyInstructionType::LOADI, 0));
-    result.push_back(AssemblyInstruction(AssemblyInstructionType::PUT, 0));
+        result.push_back(AssemblyInstruction(AssemblyInstructionType::SET, arrayStartAddress));
+        result.push_back(AssemblyInstruction(AssemblyInstructionType::ADD, indexAddress));
+        result.push_back(AssemblyInstruction(AssemblyInstructionType::LOADI, 0));
+        result.push_back(AssemblyInstruction(AssemblyInstructionType::PUT, 0));
+        return result;
+    }
+
+    // If array is local but the index is a parameter
+    if(!symbolsTable.isParameter(id) && symbolsTable.isParameter(indexIdentifier)){
+        
+        ll indexAddress = symbolsTable.getMemoryAddress_variable(indexIdentifier);
+        ll arrayStartAddress = symbolsTable.getMemoryAddress_start(id) + symbolsTable.get_offset(id);
+
+        result.push_back(AssemblyInstruction(AssemblyInstructionType::SET, arrayStartAddress));
+        result.push_back(AssemblyInstruction(AssemblyInstructionType::ADDI, indexAddress));
+        result.push_back(AssemblyInstruction(AssemblyInstructionType::LOADI, 0));
+        result.push_back(AssemblyInstruction(AssemblyInstructionType::PUT, 0));
+        return result;
+    }
+
+    // If array is a parameter but the index is local
+    if(symbolsTable.isParameter(id) && !symbolsTable.isParameter(indexIdentifier)){
+        
+        ll indexAddress = symbolsTable.getMemoryAddress_variable(indexIdentifier);
+        ll arrayAddress = symbolsTable.getMemoryAddressPointer_parameter(id);
+
+        result.push_back(AssemblyInstruction(AssemblyInstructionType::LOADI, arrayAddress));
+        result.push_back(AssemblyInstruction(AssemblyInstructionType::ADD, indexAddress));
+        result.push_back(AssemblyInstruction(AssemblyInstructionType::LOADI, 0));
+        result.push_back(AssemblyInstruction(AssemblyInstructionType::PUT, 0));
+        return result;
+    }
+
+    // If both array and the index are parameters
+    if(symbolsTable.isParameter(id) && symbolsTable.isParameter(indexIdentifier)){
+        
+        ll indexAddress = symbolsTable.getMemoryAddressPointer_parameter(indexIdentifier);
+        ll arrayAddress = symbolsTable.getMemoryAddressPointer_parameter(id);
+
+        result.push_back(AssemblyInstruction(AssemblyInstructionType::LOADI, arrayAddress));
+        result.push_back(AssemblyInstruction(AssemblyInstructionType::ADDI, indexAddress));
+        result.push_back(AssemblyInstruction(AssemblyInstructionType::LOADI, 0));
+        result.push_back(AssemblyInstruction(AssemblyInstructionType::PUT, 0));
+        return result;
+    }
     return result;
 }

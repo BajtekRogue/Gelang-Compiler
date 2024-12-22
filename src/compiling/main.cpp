@@ -1,14 +1,15 @@
 #include "assembling.hpp"
 #include "languageStructs.hpp"
 #include "colors.hpp"
+#include "compiling.hpp"
+
 
 extern void runParser(std::FILE* data, std::unique_ptr<Program>& parsedProgram);
 
 int main(int argc, char *argv[]) {
 
     if (argc < 3 || argc > 4) {
-        fprintf(stderr, "%sUsage: %s <inputFilePath> <outputFilePath> [-g]\n%s",
-                color_White.c_str(), argv[0], color_Reset.c_str());
+        fprintf(stderr, "%sUsage: %s <inputFilePath> <outputFilePath> [-g]\n%s", color_White.c_str(), argv[0], color_Reset.c_str());
         return 1;
     }
 
@@ -31,10 +32,7 @@ int main(int argc, char *argv[]) {
         std::fclose(data);
     }
 
-    // std::cout << color_Magenta << "\nAST: " << color_Reset << "\n";
-    // std::cout << parsedProgram->toString() << "\n";
     
-
     try {
         // Compile the program
         std::vector<AssemblyInstruction> code = compile(parsedProgram);
@@ -50,6 +48,7 @@ int main(int argc, char *argv[]) {
         // Write the assembly code to the output file
         for (const AssemblyInstruction& instruction : code) {
             std::string s = instruction.toString();
+            // Skip comments if not debugging
             if(!debugging && s[0] == '#') {
                 continue;
             }
@@ -58,9 +57,14 @@ int main(int argc, char *argv[]) {
 
         return 0;
 
-    } catch (const std::runtime_error& e) {
-        // Handle specific runtime errors during compilation
+    } catch (const std::logic_error& e) {
+        // Handle specific logic errors during compilation
         fprintf(stderr, "%sCompilation Error: %s%s\n", color_Red.c_str(), e.what(), color_Reset.c_str());
+        return 1;
+
+    } catch(const std::runtime_error& e){
+        // Handle specific runtime errors during compilation
+        fprintf(stderr, "%sRuntime error: %s%s\n", color_Red.c_str(), e.what(), color_Reset.c_str());
         return 1;
 
     } catch (const std::bad_alloc& e) {
