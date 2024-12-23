@@ -14,7 +14,7 @@ std::vector<AssemblyInstruction> compileRead(SymbolsTable& symbolsTable, const s
         throw std::logic_error("Cannot READ into an iterator " + id);
     }
 
-    result.push_back(AssemblyInstruction(AssemblyInstructionType::LABEL_INSTRUCTION, "READ " + id));
+    result.push_back(AssemblyInstruction(AssemblyInstructionType::LABEL_INSTRUCTION, "READ " + identifier->toString()));
 
     // READ a variable
     if(identifier->isVariable()){
@@ -49,6 +49,7 @@ std::vector<AssemblyInstruction> compileRead(SymbolsTable& symbolsTable, const s
             // Get memory address of array at the index and store the input there
             ll address = symbolsTable.getMemoryAddress_at(id, index);
             result.push_back(AssemblyInstruction(AssemblyInstructionType::GET, address));
+
             return result;
         }
 
@@ -63,11 +64,12 @@ std::vector<AssemblyInstruction> compileRead(SymbolsTable& symbolsTable, const s
         }
 
         result.push_back(AssemblyInstruction(AssemblyInstructionType::SET, index));
-        result.push_back(AssemblyInstruction(AssemblyInstructionType::ADDI, address));
+        result.push_back(AssemblyInstruction(AssemblyInstructionType::ADD, address));
         result.push_back(AssemblyInstruction(AssemblyInstructionType::STORE, MEMORY_ARRAY_VARIABLE_ASSIGN));
         result.push_back(AssemblyInstruction(AssemblyInstructionType::GET, 0));
         result.push_back(AssemblyInstruction(AssemblyInstructionType::STOREI, MEMORY_ARRAY_VARIABLE_ASSIGN));
 
+        return result;
     }
 
     // If array is accessed by variable
@@ -85,12 +87,14 @@ std::vector<AssemblyInstruction> compileRead(SymbolsTable& symbolsTable, const s
         result.push_back(AssemblyInstruction(AssemblyInstructionType::STORE, MEMORY_ARRAY_VARIABLE_ASSIGN));
         result.push_back(AssemblyInstruction(AssemblyInstructionType::GET, 0));
         result.push_back(AssemblyInstruction(AssemblyInstructionType::STOREI, MEMORY_ARRAY_VARIABLE_ASSIGN));
+
+        return result;
     }
 
     // If array is local but the index is a parameter
     if(!symbolsTable.isParameter(id) && symbolsTable.isParameter(indexIdentifier)){
 
-        ll indexAddress = symbolsTable.getMemoryAddress_variable(indexIdentifier);
+        ll indexAddress = symbolsTable.getMemoryAddressPointer_parameter(indexIdentifier);
         ll arrayStartAddress = symbolsTable.getMemoryAddress_start(id) + symbolsTable.get_offset(id);
 
         result.push_back(AssemblyInstruction(AssemblyInstructionType::SET, arrayStartAddress));
@@ -98,6 +102,8 @@ std::vector<AssemblyInstruction> compileRead(SymbolsTable& symbolsTable, const s
         result.push_back(AssemblyInstruction(AssemblyInstructionType::STORE, MEMORY_ARRAY_VARIABLE_ASSIGN));
         result.push_back(AssemblyInstruction(AssemblyInstructionType::GET, 0));
         result.push_back(AssemblyInstruction(AssemblyInstructionType::STOREI, MEMORY_ARRAY_VARIABLE_ASSIGN));
+
+        return result;
     }
     
     // If array is a parameter but the index is local
@@ -106,11 +112,13 @@ std::vector<AssemblyInstruction> compileRead(SymbolsTable& symbolsTable, const s
         ll indexAddress = symbolsTable.getMemoryAddress_variable(indexIdentifier);
         ll arrayAddress = symbolsTable.getMemoryAddressPointer_parameter(id);
 
-        result.push_back(AssemblyInstruction(AssemblyInstructionType::LOADI, arrayAddress));
+        result.push_back(AssemblyInstruction(AssemblyInstructionType::LOAD, arrayAddress));
         result.push_back(AssemblyInstruction(AssemblyInstructionType::ADD, indexAddress));
         result.push_back(AssemblyInstruction(AssemblyInstructionType::STORE, MEMORY_ARRAY_VARIABLE_ASSIGN));
         result.push_back(AssemblyInstruction(AssemblyInstructionType::GET, 0));
         result.push_back(AssemblyInstruction(AssemblyInstructionType::STOREI, MEMORY_ARRAY_VARIABLE_ASSIGN));
+
+        return result;
     }
 
     // If both array and the index are parameters
@@ -120,7 +128,7 @@ std::vector<AssemblyInstruction> compileRead(SymbolsTable& symbolsTable, const s
         ll arrayAddress = symbolsTable.getMemoryAddressPointer_parameter(id);
 
         // Load into the accumulator the value at the index of the array
-        result.push_back(AssemblyInstruction(AssemblyInstructionType::LOADI, arrayAddress));
+        result.push_back(AssemblyInstruction(AssemblyInstructionType::LOAD, arrayAddress));
         result.push_back(AssemblyInstruction(AssemblyInstructionType::ADDI, indexAddress));
         result.push_back(AssemblyInstruction(AssemblyInstructionType::STORE, MEMORY_ARRAY_VARIABLE_ASSIGN));
         result.push_back(AssemblyInstruction(AssemblyInstructionType::GET, 0));

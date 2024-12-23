@@ -84,6 +84,7 @@ void SymbolsTable::validateIterator(const std::string& identifier) const{
         throw std::logic_error("Array with identifier '" + identifier + "' already exists but is being used as iterator");
     }
 }
+
 void SymbolsTable::addIterator(const std::string& identifier) {
     validateIterator(identifier);
     variables.insert(identifier);

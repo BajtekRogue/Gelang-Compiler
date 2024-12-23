@@ -5,11 +5,17 @@ SRC_DIR = src
 HEADER_DIR = $(SRC_DIR)/headers
 PARSER_DIR = $(SRC_DIR)/parsing
 COMPILING_DIR = $(SRC_DIR)/compiling
+CORE_DIR = $(SRC_DIR)/core
 VIRTUAL_MACHINE_DIR = VM
 
-# Find all .cpp files in the compiling directory
-CPP_FILES := $(wildcard $(COMPILING_DIR)/*.cpp)
-OBJ_FILES := $(patsubst $(COMPILING_DIR)/%.cpp, $(OBJ_DIR)/%.o, $(CPP_FILES))
+# Find all .cpp files in the compiling and core directories
+COMPILING_CPP_FILES := $(wildcard $(COMPILING_DIR)/*.cpp)
+CORE_CPP_FILES := $(wildcard $(CORE_DIR)/*.cpp)
+ALL_CPP_FILES := $(COMPILING_CPP_FILES) $(CORE_CPP_FILES)
+
+# Generate object file paths
+OBJ_FILES := $(patsubst $(COMPILING_DIR)/%.cpp, $(OBJ_DIR)/%.o, $(COMPILING_CPP_FILES))
+OBJ_FILES += $(patsubst $(CORE_DIR)/%.cpp, $(OBJ_DIR)/%.o, $(CORE_CPP_FILES))
 
 # Create the build and obj directories if they don't exist
 $(shell mkdir -p $(OBJ_DIR))
@@ -31,8 +37,11 @@ release: $(BUILD_DIR)/ge
 $(BUILD_DIR)/ge: $(OBJ_FILES) $(OBJ_DIR)/lexer.o $(OBJ_DIR)/parser.o
 	$(CXX) $(FLAGS) $^ -o $@
 
-# Generic rule to compile all .cpp files in the compiling directory
+# Generic rule to compile all .cpp files in the compiling and core directories
 $(OBJ_DIR)/%.o: $(COMPILING_DIR)/%.cpp
+	$(CXX) $(FLAGS) -I$(HEADER_DIR) -c $< -o $@
+
+$(OBJ_DIR)/%.o: $(CORE_DIR)/%.cpp
 	$(CXX) $(FLAGS) -I$(HEADER_DIR) -c $< -o $@
 
 # Rule for generating lexer.cpp from lexer.l
@@ -48,9 +57,9 @@ $(OBJ_DIR)/parser.o: $(OBJ_DIR)/parser.cpp
 
 # Rule to generate parser.cpp and parser.hpp
 $(OBJ_DIR)/parser.cpp $(OBJ_DIR)/parser.hpp: $(PARSER_DIR)/parser.y $(HEADER_DIR)/languageStructs.hpp $(HEADER_DIR)/colors.hpp
-	bison -Wall -d -o $(OBJ_DIR)/parser.cpp $<
+	bison -Wall -d -o $@ $<
 
-# $(MAKE) -C $(VIRTUAL_MACHINE_DIR) clean <- add this if you want to clean VM as well
+# Clean rules
 clean:
 	rm -f $(OBJ_DIR)/*.o $(OBJ_DIR)/parser.cpp $(OBJ_DIR)/parser.hpp $(OBJ_DIR)/lexer.cpp
 

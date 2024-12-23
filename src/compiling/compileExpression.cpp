@@ -13,6 +13,12 @@ std::vector<AssemblyInstruction> compileExpression(SymbolsTable& symbolsTable, c
 
     // If there is no right expression, return the left one
     if(!expr->right){
+
+        // Check if the variable is used correctly
+        if(left.isIdentifier()){
+            validateUseOfVariable(symbolsTable, left.asIdentifier(), "expression", true);
+        }
+        
         return getValueToDestinationAddress(symbolsTable, left, 0);
     }
 

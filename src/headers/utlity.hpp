@@ -33,6 +33,10 @@ std::vector<AssemblyInstruction> getValueToDestinationAddress(SymbolsTable& symb
  */
 void validateUseOfVariable(SymbolsTable& symbolsTable, const Identifier& identifier, const std::string commandName, bool mustBeInitialized, bool arrayAsPointer = false);
 
+/**
+ * @brief Checks if a instruction is real
+ */
+bool isRealInstruction(AssemblyInstruction ins);
 
 /**
  * @brief Counts number of real instructions in the given vector of assembly instructions
@@ -96,6 +100,6 @@ std::vector<AssemblyInstruction> getAddressToDestinationAddress(SymbolsTable& sy
  * @param code code of the compiled program, to fix
  * @param proceduresTables all procedures tables (including main)
  */
-void fixProcedureCallsJumps(std::vector<AssemblyInstruction>& code, const std::vector<SymbolsTable>& proceduresTables);
+void fixProcedureCallsJumps(std::vector<AssemblyInstruction>& code);
 
 #endif // UTILITY_HPP

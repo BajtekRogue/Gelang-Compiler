@@ -1,0 +1,30 @@
+PROCEDURE printf(x, T y) IS
+    p, q[-33:40]
+BEGIN
+
+    READ p;
+    READ q[5];
+    READ q[p];
+    READ x;
+    READ q[x];
+    READ y[0];
+    READ y[3];
+    READ y[x];
+    READ y[p];
+
+    WRITE p;
+    WRITE q[5];
+    WRITE q[p];
+    WRITE x;
+    WRITE q[x];
+    WRITE y[0];
+    WRITE y[3];
+    WRITE y[x];
+    WRITE y[p];
+END
+
+PROGRAM IS
+    a, b[-10:100]
+BEGIN
+    printf(a, b);
+END

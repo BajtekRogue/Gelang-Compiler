@@ -1,0 +1,38 @@
+# in=; out=13 8
+
+PROCEDURE f(x, y) IS
+BEGIN   
+    WRITE -999999;
+    WRITE x;
+    WRITE y;
+    x := x + y;
+    y := x - y;
+    WRITE -888888;
+    WRITE x;
+    WRITE y;
+END
+
+PROCEDURE g(p, q) IS
+BEGIN
+    WRITE -111111;
+    WRITE p;
+    WRITE q;
+    f(p, q);
+    WRITE -222222;
+    WRITE p;
+    WRITE q;
+    f(p, q);
+    WRITE -333333;
+    WRITE p;
+    WRITE q;
+END
+
+PROGRAM IS
+    a, b
+BEGIN
+    a := 5;
+    b := 3;
+    g(a, b);
+    WRITE a; 
+    WRITE b; 
+END

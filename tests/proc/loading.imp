@@ -1,0 +1,38 @@
+PROCEDURE check_values(x, T y, z) IS
+    p, q[3:40], r
+BEGIN
+    p := 1;
+
+
+    z := 14;
+    y[0] := 4567;
+    y[3] := 8901;
+    y[x] := 2345;
+    y[p] := 6789;
+    q[z] := 91919191;
+
+    WRITE z;
+    WRITE y[0];
+    WRITE y[3];
+    WRITE y[x];
+    WRITE y[p];
+    WRITE q[z];
+
+    IF y[p] > 0 THEN    
+        WRITE -11111;
+    ELSE
+        WRITE -22222;
+    ENDIF
+END
+
+PROGRAM IS
+    a, b[-10:100], c
+BEGIN
+    a := 23;
+    check_values(a, b, c);
+    WRITE c;
+    WRITE b[0];
+    WRITE b[3];
+    WRITE b[a];
+    WRITE b[1];
+END

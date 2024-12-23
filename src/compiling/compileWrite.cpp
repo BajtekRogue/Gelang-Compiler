@@ -81,8 +81,8 @@ std::vector<AssemblyInstruction> compileWrite(SymbolsTable& symbolsTable, const 
         }
 
         result.push_back(AssemblyInstruction(AssemblyInstructionType::SET, index));
-        result.push_back(AssemblyInstruction(AssemblyInstructionType::ADDI, address));
-        result.push_back(AssemblyInstruction(AssemblyInstructionType::LOAD, 0));
+        result.push_back(AssemblyInstruction(AssemblyInstructionType::ADD, address));
+        result.push_back(AssemblyInstruction(AssemblyInstructionType::LOADI, 0));
         result.push_back(AssemblyInstruction(AssemblyInstructionType::PUT, 0));
         return result;
     }
@@ -106,7 +106,7 @@ std::vector<AssemblyInstruction> compileWrite(SymbolsTable& symbolsTable, const 
     // If array is local but the index is a parameter
     if(!symbolsTable.isParameter(id) && symbolsTable.isParameter(indexIdentifier)){
         
-        ll indexAddress = symbolsTable.getMemoryAddress_variable(indexIdentifier);
+        ll indexAddress = symbolsTable.getMemoryAddressPointer_parameter(indexIdentifier);
         ll arrayStartAddress = symbolsTable.getMemoryAddress_start(id) + symbolsTable.get_offset(id);
 
         result.push_back(AssemblyInstruction(AssemblyInstructionType::SET, arrayStartAddress));
@@ -122,7 +122,7 @@ std::vector<AssemblyInstruction> compileWrite(SymbolsTable& symbolsTable, const 
         ll indexAddress = symbolsTable.getMemoryAddress_variable(indexIdentifier);
         ll arrayAddress = symbolsTable.getMemoryAddressPointer_parameter(id);
 
-        result.push_back(AssemblyInstruction(AssemblyInstructionType::LOADI, arrayAddress));
+        result.push_back(AssemblyInstruction(AssemblyInstructionType::LOAD, arrayAddress));
         result.push_back(AssemblyInstruction(AssemblyInstructionType::ADD, indexAddress));
         result.push_back(AssemblyInstruction(AssemblyInstructionType::LOADI, 0));
         result.push_back(AssemblyInstruction(AssemblyInstructionType::PUT, 0));
@@ -135,7 +135,7 @@ std::vector<AssemblyInstruction> compileWrite(SymbolsTable& symbolsTable, const 
         ll indexAddress = symbolsTable.getMemoryAddressPointer_parameter(indexIdentifier);
         ll arrayAddress = symbolsTable.getMemoryAddressPointer_parameter(id);
 
-        result.push_back(AssemblyInstruction(AssemblyInstructionType::LOADI, arrayAddress));
+        result.push_back(AssemblyInstruction(AssemblyInstructionType::LOAD, arrayAddress));
         result.push_back(AssemblyInstruction(AssemblyInstructionType::ADDI, indexAddress));
         result.push_back(AssemblyInstruction(AssemblyInstructionType::LOADI, 0));
         result.push_back(AssemblyInstruction(AssemblyInstructionType::PUT, 0));

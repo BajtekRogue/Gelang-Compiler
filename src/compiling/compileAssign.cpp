@@ -76,7 +76,7 @@ std::vector<AssemblyInstruction> compileAssign(SymbolsTable& symbolsTable, const
 
         // Load into the accumulator the value at the index of the array
         result.push_back(AssemblyInstruction(AssemblyInstructionType::SET, index));
-        result.push_back(AssemblyInstruction(AssemblyInstructionType::ADDI, arrayAddress));
+        result.push_back(AssemblyInstruction(AssemblyInstructionType::ADD, arrayAddress));
         result.push_back(AssemblyInstruction(AssemblyInstructionType::STORE,  MEMORY_ARRAY_VARIABLE_ASSIGN));
 
         std::vector<AssemblyInstruction> expressionInstructions = compileExpression(symbolsTable, cmd->expression);
@@ -136,7 +136,7 @@ std::vector<AssemblyInstruction> compileAssign(SymbolsTable& symbolsTable, const
         ll indexAddress = symbolsTable.getMemoryAddress_variable(indexIdentifier);
         ll arrayAddress = symbolsTable.getMemoryAddressPointer_parameter(id);
 
-        result.push_back(AssemblyInstruction(AssemblyInstructionType::LOADI, arrayAddress));
+        result.push_back(AssemblyInstruction(AssemblyInstructionType::LOAD, arrayAddress));
         result.push_back(AssemblyInstruction(AssemblyInstructionType::ADD, indexAddress));
         result.push_back(AssemblyInstruction(AssemblyInstructionType::STORE,  MEMORY_ARRAY_VARIABLE_ASSIGN));
 
@@ -154,7 +154,7 @@ std::vector<AssemblyInstruction> compileAssign(SymbolsTable& symbolsTable, const
         ll indexAddress = symbolsTable.getMemoryAddressPointer_parameter(indexIdentifier);
         ll arrayAddress = symbolsTable.getMemoryAddressPointer_parameter(id);
 
-        result.push_back(AssemblyInstruction(AssemblyInstructionType::LOADI, arrayAddress));
+        result.push_back(AssemblyInstruction(AssemblyInstructionType::LOAD, arrayAddress));
         result.push_back(AssemblyInstruction(AssemblyInstructionType::ADDI, indexAddress));
         result.push_back(AssemblyInstruction(AssemblyInstructionType::STORE,  MEMORY_ARRAY_VARIABLE_ASSIGN));
 

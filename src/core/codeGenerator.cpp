@@ -54,12 +54,16 @@ std::vector<AssemblyInstruction> compile(std::unique_ptr<Program>& program) {
         code.push_back(AssemblyInstruction(AssemblyInstructionType::LABEL_ENDPROCEDURE, program->procedures[i]->identifier + "\n"));
     }
 
-    // Jump to the main procedure
-    std::vector<AssemblyInstruction> jumpToMainCode;
-    jumpToMainCode.push_back(AssemblyInstruction(AssemblyInstructionType::LABEL_INSTRUCTION, "Jump to main procedure"));
-    jumpToMainCode.push_back(AssemblyInstruction(AssemblyInstructionType::JUMP, countRealInstructions(code) + 1));
-    jumpToMainCode.push_back(AssemblyInstruction(AssemblyInstructionType::LABEL_INSTRUCTION, "\n"));
-    code.insert(code.begin(), jumpToMainCode.begin(), jumpToMainCode.end());
+    // Jump to the main procedure if needed
+    ll jumpMain = countRealInstructions(code);
+    
+    if(jumpMain > 0){
+        std::vector<AssemblyInstruction> jumpToMainCode;
+        jumpToMainCode.push_back(AssemblyInstruction(AssemblyInstructionType::LABEL_INSTRUCTION, "Jump to main procedure"));
+        jumpToMainCode.push_back(AssemblyInstruction(AssemblyInstructionType::JUMP, jumpMain + 1));
+        jumpToMainCode.push_back(AssemblyInstruction(AssemblyInstructionType::LABEL_INSTRUCTION, "\n"));
+        code.insert(code.begin(), jumpToMainCode.begin(), jumpToMainCode.end());  
+    }
 
     ll mainVariablesMemoryAddress = (proceduresTables.empty() ? MEMORY_START : findNext1000(proceduresTables.back().getLastMemoryAddress() + 1));
     SymbolsTable mainTable("MAIN", mainVariablesMemoryAddress);
@@ -80,11 +84,13 @@ std::vector<AssemblyInstruction> compile(std::unique_ptr<Program>& program) {
     }
 
     // Fix procedure calls
-    proceduresTables.push_back(mainTable);
-    fixProcedureCallsJumps(code, proceduresTables);
+    fixProcedureCallsJumps(code);
 
     // Otpimalization
     code = initilizedConstants(code, isOnePresent);
+
+    // Fix procedure calls again after inserting code at the beginning...
+    fixProcedureCallsJumps(code);
 
     // Finish the program with HALT instruction
     code.push_back(AssemblyInstruction(AssemblyInstructionType::HALT, 0));

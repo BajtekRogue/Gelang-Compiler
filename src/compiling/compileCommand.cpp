@@ -324,6 +324,11 @@ std::vector<AssemblyInstruction> compileCommand(SymbolsTable& symbolsTable, std:
                 else if(symbolsTable.isArrayDeclared(paramId.id) && procParamTypes[i] == ParameterType::Integer){
                     throw std::logic_error("Array `" + procCallCmd->arguments[i]->asIdentifier().toString() + "` cannot be passed as "  + std::to_string(i) + "-th argument to a procedure as it expects a variable");
                 }
+
+                // Mark variables as initilized
+                if(symbolsTable.isVariableDeclared(paramId.id)){
+                    symbolsTable.markAsInitialized(paramId.id);
+                }
                 
                 // Load the pointers where the procedure expects them
                 std::vector<AssemblyInstruction> loadArgCode = getAddressToDestinationAddress(symbolsTable, *(procCallCmd->arguments[i]), argumentsAddresses[i]);
@@ -331,6 +336,8 @@ std::vector<AssemblyInstruction> compileCommand(SymbolsTable& symbolsTable, std:
             }
 
             // Set the return address and jump to the procedure. These addresses will be fixed later
+
+            code.push_back(AssemblyInstruction(AssemblyInstructionType::LABEL_INSTRUCTION, "Setting return address and jumping to " + procCallCmd->identifier));
             code.push_back(AssemblyInstruction(AssemblyInstructionType::SET, procCallCmd->identifier));
             code.push_back(AssemblyInstruction(AssemblyInstructionType::STORE, returnAddress));
             code.push_back(AssemblyInstruction(AssemblyInstructionType::JUMP, procCallCmd->identifier));

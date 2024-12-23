@@ -53,7 +53,7 @@ std::vector<AssemblyInstruction> getValueToDestinationAddress(SymbolsTable& symb
 
         // Otherwise load the pointer and store its dereferenced value
         result.push_back(AssemblyInstruction(AssemblyInstructionType::LOADI, parameterAddress));
-        result.push_back(AssemblyInstruction(AssemblyInstructionType::STORE, parameterAddress));
+        result.push_back(AssemblyInstruction(AssemblyInstructionType::STORE, destination));
         return result;
     }
 
@@ -127,8 +127,8 @@ std::vector<AssemblyInstruction> getValueToDestinationAddress(SymbolsTable& symb
 
         // Otherwise load the pointer and add the index
         result.push_back(AssemblyInstruction(AssemblyInstructionType::SET, index));
-        result.push_back(AssemblyInstruction(AssemblyInstructionType::ADDI, arrayAddress));
-        result.push_back(AssemblyInstruction(AssemblyInstructionType::LOAD, 0));
+        result.push_back(AssemblyInstruction(AssemblyInstructionType::ADD, arrayAddress));
+        result.push_back(AssemblyInstruction(AssemblyInstructionType::LOADI, 0));
 
         // If destination is not the accumulator, store it
         if(destination != 0){
@@ -150,7 +150,7 @@ std::vector<AssemblyInstruction> getValueToDestinationAddress(SymbolsTable& symb
         // Load into the accumulator the value at the index of the array
         result.push_back(AssemblyInstruction(AssemblyInstructionType::SET, arrayStartAddress));
         result.push_back(AssemblyInstruction(AssemblyInstructionType::ADD, indexAddress));
-        result.push_back(AssemblyInstruction(AssemblyInstructionType::LOAD, 0));
+        result.push_back(AssemblyInstruction(AssemblyInstructionType::LOADI, 0));
 
         // If destination is not the accumulator, store it
         if(destination != 0){
@@ -169,7 +169,7 @@ std::vector<AssemblyInstruction> getValueToDestinationAddress(SymbolsTable& symb
         // Load into the accumulator the value at the index of the array
         result.push_back(AssemblyInstruction(AssemblyInstructionType::SET, arrayStartAddress));
         result.push_back(AssemblyInstruction(AssemblyInstructionType::ADDI, indexAddress));
-        result.push_back(AssemblyInstruction(AssemblyInstructionType::LOAD, 0));
+        result.push_back(AssemblyInstruction(AssemblyInstructionType::LOADI, 0));
 
         // If destination is not the accumulator, store it
         if(destination != 0){
@@ -186,9 +186,9 @@ std::vector<AssemblyInstruction> getValueToDestinationAddress(SymbolsTable& symb
         ll arrayAddress = symbolsTable.getMemoryAddressPointer_parameter(id);
 
         // Load into the accumulator the value at the index of the array
-        result.push_back(AssemblyInstruction(AssemblyInstructionType::LOADI, arrayAddress));
+        result.push_back(AssemblyInstruction(AssemblyInstructionType::LOAD, arrayAddress));
         result.push_back(AssemblyInstruction(AssemblyInstructionType::ADD, indexAddress));
-        result.push_back(AssemblyInstruction(AssemblyInstructionType::LOAD, 0));
+        result.push_back(AssemblyInstruction(AssemblyInstructionType::LOADI, 0));
 
         // If destination is not the accumulator, store it
         if(destination != 0){
@@ -205,9 +205,9 @@ std::vector<AssemblyInstruction> getValueToDestinationAddress(SymbolsTable& symb
         ll arrayAddress = symbolsTable.getMemoryAddressPointer_parameter(id);
 
         // Load into the accumulator the value at the index of the array
-        result.push_back(AssemblyInstruction(AssemblyInstructionType::LOADI, arrayAddress));
+        result.push_back(AssemblyInstruction(AssemblyInstructionType::LOAD, arrayAddress));
         result.push_back(AssemblyInstruction(AssemblyInstructionType::ADDI, indexAddress));
-        result.push_back(AssemblyInstruction(AssemblyInstructionType::LOAD, 0));
+        result.push_back(AssemblyInstruction(AssemblyInstructionType::LOADI, 0));
 
         // If destination is not the accumulator, store it
         if(destination != 0){
@@ -335,33 +335,37 @@ void validateUseOfVariable(SymbolsTable& symbolsTable, const Identifier& identif
     return;
 }
 
+bool isRealInstruction(AssemblyInstruction ins){
+    switch (ins.type) {
+        case AssemblyInstructionType::GET:
+        case AssemblyInstructionType::PUT:
+        case AssemblyInstructionType::LOAD:
+        case AssemblyInstructionType::STORE:
+        case AssemblyInstructionType::LOADI:
+        case AssemblyInstructionType::STOREI:
+        case AssemblyInstructionType::ADD:
+        case AssemblyInstructionType::SUB:
+        case AssemblyInstructionType::ADDI:
+        case AssemblyInstructionType::SUBI:
+        case AssemblyInstructionType::SET:
+        case AssemblyInstructionType::HALF:
+        case AssemblyInstructionType::JUMP:
+        case AssemblyInstructionType::JPOS:
+        case AssemblyInstructionType::JZERO:
+        case AssemblyInstructionType::JNEG:
+        case AssemblyInstructionType::RTRN:
+        case AssemblyInstructionType::HALT:
+            return true;
+        default:
+            return false;
+    }
+}
 
 ll countRealInstructions(const std::vector<AssemblyInstruction>& instructions){
     ll count = 0;
     for (const AssemblyInstruction& instruction : instructions) {
-        switch (instruction.type) {
-            case AssemblyInstructionType::GET:
-            case AssemblyInstructionType::PUT:
-            case AssemblyInstructionType::LOAD:
-            case AssemblyInstructionType::STORE:
-            case AssemblyInstructionType::LOADI:
-            case AssemblyInstructionType::STOREI:
-            case AssemblyInstructionType::ADD:
-            case AssemblyInstructionType::SUB:
-            case AssemblyInstructionType::ADDI:
-            case AssemblyInstructionType::SUBI:
-            case AssemblyInstructionType::SET:
-            case AssemblyInstructionType::HALF:
-            case AssemblyInstructionType::JUMP:
-            case AssemblyInstructionType::JPOS:
-            case AssemblyInstructionType::JZERO:
-            case AssemblyInstructionType::JNEG:
-            case AssemblyInstructionType::RTRN:
-            case AssemblyInstructionType::HALT:
-                count++;
-                break;
-            default:
-                break;
+        if (isRealInstruction(instruction)) {
+            count++;
         }
     }
     return count;
@@ -407,15 +411,82 @@ ll findNext1000(ll n){
 }
 
 std::vector<AssemblyInstruction> getAddressToDestinationAddress(SymbolsTable& symbolsTable, const Value& val, ll destination){
-    //TODO: Implement
-    // this will only be used to set parameters pointers in procedures properly
+
+    std::vector<AssemblyInstruction> result;
+    Identifier identifier = val.asIdentifier();
+
+    // If variable is local
+    if(symbolsTable.isVariableDeclared(identifier.id)){
+        
+        ll varAddress = symbolsTable.getMemoryAddress_variable(identifier.id);
+
+        result.push_back(AssemblyInstruction(AssemblyInstructionType::SET, varAddress));
+        result.push_back(AssemblyInstruction(AssemblyInstructionType::STORE, destination));
+
+        return result;
+    }
+
+    // If variable is a parameter
+    if(symbolsTable.isParameter(identifier.id) && symbolsTable.getParameterType(identifier.id) == ParameterType::Integer){
+        
+        ll paramAddress = symbolsTable.getMemoryAddressPointer_parameter(identifier.id);
+
+        result.push_back(AssemblyInstruction(AssemblyInstructionType::LOAD, paramAddress));
+        result.push_back(AssemblyInstruction(AssemblyInstructionType::STORE, destination));
+
+        return result;
+    }
+
+    // If variable is a local array
+    if(symbolsTable.isArrayDeclared(identifier.id)){
+        
+        ll arrayAddress = symbolsTable.getMemoryAddress_start(identifier.id) + symbolsTable.get_offset(identifier.id);
+
+        result.push_back(AssemblyInstruction(AssemblyInstructionType::SET, arrayAddress));
+        result.push_back(AssemblyInstruction(AssemblyInstructionType::STORE, destination));
+
+        return result;
+    }
+
+    // If variable is a parameter array
+    if(symbolsTable.isParameter(identifier.id) && symbolsTable.getParameterType(identifier.id) == ParameterType::Array){
+        
+        ll arrayAddress = symbolsTable.getMemoryAddressPointer_parameter(identifier.id);
+
+        result.push_back(AssemblyInstruction(AssemblyInstructionType::LOAD, arrayAddress));
+        result.push_back(AssemblyInstruction(AssemblyInstructionType::STORE, destination));
+
+        return result;
+    }
+    return result;
 }
 
-void fixProcedureCallsJumps(std::vector<AssemblyInstruction>& code, const std::vector<SymbolsTable>& proceduresTables){
+void fixProcedureCallsJumps(std::vector<AssemblyInstruction>& code){
 
-    //TODO: Implement
-    // this will be called at the end of compilation and is supposed to set jump and return addresses of procedure calls properly
+    int realIdx = 0;
+    std::unordered_map<std::string, ll> procedureStartAddresses;
 
+    for(size_t j = 0; j < code.size(); j++){
 
+        // Keep count of real instructions
+        if(isRealInstruction(code[j])){
+            realIdx++;
+        }
 
+        // If it is a procedure label, save its address
+        if(code[j].type == AssemblyInstructionType::LABEL_PROCEDURE){
+            procedureStartAddresses[code[j].getLabel()] = realIdx + 1;
+        }
+
+        // If it is a SET of the return, set the address to the return address
+        if(code[j].type == AssemblyInstructionType::LABEL_INSTRUCTION && code[j].getLabel().find("Setting return address and jumping to ") != std::string::npos){
+            code[j+1].address = realIdx + 3;
+        }
+
+        // If it is a JUMP to a procedure, set the address to the start of the procedure
+        if(code[j].type == AssemblyInstructionType::JUMP && code[j].hasLabel()){
+            code[j].address = procedureStartAddresses[code[j].getLabel()] - realIdx;
+        }
+
+    }
 }

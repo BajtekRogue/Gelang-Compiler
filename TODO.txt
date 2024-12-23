@@ -9,7 +9,7 @@ COMMANDS:
     -REPEAT [done]
     -FOR UP [done]
     -FOR DOWN [done]
-    -PROC CALL
+    -PROC CALL [done]
 
 EXPRESSION:
     -nothing [done]
@@ -19,8 +19,3 @@ EXPRESSION:
     -divide
     -modulo
 
-
-std::vector<AssemblyInstruction> getAddressToDestinationAddress(SymbolsTable& symbolsTable, const Value& val, ll destination){
-    //TODO: Implement
-    // this will only be used to set parameters pointers in procedures properly
-}

@@ -1,0 +1,31 @@
+PROCEDURE simple_math(x, T y) IS
+    f, g, h, i, j, k, l, tab[0:10]
+BEGIN
+    j := 31;
+    tab[x] := 25;
+
+    f := x;
+    g := y[0];
+    h := y[x];
+    i := y[20];
+    k := tab[x];
+    l := y[j];
+
+    WRITE f;
+    WRITE g;
+    WRITE h;
+    WRITE i;
+    WRITE k;
+    WRITE l;
+END
+
+PROGRAM IS
+    a, b[-30:31]
+BEGIN
+    a := 5;
+    b[0] := 10;
+    b[a] := 15;
+    b[20] := 20;
+    b[31] := 30;
+    simple_math(a, b);
+END
