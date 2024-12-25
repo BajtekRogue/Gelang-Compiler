@@ -1,3 +1,4 @@
+# in =; out = 5044
 PROGRAM IS
     x, y, a[-100:-80]
 BEGIN

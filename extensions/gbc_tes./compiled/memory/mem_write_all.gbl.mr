@@ -1,0 +1,118 @@
+# Preprocessing...
+# Store const = 5 at p[501]
+SET 5
+STORE 501
+# Store const = 3 at p[502]
+SET 3
+STORE 502
+# Store const = 1004 at p[503]
+SET 1004
+STORE 503
+# Store const = 2 at p[504]
+SET 2
+STORE 504
+# Store const = 32 at p[505]
+SET 32
+STORE 505
+# Store const = 12 at p[506]
+SET 12
+STORE 506
+# Finished preprocessing
+
+# Jump to main procedure
+JUMP 55
+# 
+
+# PROCEDURE test
+# a := 12
+LOAD 506
+STORE 1004
+# n := 32
+LOAD 505
+STOREI 1001
+# WRITE a
+PUT 1004
+# WRITE n
+LOADI 1001
+PUT 0
+# tab[2] := 2
+LOAD 504
+STORE 1006
+# WRITE tab[2]
+PUT 1006
+# tab[a] := 3
+LOAD 503
+ADD 1004
+STORE 28
+LOAD 502
+STOREI 28
+# WRITE tab[12]
+PUT 1016
+# _n := n
+LOADI 1001
+STORE 1305
+# tab[n] := 5
+LOAD 503
+ADDI 1001
+STORE 28
+LOAD 501
+STOREI 28
+# WRITE tab[32]
+PUT 1036
+# arr[2] := 2
+LOAD 504
+ADD 1003
+STORE 28
+LOAD 504
+STOREI 28
+# WRITE arr[2]
+LOAD 504
+ADD 1003
+LOADI 0
+PUT 0
+# arr[a] := 3
+LOAD 1003
+ADD 1004
+STORE 28
+LOAD 502
+STOREI 28
+# WRITE arr[12]
+LOAD 506
+ADD 1003
+LOADI 0
+PUT 0
+# _n := n
+LOADI 1001
+STORE 1305
+# arr[n] := 5
+LOAD 1003
+ADDI 1001
+STORE 28
+LOAD 501
+STOREI 28
+# WRITE arr[32]
+LOAD 505
+ADD 1003
+LOADI 0
+PUT 0
+# RETURN test
+RTRN 1306
+# ENDPROCEDURE test
+
+# MAIN 
+# READ a
+GET 2001
+# READ b
+GET 2002
+# CALL test (a, b, arr)
+SET 2001
+STORE 1001
+SET 2002
+STORE 1002
+SET 2015
+STORE 1003
+# Setting return address and jumping to test
+SET 78
+STORE 1306
+JUMP -64
+HALT

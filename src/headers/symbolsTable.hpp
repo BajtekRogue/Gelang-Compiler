@@ -10,17 +10,16 @@
 #include <utility>
 #include <vector>
 #include <algorithm>
-
-typedef long long ll;
+#include <cinttypes>
 
 
 // make sure arrays are indexed from 0
 struct Array_offset{
     std::string identifier;
-    ll size;
-    ll offset;
+    int64_t size;
+    int64_t offset;
 
-    Array_offset(const std::string& id, ll start, ll end){
+    Array_offset(const std::string& id, int64_t start, int64_t end){
         identifier = id;
         offset = -start;
         size = end - start + 1;
@@ -41,7 +40,7 @@ struct Array_offset{
         }
     }
 
-    bool isInside(ll index) const {
+    bool isInside(int64_t index) const {
         return index >= -offset && index < size - offset;
     }
 };
@@ -52,8 +51,8 @@ namespace std {
     struct hash<Array_offset> {
         std::size_t operator()(const Array_offset& k) const {
             return ((std::hash<std::string>()(k.identifier)
-                    ^ (std::hash<ll>()(k.offset) << 1)) >> 1)
-                    ^ (std::hash<ll>()(k.size) << 1);
+                    ^ (std::hash<int64_t>()(k.offset) << 1)) >> 1)
+                    ^ (std::hash<int64_t>()(k.size) << 1);
         }
     };
 }
@@ -61,18 +60,18 @@ namespace std {
 class SymbolsTable {
 public:
     SymbolsTable();
-    SymbolsTable(std::string procedureIdentifier, ll startingMemoryAddres);
+    SymbolsTable(std::string procedureIdentifier, int64_t startingMemoryAddres);
 
     bool isVariableDeclared(const std::string& identifier) const;
     bool isVariableInitialized(const std::string& identifier) const;
     void markAsInitialized(const std::string& identifier);
-    ll getMemoryAddress_variable(const std::string& identifier) const;
+    int64_t getMemoryAddress_variable(const std::string& identifier) const;
 
     bool isArrayDeclared(const std::string& identifier) const;
-    ll getMemoryAddress_at(const std::string& identifier, ll index) const;
-    ll getMemoryAddress_start(const std::string& identifier) const;
-    bool isInsideArray(const std::string& identifier, ll index) const;
-    ll get_offset(const std::string& identifier) const;
+    int64_t getMemoryAddress_at(const std::string& identifier, int64_t index) const;
+    int64_t getMemoryAddress_start(const std::string& identifier) const;
+    bool isInsideArray(const std::string& identifier, int64_t index) const;
+    int64_t get_offset(const std::string& identifier) const;
     
     void addVariable(const std::unique_ptr<Variable>& var);
 
@@ -81,19 +80,19 @@ public:
     void removeIterator(const std::string& identifier);
     bool isIterator(const std::string& identifier) const;
     void addForLoopBound(const std::string& identifier, const std::string& boundIdentifier);
-    ll getMemoryAddress_forLoopBound(const std::string& identifier) const;
+    int64_t getMemoryAddress_forLoopBound(const std::string& identifier) const;
     
-    void addProcedure(const std::string& identifier, const std::vector<ParameterType>& parameters, const std::vector<ll>& parametersMemoryAddresses, ll returnAddress);
+    void addProcedure(const std::string& identifier, const std::vector<ParameterType>& parameters, const std::vector<int64_t>& parametersMemoryAddresses, int64_t returnAddress);
     bool isProcedureDeclared(const std::string& identifier) const;
     const std::vector<ParameterType>& getProcedureParameters(const std::string& identifier) const;
-    const std::vector<ll>& getProcedureParametersMemoryAddresses(const std::string& identifier) const;
-    ll getProcedureReturnAddress(const std::string& identifier) const;
+    const std::vector<int64_t>& getProcedureParametersMemoryAddresses(const std::string& identifier) const;
+    int64_t getProcedureReturnAddress(const std::string& identifier) const;
 
     void addParameter(const std::string& identifier, ParameterType type);
     ParameterType getParameterType(const std::string& identifier) const;
-    ll getMemoryAddressPointer_parameter(const std::string& identifier) const;
+    int64_t getMemoryAddressPointer_parameter(const std::string& identifier) const;
 
-    ll getLastMemoryAddress() const;
+    int64_t getLastMemoryAddress() const;
     
     bool isLocalVariable(const std::string& identifier) const;
     bool isParameter(const std::string& identifier) const;
@@ -101,36 +100,36 @@ public:
     void printSymbols() const;
 
     void setReturnAddress();
-    ll getReturnAddress() const;
+    int64_t getReturnAddress() const;
 
-    std::vector<ll> getOwnParametersMemoryAddresses() const;
+    std::vector<int64_t> getOwnParametersMemoryAddresses() const;
     std::string getOwnIdentifier() const;
 
 private:
-    std::string procedureIdentifier;
+    std::string _procedureIdentifier;
 
-    std::unordered_set<std::string> variables;
-    std::unordered_map<std::string, bool> initialized_variables;
-    std::unordered_map<std::string, ll> memoryAddresses_variables;
+    std::unordered_set<std::string> _variables;
+    std::unordered_map<std::string, bool> _initializedVariables;
+    std::unordered_map<std::string, int64_t> _memoryAddressesVariables;
 
-    std::unordered_set<Array_offset> arrays;
-    std::unordered_map<Array_offset, std::pair<ll, ll>> memoryAddresses_arrays;
+    std::unordered_set<Array_offset> _arrays;
+    std::unordered_map<Array_offset, std::pair<int64_t, int64_t>> _memoryAddressesArrays;
 
-    std::unordered_set<std::string> iterators;
-    std::unordered_map<std::string, std::string> forLoopBounds;
-    std::unordered_map<std::string, ll> memoryAddresses_forLoopBounds;
+    std::unordered_set<std::string> _iterators;
+    std::unordered_map<std::string, std::string> _forLoopBounds;
+    std::unordered_map<std::string, int64_t> _memoryAddressesForLoopBounds;
 
-    std::unordered_map<std::string, std::vector<ParameterType>> procedures_toCall;
-    std::unordered_map<std::string, std::vector<ll>> proceduresParametersMemoryAddresses_toCall;
-    std::unordered_map<std::string, ll> proceduresReturnAddresses_toCall;
+    std::unordered_map<std::string, std::vector<ParameterType>> _proceduresToCall;
+    std::unordered_map<std::string, std::vector<int64_t>> _proceduresParametersMemoryAddressesToCall;
+    std::unordered_map<std::string, int64_t> _proceduresReturnAddressesToCall;
 
-    std::vector<std::pair<std::string, ParameterType>> parameters;
-    std::unordered_map<std::string, ll> memoryAddressesPointers_parameters;
+    std::vector<std::pair<std::string, ParameterType>> _parameters;
+    std::unordered_map<std::string, int64_t> _memoryAddressesPointersParameters;
 
-    ll lastMemoryAddress;
-    ll returnAddress;
+    int64_t _lastMemoryAddress;
+    int64_t _returnAddress;
 
-    void __addVariable(const std::unique_ptr<Variable>& var, ll memoryAddress);
+    void _addVariable(const std::unique_ptr<Variable>& var, int64_t memoryAddress);
 
 };
 

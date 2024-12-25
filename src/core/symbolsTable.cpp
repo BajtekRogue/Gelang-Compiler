@@ -2,26 +2,26 @@
 
 SymbolsTable::SymbolsTable() {}
 
-SymbolsTable::SymbolsTable(std::string procedureIdentifier, ll startingMemoryAddres) : procedureIdentifier(procedureIdentifier), lastMemoryAddress(startingMemoryAddres) {}
+SymbolsTable::SymbolsTable(std::string procedureIdentifier, int64_t startingMemoryAddres) : _procedureIdentifier(procedureIdentifier), _lastMemoryAddress(startingMemoryAddres) {}
 
 bool SymbolsTable::isVariableDeclared(const std::string& identifier) const{
-    return variables.find(identifier) != variables.end();
+    return _variables.find(identifier) != _variables.end();
 }
 
 bool SymbolsTable::isVariableInitialized(const std::string& identifier) const {
-    return initialized_variables.at(identifier);
+    return _initializedVariables.at(identifier);
 }
 
 void SymbolsTable::markAsInitialized(const std::string& identifier) {
-    initialized_variables[identifier] = true;
+    _initializedVariables[identifier] = true;
 }
 
-ll SymbolsTable::getMemoryAddress_variable(const std::string& identifier) const {
-    return memoryAddresses_variables.at(identifier);
+int64_t SymbolsTable::getMemoryAddress_variable(const std::string& identifier) const {
+    return _memoryAddressesVariables.at(identifier);
 }
 
 bool SymbolsTable::isArrayDeclared(const std::string& identifier) const{
-    for(const auto& arr : arrays){
+    for(const auto& arr : _arrays){
         if(arr.identifier == identifier){
             return true;
         }
@@ -29,26 +29,26 @@ bool SymbolsTable::isArrayDeclared(const std::string& identifier) const{
     return false;
 }
 
-ll SymbolsTable::getMemoryAddress_at(const std::string& identifier, ll index) const {
-    for(const auto& arr : arrays){
+int64_t SymbolsTable::getMemoryAddress_at(const std::string& identifier, int64_t index) const {
+    for(const auto& arr : _arrays){
         if(arr.identifier == identifier){
-            return memoryAddresses_arrays.at(arr).first + index + arr.offset;
+            return _memoryAddressesArrays.at(arr).first + index + arr.offset;
         }
     }
     throw std::runtime_error("Array `" + identifier + "` not declared but someone is trying to access its memory address");
 }
 
-ll SymbolsTable::getMemoryAddress_start(const std::string& identifier) const {
-    for(const auto& arr : arrays){
+int64_t SymbolsTable::getMemoryAddress_start(const std::string& identifier) const {
+    for(const auto& arr : _arrays){
         if(arr.identifier == identifier){
-            return memoryAddresses_arrays.at(arr).first;
+            return _memoryAddressesArrays.at(arr).first;
         }
     }
     throw std::runtime_error("Array `" + identifier + "` not declared but someone is trying to access its memory address");
 }
 
-bool SymbolsTable::isInsideArray(const std::string& identifier, ll index) const {
-    for(const auto& arr : arrays){
+bool SymbolsTable::isInsideArray(const std::string& identifier, int64_t index) const {
+    for(const auto& arr : _arrays){
         if(arr.identifier == identifier){
             return arr.isInside(index);
         }
@@ -56,8 +56,8 @@ bool SymbolsTable::isInsideArray(const std::string& identifier, ll index) const 
     return false;
 }
 
-ll SymbolsTable::get_offset(const std::string& identifier) const {
-    for(const auto& arr : arrays){
+int64_t SymbolsTable::get_offset(const std::string& identifier) const {
+    for(const auto& arr : _arrays){
         if(arr.identifier == identifier){
             return arr.offset;
         }
@@ -66,13 +66,13 @@ ll SymbolsTable::get_offset(const std::string& identifier) const {
 }
 
 void SymbolsTable::addVariable(const std::unique_ptr<Variable>& var) {
-    __addVariable(var, lastMemoryAddress + 1);
+    _addVariable(var, _lastMemoryAddress + 1);
 }
 
 void SymbolsTable::validateIterator(const std::string& identifier) const{
-    auto it = std::find_if(parameters.begin(), parameters.end(),
+    auto it = std::find_if(_parameters.begin(), _parameters.end(),
                            [&identifier](const auto& pair) { return pair.first == identifier; });
-    if (it != parameters.end()) {
+    if (it != _parameters.end()) {
         throw std::logic_error("Parameter with identifier '" + identifier + "' already exists but is being used as an iterator");
     }
 
@@ -87,11 +87,11 @@ void SymbolsTable::validateIterator(const std::string& identifier) const{
 
 void SymbolsTable::addIterator(const std::string& identifier) {
     validateIterator(identifier);
-    variables.insert(identifier);
-    initialized_variables[identifier] = true;
-    memoryAddresses_variables[identifier] = lastMemoryAddress + 1;
-    lastMemoryAddress++;
-    iterators.insert(identifier);
+    _variables.insert(identifier);
+    _initializedVariables[identifier] = true;
+    _memoryAddressesVariables[identifier] = _lastMemoryAddress + 1;
+    _lastMemoryAddress++;
+    _iterators.insert(identifier);
 }
 
 void SymbolsTable::removeIterator(const std::string& identifier) {
@@ -99,81 +99,81 @@ void SymbolsTable::removeIterator(const std::string& identifier) {
         throw std::runtime_error("Iterator '" + identifier + "' does not exist but someone is trying to remove it");
     }
 
-    variables.erase(identifier);
-    initialized_variables.erase(identifier);
-    memoryAddresses_variables.erase(identifier);
-    iterators.erase(identifier);
-    memoryAddresses_forLoopBounds.erase(identifier);
+    _variables.erase(identifier);
+    _initializedVariables.erase(identifier);
+    _memoryAddressesVariables.erase(identifier);
+    _iterators.erase(identifier);
+    _memoryAddressesForLoopBounds.erase(identifier);
 }
 
 bool SymbolsTable::isIterator(const std::string& identifier) const {
-    return iterators.find(identifier) != iterators.end();
+    return _iterators.find(identifier) != _iterators.end();
 }
 
 void SymbolsTable::addForLoopBound(const std::string& identifier, const std::string& boundIdentifier) {
-    lastMemoryAddress++;
-    forLoopBounds[identifier] = boundIdentifier;
-    memoryAddresses_forLoopBounds[identifier] = memoryAddresses_variables.at(identifier) + 1;
+    _lastMemoryAddress++;
+    _forLoopBounds[identifier] = boundIdentifier;
+    _memoryAddressesForLoopBounds[identifier] = _memoryAddressesVariables.at(identifier) + 1;
 }
 
-ll SymbolsTable::getMemoryAddress_forLoopBound(const std::string& identifier) const {
-    return memoryAddresses_forLoopBounds.at(identifier);
+int64_t SymbolsTable::getMemoryAddress_forLoopBound(const std::string& identifier) const {
+    return _memoryAddressesForLoopBounds.at(identifier);
 }
 
-void SymbolsTable::addProcedure(const std::string& identifier, const std::vector<ParameterType>& parameters, const std::vector<ll>& parametersMemoryAddresses, ll returnAddress) {
+void SymbolsTable::addProcedure(const std::string& identifier, const std::vector<ParameterType>& parameters, const std::vector<int64_t>& parametersMemoryAddresses, int64_t returnAddress) {
     if (isProcedureDeclared(identifier)) {
         throw std::logic_error("Procedure '" + identifier + "' already exists");
     }
 
     for(size_t i = 0; i < parameters.size(); i++){
-        procedures_toCall[identifier].push_back(parameters[i]);
-        proceduresParametersMemoryAddresses_toCall[identifier].push_back(parametersMemoryAddresses[i]);
+        _proceduresToCall[identifier].push_back(parameters[i]);
+        _proceduresParametersMemoryAddressesToCall[identifier].push_back(parametersMemoryAddresses[i]);
     }
 
-    proceduresReturnAddresses_toCall[identifier] = returnAddress;
+    _proceduresReturnAddressesToCall[identifier] = returnAddress;
 }
 
 bool SymbolsTable::isProcedureDeclared(const std::string& identifier) const {
-    return procedures_toCall.find(identifier) != procedures_toCall.end();
+    return _proceduresToCall.find(identifier) != _proceduresToCall.end();
 }
 
 const std::vector<ParameterType>& SymbolsTable::getProcedureParameters(const std::string& identifier) const {
-    return procedures_toCall.at(identifier);
+    return _proceduresToCall.at(identifier);
 }
 
-const std::vector<ll>& SymbolsTable::getProcedureParametersMemoryAddresses(const std::string& identifier) const {
-    return proceduresParametersMemoryAddresses_toCall.at(identifier);
+const std::vector<int64_t>& SymbolsTable::getProcedureParametersMemoryAddresses(const std::string& identifier) const {
+    return _proceduresParametersMemoryAddressesToCall.at(identifier);
 }
 
-ll SymbolsTable::getProcedureReturnAddress(const std::string& identifier) const {
-    if(identifier == procedureIdentifier){
-        return returnAddress;
+int64_t SymbolsTable::getProcedureReturnAddress(const std::string& identifier) const {
+    if(identifier == _procedureIdentifier){
+        return _returnAddress;
     }
-    return proceduresReturnAddresses_toCall.at(identifier);
+    return _proceduresReturnAddressesToCall.at(identifier);
 }
 
-ll SymbolsTable::getLastMemoryAddress() const {
-    return lastMemoryAddress;
+int64_t SymbolsTable::getLastMemoryAddress() const {
+    return _lastMemoryAddress;
 }
 
 void SymbolsTable::addParameter(const std::string& identifier, ParameterType type) {
-    auto it = std::find_if(parameters.begin(), parameters.end(),
+    auto it = std::find_if(_parameters.begin(), _parameters.end(),
                            [&identifier](const auto& pair) { return pair.first == identifier; });
 
-    if (it != parameters.end()) {
+    if (it != _parameters.end()) {
         throw std::logic_error("Parameter with identifier '" + identifier + "' already exists");
     }
 
-    parameters.push_back({identifier, type});
-    memoryAddressesPointers_parameters[identifier] = lastMemoryAddress + 1;
-    lastMemoryAddress++;
+    _parameters.push_back({identifier, type});
+    _memoryAddressesPointersParameters[identifier] = _lastMemoryAddress + 1;
+    _lastMemoryAddress++;
 }
 
 ParameterType SymbolsTable::getParameterType(const std::string& identifier) const {
-    auto it = std::find_if(parameters.begin(), parameters.end(),
+    auto it = std::find_if(_parameters.begin(), _parameters.end(),
                            [&identifier](const auto& pair) { return pair.first == identifier; });
 
-    if (it == parameters.end()) {
+    if (it == _parameters.end()) {
         throw std::runtime_error("Parameter with identifier '" + identifier + "' does not exist but someone is trying to access its type");
     }
 
@@ -181,8 +181,8 @@ ParameterType SymbolsTable::getParameterType(const std::string& identifier) cons
 }
 
 
-ll SymbolsTable::getMemoryAddressPointer_parameter(const std::string& identifier) const {
-    return memoryAddressesPointers_parameters.at(identifier);
+int64_t SymbolsTable::getMemoryAddressPointer_parameter(const std::string& identifier) const {
+    return _memoryAddressesPointersParameters.at(identifier);
 }
 
 bool SymbolsTable::isLocalVariable(const std::string& identifier) const {
@@ -190,16 +190,16 @@ bool SymbolsTable::isLocalVariable(const std::string& identifier) const {
 }
 
 bool SymbolsTable::isParameter(const std::string& identifier) const {
-    return std::find_if(parameters.begin(), parameters.end(),
-                        [&identifier](const auto& pair) { return pair.first == identifier; }) != parameters.end();
+    return std::find_if(_parameters.begin(), _parameters.end(),
+                        [&identifier](const auto& pair) { return pair.first == identifier; }) != _parameters.end();
 }
 
 
-void SymbolsTable::__addVariable(const std::unique_ptr<Variable>& var, ll memoryAddress) {
-    auto it = std::find_if(parameters.begin(), parameters.end(),
+void SymbolsTable::_addVariable(const std::unique_ptr<Variable>& var, int64_t memoryAddress) {
+    auto it = std::find_if(_parameters.begin(), _parameters.end(),
                            [&var](const auto& pair) { return pair.first == var->identifier; });
 
-    if (it != parameters.end()) {
+    if (it != _parameters.end()) {
         throw std::logic_error("Parameter with identifier '" + var->identifier + "' already exists but is being declared as a variable");
     }
 
@@ -213,15 +213,16 @@ void SymbolsTable::__addVariable(const std::unique_ptr<Variable>& var, ll memory
             throw std::logic_error("Array with identifier '" + var->identifier + "' already exists");
         }
 
-        variables.insert(var->identifier);
-        initialized_variables[var->identifier] = false;  
-        memoryAddresses_variables[var->identifier] = memoryAddress;     
-        lastMemoryAddress = memoryAddress;
+        _variables.insert(var->identifier);
+        _initializedVariables[var->identifier] = false;  
+        _memoryAddressesVariables[var->identifier] = memoryAddress;     
+        _lastMemoryAddress = memoryAddress;
 
-    }else{
+    }
+    else{
 
-        ll start = var->arrayBounds.value().first;
-        ll end = var->arrayBounds.value().second;
+        int64_t start = var->arrayBounds.value().first;
+        int64_t end = var->arrayBounds.value().second;
 
         if(start > end){
             throw std::logic_error("Invalid array bounds for variable '" + var->identifier + "'");
@@ -237,43 +238,43 @@ void SymbolsTable::__addVariable(const std::unique_ptr<Variable>& var, ll memory
 
         Array_offset arr(var->identifier, start, end);
         
-        arrays.insert(arr);
-        memoryAddresses_arrays[arr] = {memoryAddress, memoryAddress + arr.size - 1};
-        lastMemoryAddress = memoryAddress + arr.size - 1;
+        _arrays.insert(arr);
+        _memoryAddressesArrays[arr] = {memoryAddress, memoryAddress + arr.size - 1};
+        _lastMemoryAddress = memoryAddress + arr.size - 1;
     }
 }
 
 
 void SymbolsTable::printSymbols() const {
-    std::cout << "Procedure: " << procedureIdentifier << "\n";
+    std::cout << "Procedure: " << _procedureIdentifier << "\n";
 
-    if(!parameters.empty()){
+    if(!_parameters.empty()){
         std::cout << "Parameters:\n";
-        for(const auto& [id, type] : parameters){
-            std::cout << id << (type == ParameterType::Integer ? " (Integer)" : " (Array)") << " at p[" << memoryAddressesPointers_parameters.at(id) << "], ";
+        for(const auto& [id, type] : _parameters){
+            std::cout << id << (type == ParameterType::Integer ? " (Integer)" : " (Array)") << " at p[" << _memoryAddressesPointersParameters.at(id) << "], ";
         }
         std::cout << "\n";
     }
 
-    if(!variables.empty()){
+    if(!_variables.empty()){
         std::cout << "Variables:\n";
-        for(const auto& var : variables){
-            std::cout << var << " at p[" << memoryAddresses_variables.at(var) << "], ";
+        for(const auto& var : _variables){
+            std::cout << var << " at p[" << _memoryAddressesVariables.at(var) << "], ";
         }
         std::cout << "\n";
     }
 
-    if(!arrays.empty()){
+    if(!_arrays.empty()){
         std::cout << "Arrays:\n";
-        for(const auto& arr : arrays){
-            std::cout << arr.identifier << "[0:" << arr.size - 1 << "] , offset: " << arr.offset << " at p[" << memoryAddresses_arrays.at(arr).first << "], ";
+        for(const auto& arr : _arrays){
+            std::cout << arr.identifier << "[0:" << arr.size - 1 << "] , offset: " << arr.offset << " at p[" << _memoryAddressesArrays.at(arr).first << "], ";
         }
         std::cout << "\n";
     }
 
-    if(!procedures_toCall.empty()){
+    if(!_proceduresToCall.empty()){
         std::cout << "Procedures:\n";
-        for(const auto& [proc, parameters] : procedures_toCall){
+        for(const auto& [proc, parameters] : _proceduresToCall){
             std::cout << proc << "< ";
             for(const auto& param : parameters){
                 std::cout << (param == ParameterType::Integer ? ("Integer") : "Array") << ", ";
@@ -287,21 +288,21 @@ void SymbolsTable::printSymbols() const {
 }
 
 void SymbolsTable::setReturnAddress() {
-    returnAddress = lastMemoryAddress + 1;
+    _returnAddress = _lastMemoryAddress + 1;
 }
 
-ll SymbolsTable::getReturnAddress() const {
-    return returnAddress;
+int64_t SymbolsTable::getReturnAddress() const {
+    return _returnAddress;
 }
 
-std::vector<ll> SymbolsTable::getOwnParametersMemoryAddresses() const {
-    std::vector<ll> addresses;
-    for(const auto& [id, type] : parameters){
-        addresses.push_back(memoryAddressesPointers_parameters.at(id));
+std::vector<int64_t> SymbolsTable::getOwnParametersMemoryAddresses() const {
+    std::vector<int64_t> addresses;
+    for(const auto& [id, type] : _parameters){
+        addresses.push_back(_memoryAddressesPointersParameters.at(id));
     }
     return addresses;
 }
 
 std::string SymbolsTable::getOwnIdentifier() const {
-    return procedureIdentifier;
+    return _procedureIdentifier;
 }

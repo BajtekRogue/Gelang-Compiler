@@ -3,13 +3,16 @@ PROCEDURE function(T x, y, T z, q) IS
 BEGIN
 
   IF x[1] > y THEN
-    u := 3 * 4;
+    # u := 3 * 4;
+    # u := 20 / 5;
+    # v := x[1] % 5;
+    y := 1;
   ELSE
-    u := 20 / 5;
+    u := 5;
   ENDIF
 
   IF y <= z[-32] THEN
-      v := x[1] % 5;
+      v := 6;
   ENDIF
 
   v := 0; # comment
@@ -39,7 +42,7 @@ BEGIN
         b := b - 1;
     ENDFOR
 
-    function(a, b, a);
+    function(a, b, a, b);
 
     REPEAT
         a[1] := a[1] + 1;

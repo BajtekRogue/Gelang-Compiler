@@ -7,8 +7,8 @@
 #include <memory>
 #include <variant>
 #include <optional>
+#include <cinttypes>
 
-typedef long long ll;
 
 enum class ExpressionType {
     Value,
@@ -56,14 +56,14 @@ enum class ParameterType {
 struct Variable {
     VariableType type;
     std::string identifier;
-    std::optional<std::pair<ll, ll>> arrayBounds;  // Only used for array declarations
+    std::optional<std::pair<int64_t, int64_t>> arrayBounds;  // Only used for array declarations
 
     // Constructor for integer variable
     explicit Variable(const std::string& id) 
         : type(VariableType::Integer), identifier(id) {}
 
     // Constructor for array variable with bounds
-    Variable(const std::string& id, ll start, ll end) 
+    Variable(const std::string& id, int64_t start, int64_t end) 
         : type(VariableType::Array), 
           identifier(id), 
           arrayBounds(std::make_pair(start, end)) {}
@@ -77,7 +77,7 @@ struct Variable {
     }
 
     // Utility method to get bounds, throws if no bounds
-    std::pair<ll, ll> getBounds() const {
+    std::pair<int64_t, int64_t> getBounds() const {
         if (!hasBounds()) {
             throw std::runtime_error("No array bounds specified");
         }
@@ -129,40 +129,40 @@ struct Parameter {
 // Represents an array access
 struct ArrayAccess {
     std::string identifier;
-    std::variant<std::string, ll> index;
+    std::variant<std::string, int64_t> index;
 
     ArrayAccess(const std::string& id, const std::string& idx) 
         : identifier(id), index(idx) {}
     
-    ArrayAccess(const std::string& id, ll idx) 
+    ArrayAccess(const std::string& id, int64_t idx) 
         : identifier(id), index(idx) {}
 
     bool isByIndex() const { 
-        return std::holds_alternative<ll>(index); 
+        return std::holds_alternative<int64_t>(index); 
     }
 
     bool isByVariable() const { 
         return std::holds_alternative<std::string>(index); 
     }
 
-    ll getIndex() const { 
+    int64_t getIndex() const { 
         if(!isByIndex()){
             throw std::runtime_error("Array " + identifier + " is accessed by variable " + std::get<std::string>(index));
         }
-        return std::get<ll>(index); 
+        return std::get<int64_t>(index); 
     }
 
     std::string getIndexVariable() const { 
         if(!isByVariable()){
-            throw std::runtime_error("Array " + identifier + " is accessed by index " + std::to_string(std::get<ll>(index)));
+            throw std::runtime_error("Array " + identifier + " is accessed by index " + std::to_string(std::get<int64_t>(index)));
         }
         return std::get<std::string>(index); 
     }
 
     std::string toString() const {
         std::string result = identifier + "[";
-        if (std::holds_alternative<ll>(index)) {
-            result += std::to_string(std::get<ll>(index));
+        if (std::holds_alternative<int64_t>(index)) {
+            result += std::to_string(std::get<int64_t>(index));
         } else {
             result += std::get<std::string>(index);
         }
@@ -224,29 +224,29 @@ struct Identifier{
 
 // Represents a value - can be a number or an identifier
 struct Value {
-    std::variant<ll, Identifier> data;
+    std::variant<int64_t, Identifier> data;
 
-    Value(ll val) : data(val) {}
+    Value(int64_t val) : data(val) {}
     Value(const Identifier& id) : data(Identifier(id)) {}
 
     bool isNumber() const { 
-        return std::holds_alternative<ll>(data); 
+        return std::holds_alternative<int64_t>(data); 
     }
 
     bool isIdentifier() const { 
         return std::holds_alternative<Identifier>(data); 
     }
 
-    ll asNumber() const { 
+    int64_t asNumber() const { 
         if(!isNumber()){
             throw std::runtime_error("Value is not a number");
         }
-        return std::get<ll>(data); 
+        return std::get<int64_t>(data); 
     }
 
     Identifier asIdentifier() const { 
         if(!isIdentifier()){
-            throw std::runtime_error("Value is not an identifier but a number " + std::to_string(std::get<ll>(data)));
+            throw std::runtime_error("Value is not an identifier but a number " + std::to_string(std::get<int64_t>(data)));
         }
         return std::get<Identifier>(data); 
     }

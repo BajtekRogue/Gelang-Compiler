@@ -11,28 +11,15 @@
 #include <optional>
 #include <unordered_map>
 #include <fstream>
+#include <cinttypes>
 
 
-typedef long long ll;
 
-const ll MEMORY_START = 1000;
-const ll MEMORY_ARRAY_VARIABLE_ASSIGN = 28;
-const ll MEMORY_ONE = 69;
-const ll MEMORY_CONSTANTS = 500;
-
-
-// utility.cpp
-// counter to display in the labels
-namespace LabelCounters {
-    extern ll ifCounter;
-    extern ll whileCounter;
-    extern ll repeatCounter;
-    extern ll forCounter;
-    extern ll procedureCounter;
-};
-
-
-enum class AssemblyInstructionType{
+/**
+ * @brief Types of assembly instructions.
+ * 
+ */
+enum class Instruction{
 
     // These instruction exist in the GeAssembly
     GET,
@@ -71,42 +58,42 @@ enum class AssemblyInstructionType{
     LABEL_INSTRUCTION
 };
 
-static const std::unordered_map<AssemblyInstructionType, std::string> instructionNames = {
-        // existing GeAssembly instructions
-        {AssemblyInstructionType::GET,    "GET"},
-        {AssemblyInstructionType::PUT,    "PUT"},
-        {AssemblyInstructionType::LOAD,   "LOAD"},
-        {AssemblyInstructionType::STORE,  "STORE"},
-        {AssemblyInstructionType::LOADI,  "LOADI"},
-        {AssemblyInstructionType::STOREI, "STOREI"},
-        {AssemblyInstructionType::ADD,    "ADD"},
-        {AssemblyInstructionType::SUB,    "SUB"},
-        {AssemblyInstructionType::ADDI,   "ADDI"},
-        {AssemblyInstructionType::SUBI,   "SUBI"},
-        {AssemblyInstructionType::SET,    "SET"},
-        {AssemblyInstructionType::HALF,   "HALF"},
-        {AssemblyInstructionType::JUMP,   "JUMP"},
-        {AssemblyInstructionType::JPOS,   "JPOS"},
-        {AssemblyInstructionType::JZERO,  "JZERO"},
-        {AssemblyInstructionType::JNEG,   "JNEG"},
-        {AssemblyInstructionType::RTRN,   "RTRN"},
-        {AssemblyInstructionType::HALT,   "HALT"},
+static const std::unordered_map<Instruction, std::string> instructionNames = {
+    // existing GeAssembly instructions
+    {Instruction::GET,    "GET"},
+    {Instruction::PUT,    "PUT"},
+    {Instruction::LOAD,   "LOAD"},
+    {Instruction::STORE,  "STORE"},
+    {Instruction::LOADI,  "LOADI"},
+    {Instruction::STOREI, "STOREI"},
+    {Instruction::ADD,    "ADD"},
+    {Instruction::SUB,    "SUB"},
+    {Instruction::ADDI,   "ADDI"},
+    {Instruction::SUBI,   "SUBI"},
+    {Instruction::SET,    "SET"},
+    {Instruction::HALF,   "HALF"},
+    {Instruction::JUMP,   "JUMP"},
+    {Instruction::JPOS,   "JPOS"},
+    {Instruction::JZERO,  "JZERO"},
+    {Instruction::JNEG,   "JNEG"},
+    {Instruction::RTRN,   "RTRN"},
+    {Instruction::HALT,   "HALT"},
 
-        // non-existing GeAssembly instructions
-        {AssemblyInstructionType::LABEL_IF, "# IF"},
-        {AssemblyInstructionType::LABEL_ELSE, "# ELSE"},
-        {AssemblyInstructionType::LABEL_ENDIF, "# ENDIF"},
-        {AssemblyInstructionType::LABEL_WHILE, "# WHILE"},
-        {AssemblyInstructionType::LABEL_ENDWHILE, "# ENDWHILE"},
-        {AssemblyInstructionType::LABEL_REPEAT, "# REPEAT"},
-        {AssemblyInstructionType::LABEL_UNTIL, "# UNTIL"},
-        {AssemblyInstructionType::LABEL_FOR_UP, "# FOR_UP"},
-        {AssemblyInstructionType::LABEL_FOR_DOWN, "# FOR_DOWN"},
-        {AssemblyInstructionType::LABEL_ENDFOR, "# ENDFOR"},
-        {AssemblyInstructionType::LABEL_PROCEDURE, "# PROCEDURE"},
-        {AssemblyInstructionType::LABEL_ENDPROCEDURE, "# ENDPROCEDURE"},
-        {AssemblyInstructionType::LABEL_MAIN, "# MAIN"},
-        {AssemblyInstructionType::LABEL_INSTRUCTION, "#"}
+    // non-existing GeAssembly instructions
+    {Instruction::LABEL_IF, "# IF"},
+    {Instruction::LABEL_ELSE, "# ELSE"},
+    {Instruction::LABEL_ENDIF, "# ENDIF"},
+    {Instruction::LABEL_WHILE, "# WHILE"},
+    {Instruction::LABEL_ENDWHILE, "# ENDWHILE"},
+    {Instruction::LABEL_REPEAT, "# REPEAT"},
+    {Instruction::LABEL_UNTIL, "# UNTIL"},
+    {Instruction::LABEL_FOR_UP, "# FOR_UP"},
+    {Instruction::LABEL_FOR_DOWN, "# FOR_DOWN"},
+    {Instruction::LABEL_ENDFOR, "# ENDFOR"},
+    {Instruction::LABEL_PROCEDURE, "# PROCEDURE"},
+    {Instruction::LABEL_ENDPROCEDURE, "# ENDPROCEDURE"},
+    {Instruction::LABEL_MAIN, "# MAIN"},
+    {Instruction::LABEL_INSTRUCTION, "#"}
 };
 
 /**
@@ -117,22 +104,22 @@ static const std::unordered_map<AssemblyInstructionType, std::string> instructio
  * (for labels in the generated code).
  */
 struct AssemblyInstruction {
-    AssemblyInstructionType type;
-    std::variant<ll, std::string> address; 
+    Instruction instruction;
+    std::variant<int64_t, std::string> address; 
 
-    AssemblyInstruction(AssemblyInstructionType t, ll addr) : type(t), address(addr) {}
-    AssemblyInstruction(AssemblyInstructionType t, const std::string& addr) : type(t), address(addr) {}
+    AssemblyInstruction(Instruction t, int64_t addr) : instruction(t), address(addr) {}
+    AssemblyInstruction(Instruction t, const std::string& addr) : instruction(t), address(addr) {}
 
     bool hasAddress() const {
-        return std::holds_alternative<ll>(address);
+        return std::holds_alternative<int64_t>(address);
     }
 
     bool hasLabel() const {
         return std::holds_alternative<std::string>(address);
     }
 
-    ll getAddress() const {
-        return std::get<ll>(address);
+    int64_t getAddress() const {
+        return std::get<int64_t>(address);
     }
 
     std::string getLabel() const {
@@ -140,14 +127,14 @@ struct AssemblyInstruction {
     }
 
     std::string toString() const {
-        auto it = instructionNames.find(type);
+        auto it = instructionNames.find(instruction);
         if (it == instructionNames.end()) {
             return "UNKNOWN";
         }
         
         std::string result = it->second;
         if (hasAddress()) {
-            if (type == AssemblyInstructionType::HALT || type == AssemblyInstructionType::HALF) {
+            if (instruction == Instruction::HALT || instruction == Instruction::HALF) {
                 return result;
             }else{
                 result += " " + std::to_string(getAddress());
@@ -159,16 +146,6 @@ struct AssemblyInstruction {
     }
 
 };
-
-
-// codeGenerator.cpp
-/**
- * @brief Compiles the parsed program into GeAssembly code
- * 
- * @param program the parsed program
- * @return `std::vector<AssemblyInstruction>` instructions generated in the process 
- */
-std::vector<AssemblyInstruction> compile(std::unique_ptr<Program>& program);
 
 
 #endif // ASSEMBLING_HPP

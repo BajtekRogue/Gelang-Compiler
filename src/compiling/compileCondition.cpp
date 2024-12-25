@@ -5,7 +5,7 @@
 #include "utlity.hpp"
 
 
-std::pair<std::vector<AssemblyInstruction>, std::optional<bool>> compileCondition(SymbolsTable& symbolsTable, const std::unique_ptr<Condition>& cond, ll jumpAddress){
+std::pair<std::vector<AssemblyInstruction>, std::optional<bool>> compileCondition(SymbolsTable& symbolsTable, const std::unique_ptr<Condition>& cond, int64_t jumpAddress){
     std::vector<AssemblyInstruction> result;
 
     // Grammar ensures that both values are initialized
@@ -15,8 +15,8 @@ std::pair<std::vector<AssemblyInstruction>, std::optional<bool>> compileConditio
     // If both are numbers evaluate the condition during compile time and return the result as second std::optional argument
     if(left.isNumber() && right.isNumber()){
 
-        ll leftNum = left.asNumber();
-        ll rightNum = right.asNumber();
+        int64_t leftNum = left.asNumber();
+        int64_t rightNum = right.asNumber();
 
         switch(cond->type){
             case ConditionType::Equal:
@@ -34,7 +34,6 @@ std::pair<std::vector<AssemblyInstruction>, std::optional<bool>> compileConditio
             default:
                 throw std::runtime_error("Unknown condition type");
         }
-
     }
 
     // Validate use of variables
@@ -72,40 +71,40 @@ std::pair<std::vector<AssemblyInstruction>, std::optional<bool>> compileConditio
     result.insert(result.end(), loadLeft_code.begin(), loadLeft_code.end());
 
     // accu = x - y
-    result.push_back(AssemblyInstruction(AssemblyInstructionType::SUB, 1));
+    result.push_back(AssemblyInstruction(Instruction::SUB, 1));
 
     switch(cond->type){
         case ConditionType::Equal:
             // x = y  iff  ~(x - y > 0 AND x - y < 0)
-            result.push_back(AssemblyInstruction(AssemblyInstructionType::JPOS, jumpAddress + 1));
-            result.push_back(AssemblyInstruction(AssemblyInstructionType::JNEG, jumpAddress));
+            result.push_back(AssemblyInstruction(Instruction::JPOS, jumpAddress + 1));
+            result.push_back(AssemblyInstruction(Instruction::JNEG, jumpAddress));
             return {result, std::nullopt};
             break;
         case ConditionType::NotEqual:
             // x != y  iff  ~(x - y = 0)
-            result.push_back(AssemblyInstruction(AssemblyInstructionType::JZERO, jumpAddress));
+            result.push_back(AssemblyInstruction(Instruction::JZERO, jumpAddress));
             return {result, std::nullopt};
             break;
         case ConditionType::GreaterThan:
             // x > y  iff  ~(x - y <= 0)
-            result.push_back(AssemblyInstruction(AssemblyInstructionType::JNEG, jumpAddress + 1));
-            result.push_back(AssemblyInstruction(AssemblyInstructionType::JZERO, jumpAddress));
+            result.push_back(AssemblyInstruction(Instruction::JNEG, jumpAddress + 1));
+            result.push_back(AssemblyInstruction(Instruction::JZERO, jumpAddress));
             return {result, std::nullopt};
             break;
         case ConditionType::LessThan:
             // x < y  iff  ~(x - y >= 0)
-            result.push_back(AssemblyInstruction(AssemblyInstructionType::JPOS, jumpAddress + 1));
-            result.push_back(AssemblyInstruction(AssemblyInstructionType::JZERO, jumpAddress));
+            result.push_back(AssemblyInstruction(Instruction::JPOS, jumpAddress + 1));
+            result.push_back(AssemblyInstruction(Instruction::JZERO, jumpAddress));
             return {result, std::nullopt};
             break;
         case ConditionType::GreaterEqual:
             // x >= y  iff  ~(x - y < 0)
-            result.push_back(AssemblyInstruction(AssemblyInstructionType::JNEG, jumpAddress));
+            result.push_back(AssemblyInstruction(Instruction::JNEG, jumpAddress));
             return {result, std::nullopt};
             break;
         case ConditionType::LessEqual:
             // x <= y  iff  ~(x - y > 0)
-            result.push_back(AssemblyInstruction(AssemblyInstructionType::JPOS, jumpAddress));
+            result.push_back(AssemblyInstruction(Instruction::JPOS, jumpAddress));
             return {result, std::nullopt};
             break;
         default:

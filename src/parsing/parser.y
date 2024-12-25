@@ -6,6 +6,7 @@
 #include <variant>
 #include <optional>   
 #include <cstring>
+#include <cinttypes>
 #include "../headers/languageStructs.hpp"
 #include "../headers/colors.hpp"
 }
@@ -17,8 +18,9 @@
 #include <variant>
 #include <optional>   
 #include <cstring>
+#include <cinttypes>
 #include "../headers/languageStructs.hpp"
-#include "../headers/colors.hpp" //colors for printing
+#include "../headers/colors.hpp" 
 
 extern int yylineno;
 extern int yylex(void);

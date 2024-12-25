@@ -1,0 +1,14 @@
+PROCEDURE meh(x, T y) IS
+BEGIN
+    x := 1455;
+END
+
+PROGRAM IS
+    a, b[-10:100]
+BEGIN
+    FOR i FROM -10 TO 100 DO
+        WRITE i;
+        meh(i, b);
+        WRITE i;
+    ENDFOR
+END

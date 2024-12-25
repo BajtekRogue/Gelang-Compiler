@@ -7,9 +7,32 @@
 #include "assembling.hpp"
 #include <vector>
 #include <string>
+#include <cinttypes>
 
-typedef long long ll;
+const int64_t MEMORY_START = 1000;
+const int64_t MEMORY_ARRAY_VARIABLE_ASSIGN = 28;
+const int64_t MEMORY_ONE = 69;
+const int64_t MEMORY_CONSTANTS = 300;
+const int64_t MEMORY_RETURN_MULTIPLICATION = 56;
+const int64_t MEMORY_RETURN_DIVISION = 47;
+const int64_t MEMORY_RETURN_MODULO = 35;
 
+
+// utility.cpp
+// counter to display in the labels
+namespace LabelCounters {
+    extern int64_t ifCounter;
+    extern int64_t whileCounter;
+    extern int64_t repeatCounter;
+    extern int64_t forCounter;
+    extern int64_t procedureCounter;
+};
+
+namespace Arithmetic {
+    extern bool multiplication;
+    extern bool division;
+    extern bool modulo;
+}
 
 // utility.cpp
 /**
@@ -20,7 +43,7 @@ typedef long long ll;
  * @param destination address to store the value
  * @return `std::vector<AssemblyInstruction>` instructions generated in the process
  */
-std::vector<AssemblyInstruction> getValueToDestinationAddress(SymbolsTable& symbolsTable, const Value& val, ll destination);
+std::vector<AssemblyInstruction> getValueToDestinationAddress(SymbolsTable& symbolsTable, const Value& val, int64_t destination);
 
 /**
  * @brief Checks if the variable is used correctly
@@ -44,7 +67,7 @@ bool isRealInstruction(AssemblyInstruction ins);
  * @param instructions instructions to count
  * @return `ll` number of real instructions
  */
-ll countRealInstructions(const std::vector<AssemblyInstruction>& instructions);
+int64_t countRealInstructions(const std::vector<AssemblyInstruction>& instructions);
 
 /**
  * @brief Get the Start Label object
@@ -68,7 +91,7 @@ std::string getEndLabel(std::string label);
  * @param label the loop label
  * @return `ll` number of the loop
  */
-ll extractLoopLabel(const std::string& label);
+int64_t extractLoopLabel(const std::string& label);
 
 /**
  * @brief Fixes jump addresses when compiling UNTIL loops
@@ -77,12 +100,12 @@ ll extractLoopLabel(const std::string& label);
  * @param loopSize size of loop code
  * @param conditonSize size of condition code
  */
-void fixUntilJump(std::vector<AssemblyInstruction>& code, ll loopSize, ll conditonSize);
+void fixUntilJump(std::vector<AssemblyInstruction>& code, int64_t loopSize, int64_t conditonSize);
 
 /**
  * @brief Find the next multiple of `1000` bigger than `n`
  */
-ll findNext1000(ll n);
+int64_t findNext1000(int64_t n);
 
 /**
  * @brief Get the address of `Value` to `destination` address. Assumes variable is used correctly
@@ -92,7 +115,7 @@ ll findNext1000(ll n);
  * @param destination address to store the value
  * @return `std::vector<AssemblyInstruction>` instructions generated in the process 
  */
-std::vector<AssemblyInstruction> getAddressToDestinationAddress(SymbolsTable& symbolsTable, const Value& val, ll destination);
+std::vector<AssemblyInstruction> getAddressToDestinationAddress(SymbolsTable& symbolsTable, const Value& val, int64_t destination);
 
 /**
  * @brief Fixes procedure jump addresses
@@ -101,5 +124,37 @@ std::vector<AssemblyInstruction> getAddressToDestinationAddress(SymbolsTable& sy
  * @param proceduresTables all procedures tables (including main)
  */
 void fixProcedureCallsJumps(std::vector<AssemblyInstruction>& code);
+
+
+// arithmetic.cpp
+/**
+ * @brief Compiles the multiplication operation. Assume that to calculate `x * y` we have `p[1] = x` and `p[2] = y`. The return address of this procedure is `MEMORY_RETURN_MULTIPLICATION`. Time complexity is `O(log(min{|x|, |y|}))`.
+ * @return `std::vector<AssemblyInstruction>` procedure code 
+ */
+std::vector<AssemblyInstruction> generateMultiplication();
+
+/**
+ * @brief Compiles the division operation. Assume that to calculate `x / y` the value of `x` is in the accumulator and the value of `y` is in the memory at address `p[1]`. The return address of this procedure is `MEMORY_RETURN_DIVISION`.
+ * @return `std::vector<AssemblyInstruction>` procedure code 
+ */
+std::vector<AssemblyInstruction> generateDivision();
+
+/**
+ * @brief Compiles the multiplication operation. Assume that to calculate `x % y` the value of `x` is in the accumulator and the value of `y` is in the memory at address `p[1]`. The return address of this procedure is `MEMORY_RETURN_MODULO`.
+ * @return `std::vector<AssemblyInstruction>` procedure code 
+ */
+std::vector<AssemblyInstruction> generateModulo();
+
+
+// optimalization.cpp
+/**
+ * @brief Detects all `SET x` instructions that will be used more than once or in a loop or in a procedure that is called more than once. Then it initializes them at the beginning of the program and sotres the constants in the memory. Allowed number of constants is `700`.
+ * 
+ * @param code compiled code to optimize
+ * @param isOnePresent if the constant `1` is present in the code due to `FOR` loops
+ * @return `std::vector<AssemblyInstruction>` optimized code 
+ */
+std::vector<AssemblyInstruction> cacheConstants(std::vector<AssemblyInstruction> code, bool isOnePresent);
+
 
 #endif // UTILITY_HPP

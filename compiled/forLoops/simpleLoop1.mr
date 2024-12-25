@@ -1,15 +1,21 @@
+# Preprocessing...
 # Store const = 1 at p[69]
 SET 1
 STORE 69
+# Finished preprocessing
+
+# MAIN 
 # s := 0
 SUB 0
 STORE 1001
 # Initializing FOR_UP _1_: 
-LOAD 69
-STORE 1002
 SET 100
 STORE 1003
+LOAD 69
+STORE 1002
 # FOR_UP _1_: 1 TO 100
+SUB 1003
+JPOS 10
 # s := s + i
 LOAD 1002
 STORE 1
@@ -20,10 +26,7 @@ STORE 1001
 LOAD 1002
 ADD 69
 STORE 1002
-SUB 1003
-JNEG -9
-JZERO -10
-# ENDFOR _1_.
+JUMP -10
 # WRITE s
 PUT 1001
 HALT

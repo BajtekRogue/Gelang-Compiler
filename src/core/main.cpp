@@ -32,7 +32,6 @@ int main(int argc, char *argv[]) {
         std::fclose(data);
     }
 
-    
     try {
         // Compile the program
         std::vector<AssemblyInstruction> code = compile(parsedProgram);
@@ -46,7 +45,7 @@ int main(int argc, char *argv[]) {
         }
 
         // Write the assembly code to the output file
-        for (const AssemblyInstruction& instruction : code) {
+        for (const auto& instruction : code) {
             std::string s = instruction.toString();
             // Skip comments if not debugging
             if(!debugging && s[0] == '#') {

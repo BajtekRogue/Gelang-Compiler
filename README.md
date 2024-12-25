@@ -7,7 +7,7 @@ where
 - `<inputFilePath>` is the path to Gelang source code
 - `<outputFilePath>` is the path to the compiled code in GeAssembly
 
-`-g` flag enables labels in generated assembly
+`-g` flag enables labels in the generated assembly
 
 # Errors:
 ## Variables
@@ -37,7 +37,7 @@ where
 ## FOR loops
 - when an iterator of a FOR loop is being modified by := instruction
 - when an iterator of a FOR loop is being modified by READ command
-- when an iterator of a FOR loop is being modified by procedure call with it as an argument [add this]
+- when an iterator of a FOR loop is being modified by procedure call with it as an argument 
 - when lower and upper bounds of a FOR loop are not initilized
 - when a variable with the same id as the iterator already exists
 

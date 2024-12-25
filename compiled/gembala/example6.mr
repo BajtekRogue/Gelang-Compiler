@@ -1,0 +1,165 @@
+# Preprocessing...
+# Store const = 1102 at p[301]
+SET 1102
+STORE 301
+# Store const = 1001 at p[302]
+SET 1001
+STORE 302
+# Store const = 98 at p[303]
+SET 98
+STORE 303
+# Store const = 1203 at p[304]
+SET 1203
+STORE 304
+# Store const = 1 at p[69]
+SET 1
+STORE 69
+# Finished preprocessing
+
+# Jump to MAIN procedure
+JUMP 35
+# 
+
+# PROCEDURE *
+# Negate y if needed
+LOAD 2
+STORE 4
+JZERO 4
+JPOS 3
+SUB 0
+SUB 4
+# Set result to 0
+STORE 2
+SUB 0
+STORE 3
+LOAD 2
+# Start the loop
+JZERO 16
+JNEG 15
+# Compute y % 2
+STORE 2
+HALF
+ADD 0
+SUB 2
+# If y % 2 != 0 then add x to the result
+JZERO 4
+LOAD 3
+ADD 1
+STORE 3
+# Double x and half y
+LOAD 1
+ADD 1
+STORE 1
+LOAD 2
+HALF
+JUMP -15
+# Negate the result if needed
+LOAD 4
+JPOS 5
+JZERO 4
+SUB 0
+SUB 3
+JUMP 2
+LOAD 3
+RTRN 56
+# ENDPROCEDURE *
+
+# MAIN 
+# READ n
+GET 1304
+# f[0] := 0
+SUB 0
+STORE 1001
+# s[0] := 1
+LOAD 69
+STORE 1102
+# i[0] := 0
+SUB 0
+STORE 1203
+# f[1] := 1
+LOAD 69
+STORE 1002
+# s[1] := 1
+LOAD 69
+STORE 1103
+# i[1] := 1
+LOAD 69
+STORE 1204
+# Initializing FOR_UP _1_: 
+SET 2
+STORE 1307
+LOAD 1304
+STORE 1308
+# FOR_UP _1_: 2 TO n
+# k := j - 1
+LOAD 69
+STORE 1
+LOAD 1307
+SUB 1
+STORE 1305
+# l := k - 1
+LOAD 69
+STORE 1
+LOAD 1305
+SUB 1
+STORE 1306
+# i[j] := i[k] + 1
+LOAD 304
+ADD 1307
+STORE 28
+LOAD 69
+STORE 1
+LOAD 304
+ADD 1305
+LOADI 0
+ADD 1
+STOREI 28
+# f[j] := f[k] + f[l]
+LOAD 302
+ADD 1307
+STORE 28
+LOAD 302
+ADD 1306
+LOADI 0
+STORE 1
+LOAD 302
+ADD 1305
+LOADI 0
+ADD 1
+STOREI 28
+# s[j] := s[k] * i[j]
+LOAD 301
+ADD 1307
+STORE 28
+LOAD 304
+ADD 1307
+LOADI 0
+STORE 2
+LOAD 301
+ADD 1305
+LOADI 0
+STORE 1
+# Setting return address and jumping to *
+SET 108
+STORE 56
+JUMP -96
+STOREI 28
+# j++
+LOAD 1307
+ADD 69
+STORE 1307
+SUB 1308
+JNEG -51
+JZERO -52
+# ENDFOR _1_.
+# WRITE s[n]
+LOAD 301
+ADD 1304
+LOADI 0
+PUT 0
+# WRITE f[n]
+LOAD 302
+ADD 1304
+LOADI 0
+PUT 0
+HALT

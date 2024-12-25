@@ -1,39 +1,49 @@
-# Store const = 200 at p[501]
-SET 200
-STORE 501
-# Store const = -100 at p[502]
+# Preprocessing...
+# Store const = -100 at p[301]
 SET -100
-STORE 502
-# Store const = 344 at p[503]
-SET 344
-STORE 503
-# Store const = -10 at p[504]
+STORE 301
+# Store const = 200 at p[302]
+SET 200
+STORE 302
+# Store const = -10 at p[303]
 SET -10
-STORE 504
+STORE 303
+# Store const = 344 at p[304]
+SET 344
+STORE 304
 # Store const = 1 at p[69]
 SET 1
 STORE 69
+# Finished preprocessing
+
+# MAIN 
 # xyz := -1
 SET -1
 STORE 1001
 # Initializing FOR_UP _1_: 
-LOAD 69
-STORE 1002
 SET 100
 STORE 1003
+LOAD 69
+STORE 1002
 # FOR_UP _1_: 1 TO 100
+SUB 1003
+JPOS 30
 # Initializing FOR_UP _2_: 
-LOAD 504
-STORE 1004
-LOAD 503
+LOAD 304
 STORE 1005
+LOAD 303
+STORE 1004
 # FOR_UP _2_: -10 TO 344
+SUB 1005
+JPOS 20
 # Initializing FOR_UP _3_: 
-LOAD 502
-STORE 1006
-LOAD 501
+LOAD 302
 STORE 1007
+LOAD 301
+STORE 1006
 # FOR_UP _3_: -100 TO 200
+SUB 1007
+JPOS 10
 # xyz := xyz + 1
 LOAD 69
 STORE 1
@@ -44,26 +54,17 @@ STORE 1001
 LOAD 1006
 ADD 69
 STORE 1006
-SUB 1007
-JNEG -9
-JZERO -10
-# ENDFOR _3_.
+JUMP -10
 # j++
 LOAD 1004
 ADD 69
 STORE 1004
-SUB 1005
-JNEG -19
-JZERO -20
-# ENDFOR _2_.
+JUMP -20
 # i++
 LOAD 1002
 ADD 69
 STORE 1002
-SUB 1003
-JNEG -29
-JZERO -30
-# ENDFOR _1_.
+JUMP -30
 # WRITE xyz
 PUT 1001
 HALT

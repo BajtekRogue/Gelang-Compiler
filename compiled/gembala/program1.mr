@@ -1,13 +1,13 @@
 # Preprocessing...
-# Store const = 2006 at p[501]
+# Store const = 2006 at p[301]
 SET 2006
-STORE 501
-# Store const = 2005 at p[502]
+STORE 301
+# Store const = 2005 at p[302]
 SET 2005
-STORE 502
+STORE 302
 # Finished preprocessing
 
-# Jump to main procedure
+# Jump to MAIN procedure
 JUMP 41
 # 
 
@@ -81,7 +81,7 @@ SET 2001
 STORE 1001
 SET 2002
 STORE 1002
-LOAD 502
+LOAD 302
 STORE 1003
 # Setting return address and jumping to gcd
 SET 58
@@ -92,16 +92,16 @@ SET 2003
 STORE 1001
 SET 2004
 STORE 1002
-LOAD 501
+LOAD 301
 STORE 1003
 # Setting return address and jumping to gcd
 SET 67
 STORE 1006
 JUMP -61
 # CALL gcd (x, y, z)
-LOAD 502
+LOAD 302
 STORE 1001
-LOAD 501
+LOAD 301
 STORE 1002
 SET 2007
 STORE 1003

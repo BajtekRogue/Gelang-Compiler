@@ -1,360 +1,63 @@
 #include "assembling.hpp"
 #include "symbolsTable.hpp"
 #include "languageStructs.hpp"
-#include "colors.hpp"
 #include "compiling.hpp"
-#include "utlity.hpp"
 
 
 std::vector<AssemblyInstruction> compileCommand(SymbolsTable& symbolsTable, std::unique_ptr<Command>& cmd) {
-    std::vector<AssemblyInstruction> code;
 
     switch (cmd->type) {
         case CommandType::Read: {
-            std::vector<AssemblyInstruction> readCode = compileRead(symbolsTable, 
-                    std::move(std::unique_ptr<ReadCommand>(
-                        dynamic_cast<ReadCommand*>(cmd.release())
-                ))
-            );
-            code.insert(code.end(), readCode.begin(), readCode.end());
+            return compileRead(symbolsTable, std::move(std::unique_ptr<ReadCommand>(dynamic_cast<ReadCommand*>(cmd.release()))));
             break;
         }
         case CommandType::Write: {
-            std::vector<AssemblyInstruction> writeCode = compileWrite(
-                    symbolsTable, 
-                    std::move(std::unique_ptr<WriteCommand>(
-                        dynamic_cast<WriteCommand*>(cmd.release())
-                ))
-            );
-            code.insert(code.end(), writeCode.begin(), writeCode.end());
+            return compileWrite(symbolsTable, std::move(std::unique_ptr<WriteCommand>(dynamic_cast<WriteCommand*>(cmd.release()))));
             break;
         }
         case CommandType::Assign: {
-            std::vector<AssemblyInstruction> assignCode = compileAssign(
-                    symbolsTable, 
-                    std::move(std::unique_ptr<AssignCommand>(
-                        dynamic_cast<AssignCommand*>(cmd.release())
-                ))
-            );
-            code.insert(code.end(), assignCode.begin(), assignCode.end());
+            return compileAssign(symbolsTable, std::move(std::unique_ptr<AssignCommand>(dynamic_cast<AssignCommand*>(cmd.release()))));
             break;
         }
         case CommandType::If:{
-            IfCommand* ifCmd = dynamic_cast<IfCommand*>(cmd.release());
-            LabelCounters::ifCounter++;
-            std::string labelStart = getStartLabel(std::to_string(LabelCounters::ifCounter));
-            std::string labelEnd = getEndLabel(std::to_string(LabelCounters::ifCounter));
-            code.push_back(AssemblyInstruction(AssemblyInstructionType::LABEL_IF, labelStart + ifCmd->condition->toString()));
-
-            std::vector<AssemblyInstruction> thenCode = compileAll(symbolsTable, ifCmd->thenCommands);
-            ll jumpAddress = countRealInstructions(thenCode) + 1;
-            std::pair<std::vector<AssemblyInstruction>, std::optional<bool>> conditionCode = compileCondition(symbolsTable, ifCmd->condition, jumpAddress);
-
-            // Check if condition is known during compile time
-            if(conditionCode.second.has_value()){
-                if(conditionCode.second.value()){
-                    code.insert(code.end(), thenCode.begin(), thenCode.end());
-                    code.push_back(AssemblyInstruction(AssemblyInstructionType::LABEL_ENDIF, labelEnd));
-                }
-                break;
-            }
-
-            // Check the condition and then jump to the end of the if block
-            code.insert(code.end(), conditionCode.first.begin(), conditionCode.first.end());
-            code.insert(code.end(), thenCode.begin(), thenCode.end());
-
-            code.push_back(AssemblyInstruction(AssemblyInstructionType::LABEL_ENDIF, labelEnd));
+            return compileIf(symbolsTable, std::move(std::unique_ptr<IfCommand>(dynamic_cast<IfCommand*>(cmd.release()))));
             break;
         }
         case CommandType::IfElse:{
-            IfElseCommand* ifElseCmd = dynamic_cast<IfElseCommand*>(cmd.release());
-            LabelCounters::ifCounter++;
-            std::string labelStart = getStartLabel(std::to_string(LabelCounters::ifCounter));
-            std::string labelEnd = getEndLabel(std::to_string(LabelCounters::ifCounter));
-            code.push_back(AssemblyInstruction(AssemblyInstructionType::LABEL_IF, labelStart + ifElseCmd->condition->toString()));
-
-            std::vector<AssemblyInstruction> thenCode = compileAll(symbolsTable, ifElseCmd->thenCommands);
-            std::vector<AssemblyInstruction> elseCode = compileAll(symbolsTable, ifElseCmd->elseCommands);
-            ll jumpAddress = countRealInstructions(thenCode) + 1;
-            ll jumpAddressElse = countRealInstructions(elseCode) + 1;
-            std::pair<std::vector<AssemblyInstruction>, std::optional<bool>> conditionCode = compileCondition(symbolsTable, ifElseCmd->condition, jumpAddress + 1);
-
-            // Check if condition is known during compile time
-            if(conditionCode.second.has_value()){
-                if(conditionCode.second.value()){
-                    code.insert(code.end(), thenCode.begin(), thenCode.end());
-                    code.push_back(AssemblyInstruction(AssemblyInstructionType::LABEL_ELSE, labelStart));
-                    code.push_back(AssemblyInstruction(AssemblyInstructionType::LABEL_ENDIF, labelEnd));
-                        
-                }else{
-                    code.push_back(AssemblyInstruction(AssemblyInstructionType::LABEL_ELSE, labelStart));
-                    code.insert(code.end(), elseCode.begin(), elseCode.end());
-                    code.push_back(AssemblyInstruction(AssemblyInstructionType::LABEL_ENDIF, labelEnd));
-                }
-                break;
-            }
-
-            // Check the condition and then jump to the end of the if block
-            code.insert(code.end(), conditionCode.first.begin(), conditionCode.first.end());
-            code.insert(code.end(), thenCode.begin(), thenCode.end());
-
-            code.push_back(AssemblyInstruction(AssemblyInstructionType::JUMP, jumpAddressElse));
-            code.push_back(AssemblyInstruction(AssemblyInstructionType::LABEL_ELSE, labelStart));
-
-            code.insert(code.end(), elseCode.begin(), elseCode.end());
-            code.push_back(AssemblyInstruction(AssemblyInstructionType::LABEL_ENDIF, labelEnd));
+            return compileIfElse(symbolsTable, std::move(std::unique_ptr<IfElseCommand>(dynamic_cast<IfElseCommand*>(cmd.release()))));
             break;
         }
         case CommandType::While:{
-            WhileCommand* whileCmd = dynamic_cast<WhileCommand*>(cmd.release());
-            LabelCounters::whileCounter++;
-            std::string labelStart = getStartLabel(std::to_string(LabelCounters::whileCounter));
-            std::string labelEnd = getEndLabel(std::to_string(LabelCounters::whileCounter));
-            code.push_back(AssemblyInstruction(AssemblyInstructionType::LABEL_WHILE, labelStart + whileCmd->condition->toString()));
-
-            std::vector<AssemblyInstruction> whileCode = compileAll(symbolsTable, whileCmd->commands);
-            ll jumpAddress = countRealInstructions(whileCode) + 1;
-            std::pair<std::vector<AssemblyInstruction>, std::optional<bool>> conditionCode = compileCondition(symbolsTable, whileCmd->condition, jumpAddress + 1);
-
-            // Get these to check back the condition
-            ll jumBackToCond = -countRealInstructions(whileCode) - countRealInstructions(conditionCode.first);
-
-            // Check if condition is known during compile time
-            if(conditionCode.second.has_value()){
-                if(!conditionCode.second.value()){
-                    code.push_back(AssemblyInstruction(AssemblyInstructionType::LABEL_ENDWHILE, labelEnd));
-                    break;
-                }
-                std::cout << color_Magenta << "Warning: Infinite WHILE loop detected!" << color_Reset << std::endl;
-            }
-
-            // Check the condition and then jump to the end of the while block
-            code.insert(code.end(), conditionCode.first.begin(), conditionCode.first.end());
-            code.insert(code.end(), whileCode.begin(), whileCode.end());
-
-            code.push_back(AssemblyInstruction(AssemblyInstructionType::JUMP, jumBackToCond));
-            code.push_back(AssemblyInstruction(AssemblyInstructionType::LABEL_ENDWHILE, labelStart));
+            return compileWhile(symbolsTable, std::move(std::unique_ptr<WhileCommand>(dynamic_cast<WhileCommand*>(cmd.release()))));
             break;
         }
         case CommandType::Repeat:{
-            RepeatCommand* repeatCmd = dynamic_cast<RepeatCommand*>(cmd.release());
-            LabelCounters::repeatCounter++;
-            std::string labelStart = getStartLabel(std::to_string(LabelCounters::repeatCounter));
-            std::string labelEnd = getEndLabel(std::to_string(LabelCounters::repeatCounter));
-            std::string originalCondition = repeatCmd->condition->toString();
-            code.push_back(AssemblyInstruction(AssemblyInstructionType::LABEL_REPEAT, labelStart));
-
-            std::vector<AssemblyInstruction> repeatCode = compileAll(symbolsTable, repeatCmd->commands);
-            // The loop will be repeated at least once
-            code.insert(code.end(), repeatCode.begin(), repeatCode.end());
-
-            ll loopSize = countRealInstructions(repeatCode);
-            std::pair<std::vector<AssemblyInstruction>, std::optional<bool>> conditionCode = compileCondition(symbolsTable, repeatCmd->condition, -1);
-
-            // Check if condition is known during compile time
-            bool finiteLoop = true;
-            if(conditionCode.second.has_value()){
-                if(conditionCode.second.value()){
-                    code.push_back(AssemblyInstruction(AssemblyInstructionType::LABEL_UNTIL, labelEnd + originalCondition));
-                    break;
-                }
-                finiteLoop = false;
-                std::cout << color_Magenta << "Warning: Infinite UNTIL loop detected!" << color_Reset << std::endl;
-            }
-
-            // Check the condition and then jump to the end of the while block
-            ll conditonSize = countRealInstructions(conditionCode.first);
-            code.insert(code.end(), conditionCode.first.begin(), conditionCode.first.end());
-
-            // Fix the jump addresses
-            if(finiteLoop){
-                fixUntilJump(code, loopSize, conditonSize);
-            }else{
-                code.push_back(AssemblyInstruction(AssemblyInstructionType::JUMP, -loopSize));
-            }
-            code.push_back(AssemblyInstruction(AssemblyInstructionType::LABEL_UNTIL, labelStart + originalCondition));
+            return compileRepeat(symbolsTable, std::move(std::unique_ptr<RepeatCommand>(dynamic_cast<RepeatCommand*>(cmd.release()))));
             break;
         }
         case CommandType::ForTo:{
-            ForToCommand* forToCmd = dynamic_cast<ForToCommand*>(cmd.release());
-            LabelCounters::forCounter++;
-            std::string labelStart = getStartLabel(std::to_string(LabelCounters::forCounter));
-            std::string labelEnd = getEndLabel(std::to_string(LabelCounters::forCounter));
-
-            // If the loop is degenerate do not compile it but still check if the iterator is valid
-            if(forToCmd->fromValue->isNumber() && forToCmd->toValue->isNumber() && forToCmd->fromValue->asNumber() > forToCmd->toValue->asNumber()){
-                code.push_back(AssemblyInstruction(AssemblyInstructionType::LABEL_FOR_UP, labelStart + forToCmd->bounds()));
-                code.push_back(AssemblyInstruction(AssemblyInstructionType::LABEL_ENDFOR, labelEnd));
-                symbolsTable.validateIterator(forToCmd->iterator);
-                break;
-            }
-
-            // Check if lower bound is valid
-            if(forToCmd->fromValue->isIdentifier()){
-                validateUseOfVariable(symbolsTable, forToCmd->fromValue->asIdentifier(), "FOR loop", true);
-            }
-            // Check if upper bound is valid
-            if(forToCmd->toValue->isIdentifier()){
-                validateUseOfVariable(symbolsTable, forToCmd->toValue->asIdentifier(), "FOR loop", true);
-            }
-
-            // Create the iterator variable
-            code.push_back(AssemblyInstruction(AssemblyInstructionType::LABEL_INSTRUCTION, "Initializing FOR_UP " + labelStart));
-            symbolsTable.addIterator(forToCmd->iterator);
-            ll iteratorAddress = symbolsTable.getMemoryAddress_variable(forToCmd->iterator);
-            std::vector<AssemblyInstruction> initilizeIteratorCode = getValueToDestinationAddress(symbolsTable, *(forToCmd->fromValue), iteratorAddress);
-            code.insert(code.end(), initilizeIteratorCode.begin(), initilizeIteratorCode.end());
-
-            // Make copy of the upper bound in case it changes during the loop
-            symbolsTable.addForLoopBound(forToCmd->iterator, forToCmd->iterator + "_LIMIT");
-            ll finalBoundAddress = symbolsTable.getMemoryAddress_forLoopBound(forToCmd->iterator);
-            std::vector<AssemblyInstruction> copyBoundCode = getValueToDestinationAddress(symbolsTable, *(forToCmd->toValue), finalBoundAddress);
-            code.insert(code.end(), copyBoundCode.begin(), copyBoundCode.end());
-
-            code.push_back(AssemblyInstruction(AssemblyInstructionType::LABEL_FOR_UP, labelStart + forToCmd->bounds()));
-            std::vector<AssemblyInstruction> forToCode = compileAll(symbolsTable, forToCmd->commands);
-            code.insert(code.end(), forToCode.begin(), forToCode.end());
-
-            // Increment the iterator
-            code.push_back(AssemblyInstruction(AssemblyInstructionType::LABEL_INSTRUCTION, forToCmd->iterator + "++"));
-            code.push_back(AssemblyInstruction(AssemblyInstructionType::LOAD, iteratorAddress));
-            code.push_back(AssemblyInstruction(AssemblyInstructionType::ADD, MEMORY_ONE));
-            code.push_back(AssemblyInstruction(AssemblyInstructionType::STORE, iteratorAddress));
-
-            // Check the loop condition
-            code.push_back(AssemblyInstruction(AssemblyInstructionType::SUB, finalBoundAddress));
-            code.push_back(AssemblyInstruction(AssemblyInstructionType::JNEG, -countRealInstructions(forToCode) - 4));
-            code.push_back(AssemblyInstruction(AssemblyInstructionType::JZERO, -countRealInstructions(forToCode) - 5));
-            code.push_back(AssemblyInstruction(AssemblyInstructionType::LABEL_ENDFOR, labelEnd));
-
-            // Remove the iterator variable
-            symbolsTable.removeIterator(forToCmd->iterator);
+            return compileForTo(symbolsTable, std::move(std::unique_ptr<ForToCommand>(dynamic_cast<ForToCommand*>(cmd.release()))));
             break;
         }
         case CommandType::ForDownto:{
-            ForDowntoCommand* forDowntoCmd = dynamic_cast<ForDowntoCommand*>(cmd.release());
-            LabelCounters::forCounter++;
-            std::string labelStart = getStartLabel(std::to_string(LabelCounters::forCounter));
-            std::string labelEnd = getEndLabel(std::to_string(LabelCounters::forCounter));
-
-            // If the loop is degenerate do not compile it but still check if the iterator is valid
-            if(forDowntoCmd->fromValue->isNumber() && forDowntoCmd->downtoValue->isNumber() && forDowntoCmd->fromValue->asNumber() < forDowntoCmd->downtoValue->asNumber()){
-                code.push_back(AssemblyInstruction(AssemblyInstructionType::LABEL_FOR_DOWN, labelStart + forDowntoCmd->bounds()));
-                code.push_back(AssemblyInstruction(AssemblyInstructionType::LABEL_ENDFOR, labelEnd));
-                symbolsTable.validateIterator(forDowntoCmd->iterator);
-                break;
-            }
-
-            // Check if lower bound is valid
-            if(forDowntoCmd->fromValue->isIdentifier()){
-                validateUseOfVariable(symbolsTable, forDowntoCmd->fromValue->asIdentifier(), "FOR loop", true);
-            }
-            // Check if upper bound is valid
-            if(forDowntoCmd->downtoValue->isIdentifier()){
-                validateUseOfVariable(symbolsTable, forDowntoCmd->downtoValue->asIdentifier(), "FOR loop", true);
-            }
-
-            // Create the iterator variable
-            code.push_back(AssemblyInstruction(AssemblyInstructionType::LABEL_INSTRUCTION, "Initializing FOR_DOWN " + labelStart));
-            symbolsTable.addIterator(forDowntoCmd->iterator);
-            ll iteratorAddress = symbolsTable.getMemoryAddress_variable(forDowntoCmd->iterator);
-            std::vector<AssemblyInstruction> initilizeIteratorCode = getValueToDestinationAddress(symbolsTable, *(forDowntoCmd->fromValue), iteratorAddress);
-            code.insert(code.end(), initilizeIteratorCode.begin(), initilizeIteratorCode.end());
-
-            // Make copy of the upper bound in case it changes during the loop
-            symbolsTable.addForLoopBound(forDowntoCmd->iterator, forDowntoCmd->iterator + "_LIMIT");
-            ll finalBoundAddress = symbolsTable.getMemoryAddress_forLoopBound(forDowntoCmd->iterator);
-            std::vector<AssemblyInstruction> copyBoundCode = getValueToDestinationAddress(symbolsTable, *(forDowntoCmd->downtoValue), finalBoundAddress);
-            code.insert(code.end(), copyBoundCode.begin(), copyBoundCode.end());
-
-            code.push_back(AssemblyInstruction(AssemblyInstructionType::LABEL_FOR_DOWN, labelStart + forDowntoCmd->bounds()));
-            std::vector<AssemblyInstruction> forToCode = compileAll(symbolsTable, forDowntoCmd->commands);
-            code.insert(code.end(), forToCode.begin(), forToCode.end());
-
-            // Decrement the iterator
-            code.push_back(AssemblyInstruction(AssemblyInstructionType::LABEL_INSTRUCTION, forDowntoCmd->iterator + "--"));
-            code.push_back(AssemblyInstruction(AssemblyInstructionType::LOAD, iteratorAddress));
-            code.push_back(AssemblyInstruction(AssemblyInstructionType::SUB, MEMORY_ONE));
-            code.push_back(AssemblyInstruction(AssemblyInstructionType::STORE, iteratorAddress));
-
-            // Check the loop condition
-            code.push_back(AssemblyInstruction(AssemblyInstructionType::SUB, finalBoundAddress));
-            code.push_back(AssemblyInstruction(AssemblyInstructionType::JPOS, -countRealInstructions(forToCode) - 4));
-            code.push_back(AssemblyInstruction(AssemblyInstructionType::JZERO, -countRealInstructions(forToCode) - 5));
-            code.push_back(AssemblyInstruction(AssemblyInstructionType::LABEL_ENDFOR, labelEnd));
-
-            // Remove the iterator variable
-            symbolsTable.removeIterator(forDowntoCmd->iterator);
+            return compileForDownto(symbolsTable, std::move(std::unique_ptr<ForDowntoCommand>(dynamic_cast<ForDowntoCommand*>(cmd.release()))));
             break;
         }
         case CommandType::ProcedureCall:{
-            ProcedureCallCommand* procCallCmd = dynamic_cast<ProcedureCallCommand*>(cmd.release());
-
-            if(!symbolsTable.isProcedureDeclared(procCallCmd->identifier)){
-                throw std::logic_error("Procedure `" + procCallCmd->identifier + "` was not declared but is called in " + symbolsTable.getOwnIdentifier());
-            }
-
-            std::vector<ParameterType> procParamTypes = symbolsTable.getProcedureParameters(procCallCmd->identifier);
-            size_t expectedNumArgs = procParamTypes.size();
-            size_t givenNumArgs = procCallCmd->arguments.size();
-
-            if(expectedNumArgs != givenNumArgs){
-                throw std::logic_error("Invalid number of arguments for procedure call " + procCallCmd->identifier);
-            }
-
-            code.push_back(AssemblyInstruction(AssemblyInstructionType::LABEL_INSTRUCTION, procCallCmd->toString()));
-
-            std::vector<ll> argumentsAddresses = symbolsTable.getProcedureParametersMemoryAddresses(procCallCmd->identifier);
-            ll returnAddress = symbolsTable.getProcedureReturnAddress(procCallCmd->identifier);
-
-            for(size_t i = 0; i < givenNumArgs; i++){
-
-                // Check if the argument is valid
-                if(procCallCmd->arguments[i]->isNumber()){
-                    throw std::logic_error("A number `" + std::to_string(procCallCmd->arguments[i]->asNumber()) + "` cannot be passed as an argument to a procedure");
-                }
-
-                Identifier paramId = procCallCmd->arguments[i]->asIdentifier();
-
-                validateUseOfVariable(symbolsTable, paramId, "Procedure call", false, procParamTypes[i] == ParameterType::Array);
-
-                if(symbolsTable.isVariableDeclared(paramId.id) && procParamTypes[i] == ParameterType::Array){
-                    throw std::logic_error("Variable `" + procCallCmd->arguments[i]->asIdentifier().toString() + "` cannot be passed as "  + std::to_string(i) + "-th argument to a procedure as it expects an array");
-                }
-                else if(symbolsTable.isArrayDeclared(paramId.id) && procParamTypes[i] == ParameterType::Integer){
-                    throw std::logic_error("Array `" + procCallCmd->arguments[i]->asIdentifier().toString() + "` cannot be passed as "  + std::to_string(i) + "-th argument to a procedure as it expects a variable");
-                }
-
-                // Mark variables as initilized
-                if(symbolsTable.isVariableDeclared(paramId.id)){
-                    symbolsTable.markAsInitialized(paramId.id);
-                }
-                
-                // Load the pointers where the procedure expects them
-                std::vector<AssemblyInstruction> loadArgCode = getAddressToDestinationAddress(symbolsTable, *(procCallCmd->arguments[i]), argumentsAddresses[i]);
-                code.insert(code.end(), loadArgCode.begin(), loadArgCode.end());
-            }
-
-            // Set the return address and jump to the procedure. These addresses will be fixed later
-
-            code.push_back(AssemblyInstruction(AssemblyInstructionType::LABEL_INSTRUCTION, "Setting return address and jumping to " + procCallCmd->identifier));
-            code.push_back(AssemblyInstruction(AssemblyInstructionType::SET, procCallCmd->identifier));
-            code.push_back(AssemblyInstruction(AssemblyInstructionType::STORE, returnAddress));
-            code.push_back(AssemblyInstruction(AssemblyInstructionType::JUMP, procCallCmd->identifier));
-            return code;
+            return compileProcedureCall(symbolsTable, std::move(std::unique_ptr<ProcedureCallCommand>(dynamic_cast<ProcedureCallCommand*>(cmd.release()))));
             break;
         }
         default:
             throw std::runtime_error("Non-implemented command type");
     }
-    return code;
 }
 
-
 std::vector<AssemblyInstruction> compileAll(SymbolsTable& symbolsTable, std::vector<std::unique_ptr<Command>>& commands){
+
     std::vector<AssemblyInstruction> code;
 
     for(auto& cmd : commands){
+        
         std::vector<AssemblyInstruction> commandCode = compileCommand(symbolsTable, cmd);
         code.insert(code.end(), commandCode.begin(), commandCode.end());
     }

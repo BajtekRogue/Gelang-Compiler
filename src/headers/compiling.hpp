@@ -8,8 +8,18 @@
 #include <vector>
 #include <string>
 #include <memory>
+#include <cinttypes>
 
-typedef long long ll;
+
+// codeGenerator.cpp
+/**
+ * @brief Compiles the parsed program into GeAssembly code
+ * 
+ * @param program the parsed program
+ * @return `std::vector<AssemblyInstruction>` instructions generated in the process 
+ */
+std::vector<AssemblyInstruction> compile(std::unique_ptr<Program>& program);
+
 
 // compileCommand.cpp
 /**
@@ -76,6 +86,27 @@ std::vector<AssemblyInstruction> compileAssign(SymbolsTable& symbolsTable, const
 std::vector<AssemblyInstruction> compileExpression(SymbolsTable& symbolsTable, const std::unique_ptr<Expression>& expr);
 
 
+// compileIf.cpp
+/**
+ * @brief Compiles IF command
+ * 
+ * @param symbolsTable symbols table for the current scope
+ * @param cmd command to compile
+ * @return `std::vector<AssemblyInstruction>` instructions generated in the process 
+ */
+std::vector<AssemblyInstruction> compileIf(SymbolsTable& symbolsTable, const std::unique_ptr<IfCommand>& cmd);
+
+// compileIfElse.cpp
+/**
+ * @brief Compiles IF ELSE command
+ * 
+ * @param symbolsTable symbols table for the current scope
+ * @param cmd command to compile
+ * @return `std::vector<AssemblyInstruction>` instructions generated in the process 
+ */
+std::vector<AssemblyInstruction> compileIfElse(SymbolsTable& symbolsTable, const std::unique_ptr<IfElseCommand>& cmd);
+
+
 // compileCondition.cpp
 /**
  * @brief Compiles a condition and returns the generated assembly code
@@ -85,25 +116,60 @@ std::vector<AssemblyInstruction> compileExpression(SymbolsTable& symbolsTable, c
  * @param jumpAddress address to jump to if the condition is false
  * @return `std::pair<std::vector<AssemblyInstruction>, std::optional<bool>>` instructions generated in the process and the value of the condition if it is known during compile time
  */
-std::pair<std::vector<AssemblyInstruction>, std::optional<bool>> compileCondition(SymbolsTable& symbolsTable, const std::unique_ptr<Condition>& cond, ll jumpAddress);
+std::pair<std::vector<AssemblyInstruction>, std::optional<bool>> compileCondition(SymbolsTable& symbolsTable, const std::unique_ptr<Condition>& cond, int64_t jumpAddress);
 
 
-// optimalization.cpp
+// compileWhile.cpp
 /**
- * @brief Checks if the program contains a FOR loop
+ * @brief Compile WHILE loop
  * 
- * @param program program to check
- * @return if the program contains a FOR loop, false otherwise
+ * @param symbolsTable symbols table for the current scope
+ * @param cmd command to compile
+ * @return `std::vector<AssemblyInstruction>` instructions generated in the process
  */
-bool isThereForLoop(std::unique_ptr<Program>& program);
+std::vector<AssemblyInstruction> compileWhile(SymbolsTable& symbolsTable, const std::unique_ptr<WhileCommand>& cmd);
 
+// compileRepeat.cpp
 /**
- * @brief Detects all "SET x" instructions that will be used more than once or in a loop. Then it initializes them at the beginning of the program and sotres the constants in the memory. Allowed number of constants is 500.
+ * @brief Compile REPEAT loop
  * 
- * @param code compiled code to optimize
- * @param isOnePresent if the constant 1 is present in the code due to FOR loops
- * @return `std::vector<AssemblyInstruction>` optimized code 
+ * @param symbolsTable symbols table for the current scope
+ * @param cmd command to compile
+ * @return `std::vector<AssemblyInstruction>` instructions generated in the process
  */
-std::vector<AssemblyInstruction> initilizedConstants(std::vector<AssemblyInstruction> code, bool isOnePresent);
+std::vector<AssemblyInstruction> compileRepeat(SymbolsTable& symbolsTable, const std::unique_ptr<RepeatCommand>& cmd);
+
+// compileForTo.cpp
+/**
+ * @brief Compile FOR TO loop
+ * 
+ * @param symbolsTable symbols table for the current scope
+ * @param cmd command to compile
+ * @return `std::vector<AssemblyInstruction>` instructions generated in the process
+ */
+std::vector<AssemblyInstruction> compileForTo(SymbolsTable& symbolsTable, const std::unique_ptr<ForToCommand>& cmd);
+
+
+// compileForDownto.cpp
+/**
+ * @brief Compile FOR DOWNTO loop
+ * 
+ * @param symbolsTable symbols table for the current scope
+ * @param cmd command to compile
+ * @return `std::vector<AssemblyInstruction>` instructions generated in the process
+ */
+std::vector<AssemblyInstruction> compileForDownto(SymbolsTable& symbolsTable, const std::unique_ptr<ForDowntoCommand>& cmd);
+
+
+// compileProcedureCall.cpp
+/**
+ * @brief Compile procedure call
+ * 
+ * @param symbolsTable symbols table for the current scope
+ * @param cmd command to compile
+ * @return `std::vector<AssemblyInstruction>` instructions generated in the process
+ */
+std::vector<AssemblyInstruction> compileProcedureCall(SymbolsTable& symbolsTable, const std::unique_ptr<ProcedureCallCommand>& cmd);
+
 
 #endif //COMPILING_HPP

@@ -1,21 +1,10 @@
-
-COMMANDS:
-    -READ [done]
-    -WRITE [done]
-    -ASSIGN [done]
-    -IF [done]
-    -IF ELSE [done]
-    -WHILE [done]
-    -REPEAT [done]
-    -FOR UP [done]
-    -FOR DOWN [done]
-    -PROC CALL [done]
-
-EXPRESSION:
-    -nothing [done]
-    -addition [done]
-    -subtraction [done]
-    -multiply
+Add EXPRESSION:
     -divide
     -modulo
 
+
+Optimalization:
+    - Keep track of the accumulator?
+    - Optimize condition checking
+    - Efficient add and sub if can [local variable, local array, parameter int]
+    

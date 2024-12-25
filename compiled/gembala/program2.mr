@@ -1,25 +1,25 @@
 # Preprocessing...
-# Store const = 3001 at p[501]
+# Store const = 3001 at p[301]
 SET 3001
-STORE 501
-# Store const = 3000 at p[502]
+STORE 301
+# Store const = 3000 at p[302]
 SET 3000
-STORE 502
+STORE 302
 # Store const = 1 at p[69]
 SET 1
 STORE 69
-# Store const = 2 at p[504]
+# Store const = 2 at p[304]
 SET 2
-STORE 504
+STORE 304
 # Finished preprocessing
 
-# Jump to main procedure
+# Jump to MAIN procedure
 JUMP 76
 # 
 
 # PROCEDURE licz
 # Initializing FOR_UP _1_: 
-LOAD 504
+LOAD 304
 STORE 1004
 LOADI 1002
 STORE 1005
@@ -39,7 +39,7 @@ JNEG -9
 JZERO -10
 # ENDFOR _1_.
 # Initializing FOR_UP _2_: 
-LOAD 504
+LOAD 304
 STORE 1006
 LOADI 1002
 STORE 1007
@@ -96,7 +96,7 @@ RTRN 1008
 # Initializing FOR_DOWN _3_: 
 LOADI 2002
 STORE 2003
-LOAD 504
+LOAD 304
 STORE 2004
 # FOR_DOWN _3_: n DOWNTO 2
 # IF _2_: s[i] > 0
@@ -128,18 +128,18 @@ RTRN 2005
 SET 100
 STORE 3001
 # CALL licz (sito, n)
-LOAD 502
+LOAD 302
 STORE 1001
-LOAD 501
+LOAD 301
 STORE 1002
 # Setting return address and jumping to licz
 SET 93
 STORE 1008
 JUMP -83
 # CALL wypisz (sito, n)
-LOAD 502
+LOAD 302
 STORE 2001
-LOAD 501
+LOAD 301
 STORE 2002
 # Setting return address and jumping to wypisz
 SET 100

@@ -4,6 +4,7 @@
 #include <vector>
 #include <string>
 #include <cstring>
+#include <cinttypes>
 #include "parser.hpp"
 
 // Store lines for error reporting
@@ -50,7 +51,7 @@ IDENTIFIER  [_a-z]+
 
 [0-9]+      { 
     try{
-        yylval.int_val = std::stoll(yytext);  
+        yylval.int_val = std::stoll(yytext);  // static cast might be needed her to convert to int64_t
         return NUMBER; 
     }catch (const std::out_of_range&){
         reportLexerError("Number out of range for long long", yylineno);
