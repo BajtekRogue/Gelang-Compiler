@@ -9,16 +9,28 @@
 #include <string>
 #include <cinttypes>
 
-const int64_t MEMORY_START = 1000;
-const int64_t MEMORY_ARRAY_VARIABLE_ASSIGN = 28;
-const int64_t MEMORY_ONE = 69;
-const int64_t MEMORY_CONSTANTS = 300;
-const int64_t MEMORY_RETURN_MULTIPLICATION = 56;
-const int64_t MEMORY_RETURN_DIVISION = 47;
-const int64_t MEMORY_RETURN_MODULO = 35;
 
+/**
+ * @brief Special memory addresses
+ * 
+ */
+namespace Memory {
+    inline const int64_t start = 1000;
+    inline const int64_t arrayVariableAssign = 144;
+    inline const int64_t constantsStart = 300;
+    inline const int64_t one = 69;
+    inline const int64_t returnMultiplication = 256;
+    inline const int64_t returnDivision = 161;
+    inline const int64_t multiplicationLeft = 11;
+    inline const int64_t multiplicationRight = 12;
+    inline const int64_t divisionLeft = 72;
+    inline const int64_t divisionRight = 73;
+    inline const int64_t divisionFlag = 75;
+}
 
-// counter to display in the labels
+/**
+ * @brief Label counters for loops and procedures
+ */
 namespace LabelCounters {
     inline int64_t ifCounter = 0;
     inline int64_t whileCounter = 0;
@@ -27,12 +39,20 @@ namespace LabelCounters {
     inline int64_t procedureCounter = 0;
 };
 
+/**
+ * @brief Flags for arithmetic operations
+ */
 namespace Arithmetic {
     inline bool multiplication = false;
     inline bool division = false;
-    inline bool modulo = false;
+    inline bool isOneNeeded = false;
+    inline const std::string multiplicationProcedureName = "*$*";
+    inline const std::string divisionProcedureName = "/@\\";
 }
 
+/**
+ * @brief Colors for terminal output
+ */
 namespace Colors {
     inline const std::string reset   = "\033[1;0m";
     inline const std::string black   = "\033[1;30m";
@@ -140,22 +160,16 @@ void fixProcedureCallsJumps(std::vector<AssemblyInstruction>& code);
 
 // arithmetic.cpp
 /**
- * @brief Compiles the multiplication operation. Assume that to calculate `x * y` we have `p[1] = x` and `p[2] = y`. The return address of this procedure is `MEMORY_RETURN_MULTIPLICATION`. Time complexity is `O(log(min{|x|, |y|}))`.
+ * @brief Compiles the multiplication operation. Assume that to calculate `x * y` we have `p[Memory::multiplicationLeft] = x` and `p[Memory::multiplicationRight] = y`. The return address of this procedure is `Memory::returnMultiplication`. Time complexity is `O(log(min{|x|, |y|}))`.
  * @return `std::vector<AssemblyInstruction>` procedure code 
  */
 std::vector<AssemblyInstruction> generateMultiplication();
 
 /**
- * @brief Compiles the division operation. Assume that to calculate `x / y` the value of `x` is in the accumulator and the value of `y` is in the memory at address `p[1]`. The return address of this procedure is `MEMORY_RETURN_DIVISION`.
+ * @brief Compiles the division operation. Assume that to calculate `x / y` we have `p[Memory::divisionLeft] = x` and `p[Memory::divisionRight] = y`. It will return the quotient if `p[Memory::divisionFlag] = 0` and the remainder otherwise. The return address of this procedure is `Memory::returnDivision`. Time complexity is `O(log(|y|))`.
  * @return `std::vector<AssemblyInstruction>` procedure code 
  */
 std::vector<AssemblyInstruction> generateDivision();
-
-/**
- * @brief Compiles the multiplication operation. Assume that to calculate `x % y` the value of `x` is in the accumulator and the value of `y` is in the memory at address `p[1]`. The return address of this procedure is `MEMORY_RETURN_MODULO`.
- * @return `std::vector<AssemblyInstruction>` procedure code 
- */
-std::vector<AssemblyInstruction> generateModulo();
 
 
 // optimalization.cpp
@@ -163,10 +177,9 @@ std::vector<AssemblyInstruction> generateModulo();
  * @brief Detects all `SET x` instructions that will be used more than once or in a loop or in a procedure that is called more than once. Then it initializes them at the beginning of the program and sotres the constants in the memory. Allowed number of constants is `700`.
  * 
  * @param code compiled code to optimize
- * @param isOnePresent if the constant `1` is present in the code due to `FOR` loops
  * @return `std::vector<AssemblyInstruction>` optimized code 
  */
-std::vector<AssemblyInstruction> cacheConstants(std::vector<AssemblyInstruction> code, bool isOnePresent);
+std::vector<AssemblyInstruction> cacheConstants(std::vector<AssemblyInstruction> code);
 
 
 #endif // UTILITY_HPP

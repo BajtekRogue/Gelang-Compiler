@@ -5,7 +5,7 @@
 #include "utility.hpp"
 
 
-std::vector<AssemblyInstruction> cacheConstants(std::vector<AssemblyInstruction> code, bool isOnePresent){
+std::vector<AssemblyInstruction> cacheConstants(std::vector<AssemblyInstruction> code){
 
     std::vector<AssemblyInstruction> newCode;
     std::unordered_map<int64_t, int64_t> constantsOccurences;
@@ -131,18 +131,18 @@ std::vector<AssemblyInstruction> cacheConstants(std::vector<AssemblyInstruction>
     }
 
     // If 1 must be initialized, mark it
-    if(isOnePresent){
+    if(Arithmetic::isOneNeeded){
         constantsOccurences[1] = 2;
     }
 
     // Load constants
-    int64_t memoryAddress = MEMORY_CONSTANTS + 1;
+    int64_t memoryAddress = Memory::constantsStart + 1;
     std::unordered_map<int64_t, int64_t> constantsMemoryAddresses;
     bool isPreprocessing = false;
 
     for(const auto& [constant, occurence] : constantsOccurences){
         if(occurence > 1){
-            int64_t destination = (isOnePresent && constant == 1 ? MEMORY_ONE : memoryAddress);
+            int64_t destination = (Arithmetic::isOneNeeded && constant == 1 ? Memory::one : memoryAddress);
             newCode.push_back(AssemblyInstruction(Instruction::LABEL_INSTRUCTION, "Store const = " + std::to_string(constant) + " at p[" + std::to_string(destination) + "]"));
             newCode.push_back(AssemblyInstruction(Instruction::SET, constant));
             newCode.push_back(AssemblyInstruction(Instruction::STORE, destination));

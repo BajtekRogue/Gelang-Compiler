@@ -8,7 +8,7 @@ STORE 302
 # Finished preprocessing
 
 # Jump to MAIN procedure
-JUMP 30
+JUMP 28
 # 
 
 # PROCEDURE gcd
@@ -20,13 +20,11 @@ LOADI 1002
 STORE 1005
 # WHILE _1_: y > 0
 LOAD 1005
-JNEG 21
-JZERO 20
+JNEG 19
+JZERO 18
 # IF _1_: x >= y
-LOAD 1005
-STORE 1
 LOAD 1004
-SUB 1
+SUB 1005
 JNEG 5
 # x := x - y
 LOAD 1004
@@ -47,7 +45,7 @@ LOAD 1004
 SUB 1005
 STORE 1004
 # ENDIF _1_.
-JUMP -21
+JUMP -19
 # ENDWHILE _1_: 
 # c := x
 LOAD 1004
@@ -73,9 +71,9 @@ STORE 1002
 LOAD 302
 STORE 1003
 # Setting return address and jumping to gcd
-SET 47
+SET 45
 STORE 1006
-JUMP -41
+JUMP -39
 # CALL gcd (c, d, y)
 SET 2003
 STORE 1001
@@ -84,9 +82,9 @@ STORE 1002
 LOAD 301
 STORE 1003
 # Setting return address and jumping to gcd
-SET 56
+SET 54
 STORE 1006
-JUMP -50
+JUMP -48
 # CALL gcd (x, y, z)
 LOAD 302
 STORE 1001
@@ -95,9 +93,9 @@ STORE 1002
 SET 2007
 STORE 1003
 # Setting return address and jumping to gcd
-SET 65
+SET 63
 STORE 1006
-JUMP -59
+JUMP -57
 # WRITE z
 PUT 2007
 HALT

@@ -1,0 +1,18 @@
+# in=; out = 0, 0, 0, 100, 100
+PROGRAM IS
+    t, s, u, v, w, p, q
+BEGIN
+    t := 100;
+    s := 0;
+    u := t / s;
+    v := t % s;
+    w := t * s;
+    p := t + s;
+    q := t - s;
+    WRITE u;
+    WRITE v;
+    WRITE w;
+    WRITE p;
+    WRITE q;
+
+END

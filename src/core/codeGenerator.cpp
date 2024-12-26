@@ -24,7 +24,7 @@ std::vector<AssemblyInstruction> compile(std::unique_ptr<Program>& program) {
     for(size_t i = 0; i < program->procedures.size(); i++) {
 
         // Create a symbols table, align starting addresses to multiple of 1000 for clarity
-        int64_t nextFreeAddress = (i == 0 ? 100 : proceduresTables[i-1].getLastMemoryAddress() + 1);
+        int64_t nextFreeAddress = (i == 0 ? Memory::start - 1 : proceduresTables[i-1].getLastMemoryAddress() + 1);
         proceduresTables[i] = SymbolsTable(program->procedures[i]->identifier, findNext1000(nextFreeAddress));
         nextFreeAddress = proceduresTables[i].getLastMemoryAddress() + 1;
 
@@ -58,7 +58,7 @@ std::vector<AssemblyInstruction> compile(std::unique_ptr<Program>& program) {
     }
 
     // Compile the main procedure
-    int64_t mainVariablesMemoryAddress = (proceduresTables.empty() ? MEMORY_START : findNext1000(proceduresTables.back().getLastMemoryAddress() + 1));
+    int64_t mainVariablesMemoryAddress = (proceduresTables.empty() ? Memory::start : findNext1000(proceduresTables.back().getLastMemoryAddress() + 1));
     SymbolsTable mainTable("MAIN", mainVariablesMemoryAddress);
     std::vector<AssemblyInstruction> mainCode;
     mainCode.push_back(AssemblyInstruction(Instruction::LABEL_MAIN, ""));
@@ -87,10 +87,6 @@ std::vector<AssemblyInstruction> compile(std::unique_ptr<Program>& program) {
         code.insert(code.begin(), divisionCode.begin(), divisionCode.end());
     }
 
-    if(Arithmetic::modulo){
-        std::vector<AssemblyInstruction> moduloCode = generateModulo();
-        code.insert(code.begin(), moduloCode.begin(), moduloCode.end());
-    }
 
     // Jump to the main procedure if needed
     int64_t jumpMain = countRealInstructions(code);
@@ -107,7 +103,7 @@ std::vector<AssemblyInstruction> compile(std::unique_ptr<Program>& program) {
     fixProcedureCallsJumps(code);
 
     // Otpimalization
-    code = cacheConstants(code, LabelCounters::forCounter != 0);
+    code = cacheConstants(code);
 
     // Fix procedure calls again after inserting code at the beginning...
     fixProcedureCallsJumps(code);

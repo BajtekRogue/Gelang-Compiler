@@ -57,13 +57,14 @@ std::vector<AssemblyInstruction> compileForDownto(SymbolsTable& symbolsTable, co
     // Decrement the iterator and jump back
     code.push_back(AssemblyInstruction(Instruction::LABEL_INSTRUCTION, cmd->iterator + "--"));
     code.push_back(AssemblyInstruction(Instruction::LOAD, iteratorAddress));
-    code.push_back(AssemblyInstruction(Instruction::SUB, MEMORY_ONE));
+    code.push_back(AssemblyInstruction(Instruction::SUB, Memory::one));
     code.push_back(AssemblyInstruction(Instruction::STORE, iteratorAddress));
     code.push_back(AssemblyInstruction(Instruction::JUMP, -countRealInstructions(forDowntoCode) - 5));
     code.push_back(AssemblyInstruction(Instruction::LABEL_ENDFOR, labelEnd));
 
     // Remove the iterator variable
     symbolsTable.removeIterator(cmd->iterator);
-    
+    Arithmetic::isOneNeeded = true;
+
     return code;
 }

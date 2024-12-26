@@ -1,29 +1,32 @@
 # Preprocessing...
-# Store const = 236 at p[301]
-SET 236
+# Store const = 220 at p[301]
+SET 220
 STORE 301
-# Store const = 224 at p[302]
-SET 224
+# Store const = 2001 at p[302]
+SET 2001
 STORE 302
-# Store const = 193 at p[303]
-SET 193
+# Store const = 2004 at p[303]
+SET 2004
 STORE 303
-# Store const = 205 at p[304]
-SET 205
+# Store const = 2003 at p[304]
+SET 2003
 STORE 304
-# Store const = 179 at p[305]
-SET 179
-STORE 305
-# Store const = 169 at p[306]
-SET 169
-STORE 306
 # Store const = 1 at p[69]
 SET 1
 STORE 69
+# Store const = 205 at p[306]
+SET 205
+STORE 306
+# Store const = 179 at p[307]
+SET 179
+STORE 307
+# Store const = 166 at p[308]
+SET 166
+STORE 308
 # Finished preprocessing
 
 # Jump to MAIN procedure
-JUMP 254
+JUMP 182
 # 
 
 # PROCEDURE /@\
@@ -196,185 +199,124 @@ SUB 0
 RTRN 256
 # ENDPROCEDURE *$*
 
-# PROCEDURE de
-# a := m
-LOADI 1001
-STORE 1006
-# b := n
-LOADI 1002
-STORE 1007
-# x := 1
-LOAD 69
+# PROCEDURE check
+# p := 0
+SUB 0
 STOREI 1003
-# y := 0
-SUB 0
-STOREI 1004
-# r := n
+# r := n % d
 LOADI 1002
-STORE 1008
-# s := m - 1
-LOAD 69
-STORE 1
-LOADI 1001
-SUB 1
-STORE 1009
-# WHILE _1_: b > 0
-LOAD 1007
-JNEG 93
-JZERO 92
-# reszta := a % b
-LOAD 1007
 STORE 73
-LOAD 1006
+LOADI 1001
 STORE 72
 LOAD 69
 STORE 75
 # Setting return address and jumping to /@\
-SET 183
+SET 169
 STORE 161
-JUMP -167
-STORE 1010
-# iloraz := a / b
-LOAD 1007
+JUMP -151
+STORE 1004
+# WHILE _1_: r = 0
+LOAD 1004
+JPOS 26
+JNEG 25
+# n := n / d
+LOADI 1002
 STORE 73
-LOAD 1006
+LOADI 1001
 STORE 72
 SUB 0
 STORE 75
 # Setting return address and jumping to /@\
-SET 193
+SET 182
+STORE 161
+JUMP -164
+STOREI 1001
+# p := p + 1
+LOAD 69
+ADDI 1003
+STOREI 1003
+# r := n % d
+LOADI 1002
+STORE 73
+LOADI 1001
+STORE 72
+LOAD 69
+STORE 75
+# Setting return address and jumping to /@\
+SET 195
 STORE 161
 JUMP -177
-STORE 1011
-# a := b
-LOAD 1007
-STORE 1006
-# b := reszta
-LOAD 1010
-STORE 1007
-# rr := r
-LOAD 1008
-STORE 1012
-# tmp := iloraz * r
-LOAD 1008
-STORE 12
-LOAD 1011
-STORE 11
-# Setting return address and jumping to *$*
-SET 207
-STORE 256
-JUMP -108
-STORE 1014
-# IF _1_: x < tmp
-LOADI 1003
-SUB 1014
-JPOS 11
-JZERO 10
-# r := n * iloraz
-LOAD 1011
-STORE 12
-LOADI 1002
-STORE 11
-# Setting return address and jumping to *$*
-SET 219
-STORE 256
-JUMP -120
-STORE 1008
-JUMP 3
-# ELSE _1_: 
-# r := 0
-SUB 0
-STORE 1008
-# ENDIF _1_.
-# r := r + x
-LOADI 1003
-ADD 1008
-STORE 1008
-# r := r - tmp
-LOAD 1008
-SUB 1014
-STORE 1008
-# ss := s
-LOAD 1009
-STORE 1013
-# tmp := iloraz * s
-LOAD 1009
-STORE 12
-LOAD 1011
-STORE 11
-# Setting return address and jumping to *$*
-SET 238
-STORE 256
-JUMP -139
-STORE 1014
-# IF _2_: y < tmp
-LOADI 1004
-SUB 1014
-JPOS 11
-JZERO 10
-# s := m * iloraz
-LOAD 1011
-STORE 12
-LOADI 1001
-STORE 11
-# Setting return address and jumping to *$*
-SET 250
-STORE 256
-JUMP -151
-STORE 1009
-JUMP 3
-# ELSE _2_: 
-# s := 0
-SUB 0
-STORE 1009
-# ENDIF _2_.
-# s := s + y
-LOADI 1004
-ADD 1009
-STORE 1009
-# s := s - tmp
-LOAD 1009
-SUB 1014
-STORE 1009
-# x := rr
-LOAD 1012
-STOREI 1003
-# y := ss
-LOAD 1013
-STOREI 1004
-JUMP -93
+STORE 1004
+JUMP -26
 # ENDWHILE _1_: 
-# z := a
-LOAD 1006
-STOREI 1005
-# RETURN de
-RTRN 1015
-# ENDPROCEDURE de
+# RETURN check
+RTRN 1005
+# ENDPROCEDURE check
 
 # MAIN 
-# READ m
-GET 2001
 # READ n
-GET 2002
-# CALL de (m, n, x, y, nwd)
-SET 2001
+GET 2001
+# dzielnik := 2
+SET 2
+STORE 2004
+# m := dzielnik * dzielnik
+LOAD 2004
+STORE 12
+LOAD 2004
+STORE 11
+# Setting return address and jumping to *$*
+SET 208
+STORE 256
+JUMP -107
+STORE 2002
+# WHILE _2_: n >= m
+LOAD 2001
+SUB 2002
+JNEG 27
+# CALL check (n, dzielnik, potega)
+LOAD 302
 STORE 1001
-SET 2002
+LOAD 303
 STORE 1002
-SET 2003
+LOAD 304
 STORE 1003
-SET 2004
-STORE 1004
-SET 2005
+# Setting return address and jumping to check
+SET 221
 STORE 1005
-# Setting return address and jumping to de
-SET 283
-STORE 1015
-JUMP -126
-# WRITE x
-PUT 2003
-# WRITE y
+JUMP -62
+# IF _1_: potega > 0
+LOAD 2003
+JNEG 4
+JZERO 3
+# WRITE dzielnik
 PUT 2004
-# WRITE nwd
-PUT 2005
+# WRITE potega
+PUT 2003
+# ENDIF _1_.
+# dzielnik := dzielnik + 1
+LOAD 69
+ADD 2004
+STORE 2004
+# m := dzielnik * dzielnik
+LOAD 2004
+STORE 12
+LOAD 2004
+STORE 11
+# Setting return address and jumping to *$*
+SET 236
+STORE 256
+JUMP -135
+STORE 2002
+JUMP -28
+# ENDWHILE _2_: 
+# IF _2_: n != 1
+LOAD 69
+SUB 2001
+JZERO 4
+# WRITE n
+PUT 2001
+# WRITE 1
+LOAD 69
+PUT 0
+# ENDIF _2_.
 HALT

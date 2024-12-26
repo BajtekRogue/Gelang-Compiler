@@ -77,7 +77,7 @@ int main(int argc, char* argv[]){
     std::cout << Colors::magenta << "Running the program..." << Colors::reset << std::endl;
 
     std::map<int64_t, int64_t> memory;
-    uint32_t instructionPointer = 0;
+    int32_t instructionPointer = 0;
     int64_t totalCost = 0;
     int64_t ioCost = 0;
 
@@ -93,11 +93,6 @@ int main(int argc, char* argv[]){
             return 1;
         }
 
-        // Check if we are out of bounds
-        if (instructionPointer < 0 || instructionPointer >= code.size()) {
-            std::cerr << Colors::red << "Error: Out of bounds" << Colors::reset << std::endl;
-            return 1;
-        }
 
         switch(instruction) {
             case Instruction::GET:
@@ -183,9 +178,15 @@ int main(int argc, char* argv[]){
                 instructionPointer = memory[address];
                 break;
         }
+
+        // Check if we are out of bounds
+        if (instructionPointer < 0 || instructionPointer >= code.size()) {
+            std::cerr << Colors::red << "Error: Out of bounds" << Colors::reset << std::endl;
+            return 1;
+        }
     }
 
     std::cout.imbue(std::locale(""));
-    std::cout << Colors::blue << "Program finished execution ! Total cost is: " << Colors::cyan << totalCost << Colors::blue << "; in this I/O: " << ioCost << Colors::reset << std::endl;
+    std::cout << Colors::blue << "Program finished execution. Total cost is: " << Colors::cyan << totalCost << Colors::blue << "; with I/O: " << ioCost << Colors::reset << std::endl;
     return 0;
 }

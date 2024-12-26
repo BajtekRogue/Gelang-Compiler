@@ -69,9 +69,9 @@ std::vector<AssemblyInstruction> compileRead(SymbolsTable& symbolsTable, const s
 
         result.push_back(AssemblyInstruction(Instruction::SET, index));
         result.push_back(AssemblyInstruction(Instruction::ADD, address));
-        result.push_back(AssemblyInstruction(Instruction::STORE, MEMORY_ARRAY_VARIABLE_ASSIGN));
+        result.push_back(AssemblyInstruction(Instruction::STORE, Memory::arrayVariableAssign));
         result.push_back(AssemblyInstruction(Instruction::GET, 0));
-        result.push_back(AssemblyInstruction(Instruction::STOREI, MEMORY_ARRAY_VARIABLE_ASSIGN));
+        result.push_back(AssemblyInstruction(Instruction::STOREI, Memory::arrayVariableAssign));
 
         return result;
     }
@@ -87,9 +87,9 @@ std::vector<AssemblyInstruction> compileRead(SymbolsTable& symbolsTable, const s
 
         result.push_back(AssemblyInstruction(Instruction::SET, arrayStartAddress));
         result.push_back(AssemblyInstruction(Instruction::ADD, indexAddress));
-        result.push_back(AssemblyInstruction(Instruction::STORE, MEMORY_ARRAY_VARIABLE_ASSIGN));
+        result.push_back(AssemblyInstruction(Instruction::STORE, Memory::arrayVariableAssign));
         result.push_back(AssemblyInstruction(Instruction::GET, 0));
-        result.push_back(AssemblyInstruction(Instruction::STOREI, MEMORY_ARRAY_VARIABLE_ASSIGN));
+        result.push_back(AssemblyInstruction(Instruction::STOREI, Memory::arrayVariableAssign));
 
         return result;
     }
@@ -102,9 +102,9 @@ std::vector<AssemblyInstruction> compileRead(SymbolsTable& symbolsTable, const s
 
         result.push_back(AssemblyInstruction(Instruction::SET, arrayStartAddress));
         result.push_back(AssemblyInstruction(Instruction::ADDI, indexAddress));
-        result.push_back(AssemblyInstruction(Instruction::STORE, MEMORY_ARRAY_VARIABLE_ASSIGN));
+        result.push_back(AssemblyInstruction(Instruction::STORE, Memory::arrayVariableAssign));
         result.push_back(AssemblyInstruction(Instruction::GET, 0));
-        result.push_back(AssemblyInstruction(Instruction::STOREI, MEMORY_ARRAY_VARIABLE_ASSIGN));
+        result.push_back(AssemblyInstruction(Instruction::STOREI, Memory::arrayVariableAssign));
 
         return result;
     }
@@ -117,9 +117,9 @@ std::vector<AssemblyInstruction> compileRead(SymbolsTable& symbolsTable, const s
 
         result.push_back(AssemblyInstruction(Instruction::LOAD, arrayAddress));
         result.push_back(AssemblyInstruction(Instruction::ADD, indexAddress));
-        result.push_back(AssemblyInstruction(Instruction::STORE, MEMORY_ARRAY_VARIABLE_ASSIGN));
+        result.push_back(AssemblyInstruction(Instruction::STORE, Memory::arrayVariableAssign));
         result.push_back(AssemblyInstruction(Instruction::GET, 0));
-        result.push_back(AssemblyInstruction(Instruction::STOREI, MEMORY_ARRAY_VARIABLE_ASSIGN));
+        result.push_back(AssemblyInstruction(Instruction::STOREI, Memory::arrayVariableAssign));
 
         return result;
     }
@@ -132,9 +132,9 @@ std::vector<AssemblyInstruction> compileRead(SymbolsTable& symbolsTable, const s
 
         result.push_back(AssemblyInstruction(Instruction::LOAD, arrayAddress));
         result.push_back(AssemblyInstruction(Instruction::ADDI, indexAddress));
-        result.push_back(AssemblyInstruction(Instruction::STORE, MEMORY_ARRAY_VARIABLE_ASSIGN));
+        result.push_back(AssemblyInstruction(Instruction::STORE, Memory::arrayVariableAssign));
         result.push_back(AssemblyInstruction(Instruction::GET, 0));
-        result.push_back(AssemblyInstruction(Instruction::STOREI, MEMORY_ARRAY_VARIABLE_ASSIGN));
+        result.push_back(AssemblyInstruction(Instruction::STOREI, Memory::arrayVariableAssign));
 
         return result;
     }

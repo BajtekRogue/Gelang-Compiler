@@ -179,6 +179,16 @@ std::vector<AssemblyInstruction> compileExpression(SymbolsTable& symbolsTable, c
         code.push_back(AssemblyInstruction(Instruction::SUB, 2));
         return code;
     }
+    // 0 / x = 0
+    if(expr->type == ExpressionType::Divide && left.isNumber() && left.asNumber() == 0){
+        code.push_back(AssemblyInstruction(Instruction::SUB, 0));
+        return code;
+    }
+    // 0 % x = 0
+    if(expr->type == ExpressionType::Modulo && left.isNumber() && left.asNumber() == 0){
+        code.push_back(AssemblyInstruction(Instruction::SUB, 0));
+        return code;
+    }
 
     // Check if addition can be done efficiently
     if(expr->type == ExpressionType::Plus && left.isIdentifier()){
@@ -347,34 +357,54 @@ std::vector<AssemblyInstruction> compileExpression(SymbolsTable& symbolsTable, c
             return code;
             break;
         case ExpressionType::Multiply:
-            // Jump to the multiplication procedure
-            loadRightCode = getValueToDestinationAddress(symbolsTable, right, 2);
-            loadLeftCode = getValueToDestinationAddress(symbolsTable, left, 1);
+            // Mark it and load the arguments
+            Arithmetic::multiplication = true;
+            loadRightCode = getValueToDestinationAddress(symbolsTable, right, Memory::multiplicationRight);
+            loadLeftCode = getValueToDestinationAddress(symbolsTable, left, Memory::multiplicationLeft);
             code.insert(code.end(), loadRightCode.begin(), loadRightCode.end());
             code.insert(code.end(), loadLeftCode.begin(), loadLeftCode.end());
-            Arithmetic::multiplication = true;
-            code.push_back(AssemblyInstruction(Instruction::LABEL_INSTRUCTION, "Setting return address and jumping to *"));
-            code.push_back(AssemblyInstruction(Instruction::SET, "*"));
-            code.push_back(AssemblyInstruction(Instruction::STORE, MEMORY_RETURN_MULTIPLICATION));
-            code.push_back(AssemblyInstruction(Instruction::JUMP, "*"));
+
+            // Jump to the multiplication procedure
+            code.push_back(AssemblyInstruction(Instruction::LABEL_INSTRUCTION, "Setting return address and jumping to " + Arithmetic::multiplicationProcedureName));
+            code.push_back(AssemblyInstruction(Instruction::SET, Arithmetic::multiplicationProcedureName));
+            code.push_back(AssemblyInstruction(Instruction::STORE, Memory::returnMultiplication));
+            code.push_back(AssemblyInstruction(Instruction::JUMP, Arithmetic::multiplicationProcedureName));
             return code;
             break;
         case ExpressionType::Divide:
-            // Jump to the division procedure
+            // Mark it and load the arguments
             Arithmetic::division = true;
-            code.push_back(AssemblyInstruction(Instruction::LABEL_INSTRUCTION, "Setting return address and jumping to /"));
-            code.push_back(AssemblyInstruction(Instruction::SET, "/"));
-            code.push_back(AssemblyInstruction(Instruction::STORE, MEMORY_RETURN_DIVISION));
-            code.push_back(AssemblyInstruction(Instruction::JUMP, "/"));
+            Arithmetic::isOneNeeded = true;
+            loadRightCode = getValueToDestinationAddress(symbolsTable, right, Memory::divisionRight);
+            loadLeftCode = getValueToDestinationAddress(symbolsTable, left, Memory::divisionLeft);
+            code.insert(code.end(), loadRightCode.begin(), loadRightCode.end());
+            code.insert(code.end(), loadLeftCode.begin(), loadLeftCode.end());
+
+            // Jump to the division procedure
+            code.push_back(AssemblyInstruction(Instruction::SUB, 0));
+            code.push_back(AssemblyInstruction(Instruction::STORE, Memory::divisionFlag));
+            code.push_back(AssemblyInstruction(Instruction::LABEL_INSTRUCTION, "Setting return address and jumping to " + Arithmetic::divisionProcedureName));
+            code.push_back(AssemblyInstruction(Instruction::SET, Arithmetic::divisionProcedureName));
+            code.push_back(AssemblyInstruction(Instruction::STORE, Memory::returnDivision));
+            code.push_back(AssemblyInstruction(Instruction::JUMP, Arithmetic::divisionProcedureName));
             return code;
             break;
         case ExpressionType::Modulo:
-            // Jump to the modulo procedure
-            Arithmetic::modulo = true;
-            code.push_back(AssemblyInstruction(Instruction::LABEL_INSTRUCTION, "Setting return address and jumping to %"));
-            code.push_back(AssemblyInstruction(Instruction::SET, "%"));
-            code.push_back(AssemblyInstruction(Instruction::STORE, MEMORY_RETURN_MODULO));
-            code.push_back(AssemblyInstruction(Instruction::JUMP, "%"));
+            // Mark it and load the arguments
+            Arithmetic::division = true;
+            Arithmetic::isOneNeeded = true;
+            loadRightCode = getValueToDestinationAddress(symbolsTable, right, Memory::divisionRight);
+            loadLeftCode = getValueToDestinationAddress(symbolsTable, left, Memory::divisionLeft);
+            code.insert(code.end(), loadRightCode.begin(), loadRightCode.end());
+            code.insert(code.end(), loadLeftCode.begin(), loadLeftCode.end());
+
+            // Jump to the division procedure
+            code.push_back(AssemblyInstruction(Instruction::LOAD, Memory::one));
+            code.push_back(AssemblyInstruction(Instruction::STORE, Memory::divisionFlag));
+            code.push_back(AssemblyInstruction(Instruction::LABEL_INSTRUCTION, "Setting return address and jumping to " + Arithmetic::divisionProcedureName));
+            code.push_back(AssemblyInstruction(Instruction::SET, Arithmetic::divisionProcedureName));
+            code.push_back(AssemblyInstruction(Instruction::STORE, Memory::returnDivision));
+            code.push_back(AssemblyInstruction(Instruction::JUMP, Arithmetic::divisionProcedureName));
             return code;
             break;
         default:

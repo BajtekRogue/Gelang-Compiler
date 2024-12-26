@@ -1,18 +1,17 @@
-# in =; out = 70077626, -70077626, 70077626, -70077626
+# in =; out = 70077626, -70077626, -70077626, 70077626
 PROGRAM IS
-    x, y, z
+    x, y, z, x_, y_
 BEGIN
     x := 56789;
     y := 1234;
+    x_ := -56789;
+    y_ := -1234;
     z := x * y;
     WRITE z;
-    x := 0-x;
-    z := x * y;
+    z := x_ * y;
     WRITE z;
-    y := 0-y;
-    z := x * y;
+    z := x * y_;
     WRITE z;
-    x := 0-x;
-    z := x * y;
+    z := x_ * y_;
     WRITE z;
 END

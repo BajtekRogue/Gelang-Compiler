@@ -1,29 +1,23 @@
 # Preprocessing...
-# Store const = 236 at p[301]
-SET 236
+# Store const = 199 at p[301]
+SET 199
 STORE 301
-# Store const = 224 at p[302]
-SET 224
+# Store const = 188 at p[302]
+SET 188
 STORE 302
-# Store const = 193 at p[303]
-SET 193
+# Store const = 178 at p[303]
+SET 178
 STORE 303
-# Store const = 205 at p[304]
-SET 205
+# Store const = 209 at p[304]
+SET 209
 STORE 304
-# Store const = 179 at p[305]
-SET 179
-STORE 305
-# Store const = 169 at p[306]
-SET 169
-STORE 306
 # Store const = 1 at p[69]
 SET 1
 STORE 69
 # Finished preprocessing
 
 # Jump to MAIN procedure
-JUMP 254
+JUMP 212
 # 
 
 # PROCEDURE /@\
@@ -196,167 +190,106 @@ SUB 0
 RTRN 256
 # ENDPROCEDURE *$*
 
-# PROCEDURE de
-# a := m
-LOADI 1001
-STORE 1006
-# b := n
-LOADI 1002
-STORE 1007
-# x := 1
+# PROCEDURE power
+# d := 1
 LOAD 69
-STOREI 1003
-# y := 0
-SUB 0
 STOREI 1004
-# r := n
+# wyk := b
 LOADI 1002
-STORE 1008
-# s := m - 1
+STORE 1006
+# pot := a % c
+LOADI 1003
+STORE 73
+LOADI 1001
+STORE 72
 LOAD 69
+STORE 75
+# Setting return address and jumping to /@\
+SET 165
+STORE 161
+JUMP -153
+STORE 1005
+# WHILE _1_: wyk > 0
+LOAD 1006
+JNEG 54
+JZERO 53
+# o := wyk % 2
+LOAD 1006
 STORE 1
-LOADI 1001
-SUB 1
-STORE 1009
-# WHILE _1_: b > 0
-LOAD 1007
-JNEG 93
-JZERO 92
-# reszta := a % b
-LOAD 1007
+HALF
+ADD 0
+STORE 2
+LOAD 1
+SUB 2
+STORE 1007
+# IF _1_: o = 1
+LOAD 69
+SUB 1007
+JPOS 20
+JNEG 19
+# d := d * pot
+LOAD 1005
+STORE 12
+LOADI 1004
+STORE 11
+# Setting return address and jumping to *$*
+SET 188
+STORE 256
+JUMP -93
+STOREI 1004
+# d := d % c
+LOADI 1003
 STORE 73
-LOAD 1006
+LOADI 1004
 STORE 72
 LOAD 69
 STORE 75
 # Setting return address and jumping to /@\
-SET 183
+SET 198
 STORE 161
-JUMP -167
-STORE 1010
-# iloraz := a / b
-LOAD 1007
-STORE 73
+JUMP -186
+STOREI 1004
+# ENDIF _1_.
+# wyk := wyk / 2
 LOAD 1006
+HALF
+STORE 1006
+# pot := pot * pot
+LOAD 1005
+STORE 12
+LOAD 1005
+STORE 11
+# Setting return address and jumping to *$*
+SET 209
+STORE 256
+JUMP -114
+STORE 1005
+# pot := pot % c
+LOADI 1003
+STORE 73
+LOAD 1005
 STORE 72
-SUB 0
+LOAD 69
 STORE 75
 # Setting return address and jumping to /@\
-SET 193
-STORE 161
-JUMP -177
-STORE 1011
-# a := b
-LOAD 1007
-STORE 1006
-# b := reszta
-LOAD 1010
-STORE 1007
-# rr := r
-LOAD 1008
-STORE 1012
-# tmp := iloraz * r
-LOAD 1008
-STORE 12
-LOAD 1011
-STORE 11
-# Setting return address and jumping to *$*
-SET 207
-STORE 256
-JUMP -108
-STORE 1014
-# IF _1_: x < tmp
-LOADI 1003
-SUB 1014
-JPOS 11
-JZERO 10
-# r := n * iloraz
-LOAD 1011
-STORE 12
-LOADI 1002
-STORE 11
-# Setting return address and jumping to *$*
 SET 219
-STORE 256
-JUMP -120
-STORE 1008
-JUMP 3
-# ELSE _1_: 
-# r := 0
-SUB 0
-STORE 1008
-# ENDIF _1_.
-# r := r + x
-LOADI 1003
-ADD 1008
-STORE 1008
-# r := r - tmp
-LOAD 1008
-SUB 1014
-STORE 1008
-# ss := s
-LOAD 1009
-STORE 1013
-# tmp := iloraz * s
-LOAD 1009
-STORE 12
-LOAD 1011
-STORE 11
-# Setting return address and jumping to *$*
-SET 238
-STORE 256
-JUMP -139
-STORE 1014
-# IF _2_: y < tmp
-LOADI 1004
-SUB 1014
-JPOS 11
-JZERO 10
-# s := m * iloraz
-LOAD 1011
-STORE 12
-LOADI 1001
-STORE 11
-# Setting return address and jumping to *$*
-SET 250
-STORE 256
-JUMP -151
-STORE 1009
-JUMP 3
-# ELSE _2_: 
-# s := 0
-SUB 0
-STORE 1009
-# ENDIF _2_.
-# s := s + y
-LOADI 1004
-ADD 1009
-STORE 1009
-# s := s - tmp
-LOAD 1009
-SUB 1014
-STORE 1009
-# x := rr
-LOAD 1012
-STOREI 1003
-# y := ss
-LOAD 1013
-STOREI 1004
-JUMP -93
+STORE 161
+JUMP -207
+STORE 1005
+JUMP -54
 # ENDWHILE _1_: 
-# z := a
-LOAD 1006
-STOREI 1005
-# RETURN de
-RTRN 1015
-# ENDPROCEDURE de
+# RETURN power
+RTRN 1008
+# ENDPROCEDURE power
 
 # MAIN 
-# READ m
+# READ a
 GET 2001
-# READ n
+# READ b
 GET 2002
-# CALL de (m, n, x, y, nwd)
+# READ c
+GET 2003
+# CALL power (a, b, c, d)
 SET 2001
 STORE 1001
 SET 2002
@@ -365,16 +298,10 @@ SET 2003
 STORE 1003
 SET 2004
 STORE 1004
-SET 2005
-STORE 1005
-# Setting return address and jumping to de
-SET 283
-STORE 1015
-JUMP -126
-# WRITE x
-PUT 2003
-# WRITE y
+# Setting return address and jumping to power
+SET 236
+STORE 1008
+JUMP -83
+# WRITE d
 PUT 2004
-# WRITE nwd
-PUT 2005
 HALT

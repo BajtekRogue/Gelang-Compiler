@@ -1,0 +1,25 @@
+# in=; out= 2131, 35, -2132, 37, -2132, -37, 2131, -35
+PROGRAM IS
+    a, b, c, d, a_, b_
+BEGIN
+    a := 153467;
+    b := 72;
+    a_ := -153467;
+    b_ := -72;
+    c := a / b;
+    d := a % b;
+    WRITE c;
+    WRITE d;
+    c := a_ / b;
+    d := a_ % b;
+    WRITE c;
+    WRITE d;
+    c := a / b_;
+    d := a % b_;
+    WRITE c;
+    WRITE d;
+    c := a_ / b_;
+    d := a_ % b_;
+    WRITE c;
+    WRITE d;
+END

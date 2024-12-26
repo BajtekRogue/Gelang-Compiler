@@ -76,12 +76,12 @@ std::vector<AssemblyInstruction> compileAssign(SymbolsTable& symbolsTable, const
         // Load into the accumulator the value at the index of the array
         result.push_back(AssemblyInstruction(Instruction::SET, index));
         result.push_back(AssemblyInstruction(Instruction::ADD, arrayAddress));
-        result.push_back(AssemblyInstruction(Instruction::STORE,  MEMORY_ARRAY_VARIABLE_ASSIGN));
+        result.push_back(AssemblyInstruction(Instruction::STORE,  Memory::arrayVariableAssign));
 
         std::vector<AssemblyInstruction> expressionInstructions = compileExpression(symbolsTable, cmd->expression);
 
         result.insert(result.end(), expressionInstructions.begin(), expressionInstructions.end());
-        result.push_back(AssemblyInstruction(Instruction::STOREI,  MEMORY_ARRAY_VARIABLE_ASSIGN));
+        result.push_back(AssemblyInstruction(Instruction::STOREI,  Memory::arrayVariableAssign));
 
         return result;
     }
@@ -98,12 +98,12 @@ std::vector<AssemblyInstruction> compileAssign(SymbolsTable& symbolsTable, const
 
         result.push_back(AssemblyInstruction(Instruction::SET, arrayStartAddress));
         result.push_back(AssemblyInstruction(Instruction::ADD, indexAddress));
-        result.push_back(AssemblyInstruction(Instruction::STORE,  MEMORY_ARRAY_VARIABLE_ASSIGN));
+        result.push_back(AssemblyInstruction(Instruction::STORE,  Memory::arrayVariableAssign));
 
         std::vector<AssemblyInstruction> expressionInstructions = compileExpression(symbolsTable, cmd->expression);
 
         result.insert(result.end(), expressionInstructions.begin(), expressionInstructions.end());
-        result.push_back(AssemblyInstruction(Instruction::STOREI,  MEMORY_ARRAY_VARIABLE_ASSIGN));
+        result.push_back(AssemblyInstruction(Instruction::STOREI,  Memory::arrayVariableAssign));
 
         return result;
     }
@@ -116,12 +116,12 @@ std::vector<AssemblyInstruction> compileAssign(SymbolsTable& symbolsTable, const
 
         result.push_back(AssemblyInstruction(Instruction::SET, arrayStartAddress));
         result.push_back(AssemblyInstruction(Instruction::ADDI, indexAddress));
-        result.push_back(AssemblyInstruction(Instruction::STORE,  MEMORY_ARRAY_VARIABLE_ASSIGN));
+        result.push_back(AssemblyInstruction(Instruction::STORE,  Memory::arrayVariableAssign));
 
         std::vector<AssemblyInstruction> expressionInstructions = compileExpression(symbolsTable, cmd->expression);
 
         result.insert(result.end(), expressionInstructions.begin(), expressionInstructions.end());
-        result.push_back(AssemblyInstruction(Instruction::STOREI,  MEMORY_ARRAY_VARIABLE_ASSIGN));
+        result.push_back(AssemblyInstruction(Instruction::STOREI,  Memory::arrayVariableAssign));
 
         return result;
     }
@@ -134,12 +134,12 @@ std::vector<AssemblyInstruction> compileAssign(SymbolsTable& symbolsTable, const
 
         result.push_back(AssemblyInstruction(Instruction::LOAD, arrayAddress));
         result.push_back(AssemblyInstruction(Instruction::ADD, indexAddress));
-        result.push_back(AssemblyInstruction(Instruction::STORE,  MEMORY_ARRAY_VARIABLE_ASSIGN));
+        result.push_back(AssemblyInstruction(Instruction::STORE,  Memory::arrayVariableAssign));
 
         std::vector<AssemblyInstruction> expressionInstructions = compileExpression(symbolsTable, cmd->expression);
 
         result.insert(result.end(), expressionInstructions.begin(), expressionInstructions.end());
-        result.push_back(AssemblyInstruction(Instruction::STOREI,  MEMORY_ARRAY_VARIABLE_ASSIGN));
+        result.push_back(AssemblyInstruction(Instruction::STOREI,  Memory::arrayVariableAssign));
 
         return result;
     }
@@ -152,12 +152,12 @@ std::vector<AssemblyInstruction> compileAssign(SymbolsTable& symbolsTable, const
 
         result.push_back(AssemblyInstruction(Instruction::LOAD, arrayAddress));
         result.push_back(AssemblyInstruction(Instruction::ADDI, indexAddress));
-        result.push_back(AssemblyInstruction(Instruction::STORE,  MEMORY_ARRAY_VARIABLE_ASSIGN));
+        result.push_back(AssemblyInstruction(Instruction::STORE,  Memory::arrayVariableAssign));
 
         std::vector<AssemblyInstruction> expressionInstructions = compileExpression(symbolsTable, cmd->expression);
 
         result.insert(result.end(), expressionInstructions.begin(), expressionInstructions.end());
-        result.push_back(AssemblyInstruction(Instruction::STOREI,  MEMORY_ARRAY_VARIABLE_ASSIGN));
+        result.push_back(AssemblyInstruction(Instruction::STOREI,  Memory::arrayVariableAssign));
 
         return result;
     }
