@@ -136,16 +136,27 @@ struct AssemblyInstruction {
         if (hasAddress()) {
             if (instruction == Instruction::HALT || instruction == Instruction::HALF) {
                 return result;
-            }else{
+            }
+            else{
                 result += " " + std::to_string(getAddress());
             }
-        } else {
+        } 
+        else{
             result += " " + getLabel();
         }
         return result;
     }
 
 };
+
+inline Instruction fromString(const std::string& s) {
+    for (const auto& [instruction, name] : instructionNames) {
+        if (name == s) {
+            return instruction;
+        }
+    }
+    throw std::domain_error("Invalid instruction name: " + s);
+}
 
 
 #endif // ASSEMBLING_HPP

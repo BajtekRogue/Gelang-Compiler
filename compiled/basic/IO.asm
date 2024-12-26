@@ -1,0 +1,27 @@
+# Preprocessing...
+# Store const = 1013 at p[301]
+SET 1013
+STORE 301
+# Finished preprocessing
+
+# MAIN 
+# READ a[3]
+GET 1016
+# READ b
+GET 1048
+# READ a[b]
+LOAD 301
+ADD 1048
+STORE 28
+GET 0
+STOREI 28
+# WRITE a[3]
+PUT 1016
+# WRITE b
+PUT 1048
+# WRITE a[b]
+LOAD 301
+ADD 1048
+LOADI 0
+PUT 0
+HALT

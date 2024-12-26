@@ -1,26 +1,12 @@
 #include "assembling.hpp"
 #include "symbolsTable.hpp"
 #include "languageStructs.hpp"
-#include "utlity.hpp"
+#include "utility.hpp"
 
-
-namespace LabelCounters {
-    int64_t ifCounter = 0;
-    int64_t whileCounter = 0;
-    int64_t repeatCounter = 0;
-    int64_t forCounter = 0;
-    int64_t procedureCounter = 0;
-}
-
-namespace Arithmetic {
-    bool multiplication = false;
-    bool division = false;
-    bool modulo = false;
-}
 
 std::vector<AssemblyInstruction> getValueToDestinationAddress(SymbolsTable& symbolsTable, const Value& val, int64_t destination){
 
-    std::vector<AssemblyInstruction> result;
+    std::vector<AssemblyInstruction> code;
 
     // If it is a number
     if(val.isNumber()){
@@ -29,18 +15,18 @@ std::vector<AssemblyInstruction> getValueToDestinationAddress(SymbolsTable& symb
         
         // If 0 clear the accumulator because it is cheaper
         if(num == 0){
-            result.push_back(AssemblyInstruction(Instruction::SUB, 0));
+            code.push_back(AssemblyInstruction(Instruction::SUB, 0));
         }
         else{
-            result.push_back(AssemblyInstruction(Instruction::SET, num));
+            code.push_back(AssemblyInstruction(Instruction::SET, num));
         }
 
         // If destination is not the accumulator, store it
         if(destination != 0){
-            result.push_back(AssemblyInstruction(Instruction::STORE, destination));
+            code.push_back(AssemblyInstruction(Instruction::STORE, destination));
         }
 
-        return result;
+        return code;
     }
 
     // If it is an identifier
@@ -54,14 +40,14 @@ std::vector<AssemblyInstruction> getValueToDestinationAddress(SymbolsTable& symb
 
         // If destination is the accumulator, load the pointer
         if(destination == 0){
-            result.push_back(AssemblyInstruction(Instruction::LOADI, parameterAddress));
-            return result;
+            code.push_back(AssemblyInstruction(Instruction::LOADI, parameterAddress));
+            return code;
         }
 
         // Otherwise load the pointer and store its dereferenced value
-        result.push_back(AssemblyInstruction(Instruction::LOADI, parameterAddress));
-        result.push_back(AssemblyInstruction(Instruction::STORE, destination));
-        return result;
+        code.push_back(AssemblyInstruction(Instruction::LOADI, parameterAddress));
+        code.push_back(AssemblyInstruction(Instruction::STORE, destination));
+        return code;
     }
 
     // Check if identifier is a variable
@@ -71,19 +57,19 @@ std::vector<AssemblyInstruction> getValueToDestinationAddress(SymbolsTable& symb
 
         // If destination is current address, do nothing
         if(destination == currentAddress){
-            return result;
+            return code;
         }
 
         // If destination is the accumulator, load it
         if(destination == 0){
-            result.push_back(AssemblyInstruction(Instruction::LOAD, currentAddress));
-            return result;
+            code.push_back(AssemblyInstruction(Instruction::LOAD, currentAddress));
+            return code;
         }
 
         // Otherwise load and store it
-        result.push_back(AssemblyInstruction(Instruction::LOAD, currentAddress));
-        result.push_back(AssemblyInstruction(Instruction::STORE, destination));
-        return result;
+        code.push_back(AssemblyInstruction(Instruction::LOAD, currentAddress));
+        code.push_back(AssemblyInstruction(Instruction::STORE, destination));
+        return code;
     }
 
     // If it is an array
@@ -99,19 +85,19 @@ std::vector<AssemblyInstruction> getValueToDestinationAddress(SymbolsTable& symb
 
         // If destination is current address, do nothing
         if(destination == currentAddress){
-            return result;
+            return code;
         }
 
         // If destination is the accumulator, load it
         if(destination == 0){
-            result.push_back(AssemblyInstruction(Instruction::LOAD, currentAddress));
-            return result;
+            code.push_back(AssemblyInstruction(Instruction::LOAD, currentAddress));
+            return code;
         }
 
         // Otherwise load and store it
-        result.push_back(AssemblyInstruction(Instruction::LOAD, currentAddress));
-        result.push_back(AssemblyInstruction(Instruction::STORE, destination));
-        return result;
+        code.push_back(AssemblyInstruction(Instruction::LOAD, currentAddress));
+        code.push_back(AssemblyInstruction(Instruction::STORE, destination));
+        return code;
     }
 
     // If it is accessed by index but is a parameter
@@ -122,27 +108,27 @@ std::vector<AssemblyInstruction> getValueToDestinationAddress(SymbolsTable& symb
 
         // If index is 0 we can just load the pointer
         if(index == 0){
-            result.push_back(AssemblyInstruction(Instruction::LOADI, arrayAddress));
+            code.push_back(AssemblyInstruction(Instruction::LOADI, arrayAddress));
 
             // If destination is not the accumulator, store it
             if(destination != 0){
-                result.push_back(AssemblyInstruction(Instruction::STORE, destination));
+                code.push_back(AssemblyInstruction(Instruction::STORE, destination));
             }
 
-            return result;
+            return code;
         }
 
         // Otherwise load the pointer and add the index
-        result.push_back(AssemblyInstruction(Instruction::SET, index));
-        result.push_back(AssemblyInstruction(Instruction::ADD, arrayAddress));
-        result.push_back(AssemblyInstruction(Instruction::LOADI, 0));
+        code.push_back(AssemblyInstruction(Instruction::SET, index));
+        code.push_back(AssemblyInstruction(Instruction::ADD, arrayAddress));
+        code.push_back(AssemblyInstruction(Instruction::LOADI, 0));
 
         // If destination is not the accumulator, store it
         if(destination != 0){
-            result.push_back(AssemblyInstruction(Instruction::STORE, destination));
+            code.push_back(AssemblyInstruction(Instruction::STORE, destination));
         }
 
-        return result;
+        return code;
     }
 
     // If the array is accessed by a variable
@@ -155,16 +141,16 @@ std::vector<AssemblyInstruction> getValueToDestinationAddress(SymbolsTable& symb
         int64_t arrayStartAddress = symbolsTable.getMemoryAddress_start(id) + symbolsTable.get_offset(id);
 
         // Load into the accumulator the value at the index of the array
-        result.push_back(AssemblyInstruction(Instruction::SET, arrayStartAddress));
-        result.push_back(AssemblyInstruction(Instruction::ADD, indexAddress));
-        result.push_back(AssemblyInstruction(Instruction::LOADI, 0));
+        code.push_back(AssemblyInstruction(Instruction::SET, arrayStartAddress));
+        code.push_back(AssemblyInstruction(Instruction::ADD, indexAddress));
+        code.push_back(AssemblyInstruction(Instruction::LOADI, 0));
 
         // If destination is not the accumulator, store it
         if(destination != 0){
-            result.push_back(AssemblyInstruction(Instruction::STORE, destination));
+            code.push_back(AssemblyInstruction(Instruction::STORE, destination));
         }
 
-        return result;
+        return code;
     }
 
     // If array is local but the index is a parameter
@@ -174,16 +160,16 @@ std::vector<AssemblyInstruction> getValueToDestinationAddress(SymbolsTable& symb
         int64_t arrayStartAddress = symbolsTable.getMemoryAddress_start(id) + symbolsTable.get_offset(id);
 
         // Load into the accumulator the value at the index of the array
-        result.push_back(AssemblyInstruction(Instruction::SET, arrayStartAddress));
-        result.push_back(AssemblyInstruction(Instruction::ADDI, indexAddress));
-        result.push_back(AssemblyInstruction(Instruction::LOADI, 0));
+        code.push_back(AssemblyInstruction(Instruction::SET, arrayStartAddress));
+        code.push_back(AssemblyInstruction(Instruction::ADDI, indexAddress));
+        code.push_back(AssemblyInstruction(Instruction::LOADI, 0));
 
         // If destination is not the accumulator, store it
         if(destination != 0){
-            result.push_back(AssemblyInstruction(Instruction::STORE, destination));
+            code.push_back(AssemblyInstruction(Instruction::STORE, destination));
         }
 
-        return result;       
+        return code;       
     }
     
     // If array is a parameter but the index is local
@@ -193,16 +179,16 @@ std::vector<AssemblyInstruction> getValueToDestinationAddress(SymbolsTable& symb
         int64_t arrayAddress = symbolsTable.getMemoryAddressPointer_parameter(id);
 
         // Load into the accumulator the value at the index of the array
-        result.push_back(AssemblyInstruction(Instruction::LOAD, arrayAddress));
-        result.push_back(AssemblyInstruction(Instruction::ADD, indexAddress));
-        result.push_back(AssemblyInstruction(Instruction::LOADI, 0));
+        code.push_back(AssemblyInstruction(Instruction::LOAD, arrayAddress));
+        code.push_back(AssemblyInstruction(Instruction::ADD, indexAddress));
+        code.push_back(AssemblyInstruction(Instruction::LOADI, 0));
 
         // If destination is not the accumulator, store it
         if(destination != 0){
-            result.push_back(AssemblyInstruction(Instruction::STORE, destination));
+            code.push_back(AssemblyInstruction(Instruction::STORE, destination));
         }
 
-        return result;
+        return code;
     }
 
     // If both array and the index are parameters
@@ -212,18 +198,18 @@ std::vector<AssemblyInstruction> getValueToDestinationAddress(SymbolsTable& symb
         int64_t arrayAddress = symbolsTable.getMemoryAddressPointer_parameter(id);
 
         // Load into the accumulator the value at the index of the array
-        result.push_back(AssemblyInstruction(Instruction::LOAD, arrayAddress));
-        result.push_back(AssemblyInstruction(Instruction::ADDI, indexAddress));
-        result.push_back(AssemblyInstruction(Instruction::LOADI, 0));
+        code.push_back(AssemblyInstruction(Instruction::LOAD, arrayAddress));
+        code.push_back(AssemblyInstruction(Instruction::ADDI, indexAddress));
+        code.push_back(AssemblyInstruction(Instruction::LOADI, 0));
 
         // If destination is not the accumulator, store it
         if(destination != 0){
-            result.push_back(AssemblyInstruction(Instruction::STORE, destination));
+            code.push_back(AssemblyInstruction(Instruction::STORE, destination));
         }
 
-        return result;
+        return code;
     }
-    return result;
+    return code;
 }
 
 
@@ -417,7 +403,8 @@ int64_t findNext1000(int64_t n){
 
 std::vector<AssemblyInstruction> getAddressToDestinationAddress(SymbolsTable& symbolsTable, const Value& val, int64_t destination){
 
-    std::vector<AssemblyInstruction> result;
+    std::vector<AssemblyInstruction> code;
+
     Identifier identifier = val.asIdentifier();
 
     // If variable is local
@@ -425,10 +412,10 @@ std::vector<AssemblyInstruction> getAddressToDestinationAddress(SymbolsTable& sy
         
         int64_t varAddress = symbolsTable.getMemoryAddress_variable(identifier.id);
 
-        result.push_back(AssemblyInstruction(Instruction::SET, varAddress));
-        result.push_back(AssemblyInstruction(Instruction::STORE, destination));
+        code.push_back(AssemblyInstruction(Instruction::SET, varAddress));
+        code.push_back(AssemblyInstruction(Instruction::STORE, destination));
 
-        return result;
+        return code;
     }
 
     // If variable is a parameter
@@ -436,10 +423,10 @@ std::vector<AssemblyInstruction> getAddressToDestinationAddress(SymbolsTable& sy
         
         int64_t paramAddress = symbolsTable.getMemoryAddressPointer_parameter(identifier.id);
 
-        result.push_back(AssemblyInstruction(Instruction::LOAD, paramAddress));
-        result.push_back(AssemblyInstruction(Instruction::STORE, destination));
+        code.push_back(AssemblyInstruction(Instruction::LOAD, paramAddress));
+        code.push_back(AssemblyInstruction(Instruction::STORE, destination));
 
-        return result;
+        return code;
     }
 
     // If variable is a local array
@@ -447,10 +434,10 @@ std::vector<AssemblyInstruction> getAddressToDestinationAddress(SymbolsTable& sy
         
         int64_t arrayAddress = symbolsTable.getMemoryAddress_start(identifier.id) + symbolsTable.get_offset(identifier.id);
 
-        result.push_back(AssemblyInstruction(Instruction::SET, arrayAddress));
-        result.push_back(AssemblyInstruction(Instruction::STORE, destination));
+        code.push_back(AssemblyInstruction(Instruction::SET, arrayAddress));
+        code.push_back(AssemblyInstruction(Instruction::STORE, destination));
 
-        return result;
+        return code;
     }
 
     // If variable is a parameter array
@@ -458,12 +445,12 @@ std::vector<AssemblyInstruction> getAddressToDestinationAddress(SymbolsTable& sy
         
         int64_t arrayAddress = symbolsTable.getMemoryAddressPointer_parameter(identifier.id);
 
-        result.push_back(AssemblyInstruction(Instruction::LOAD, arrayAddress));
-        result.push_back(AssemblyInstruction(Instruction::STORE, destination));
+        code.push_back(AssemblyInstruction(Instruction::LOAD, arrayAddress));
+        code.push_back(AssemblyInstruction(Instruction::STORE, destination));
 
-        return result;
+        return code;
     }
-    return result;
+    return code;
 }
 
 void fixProcedureCallsJumps(std::vector<AssemblyInstruction>& code){

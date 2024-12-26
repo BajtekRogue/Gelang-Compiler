@@ -1,6 +1,6 @@
-FLAGS = -W -Wall -Wextra -pedantic -std=c++17
+FLAGS = -W -Wall -Wextra -pedantic -std=c++17 -g
 BUILD_DIR = build
-OBJ_DIR = $(BUILD_DIR)/obj
+OBJ_DIR = $(BUILD_DIR)/bin
 SRC_DIR = src
 HEADER_DIR = $(SRC_DIR)/headers
 PARSER_DIR = $(SRC_DIR)/parsing
@@ -17,7 +17,7 @@ ALL_CPP_FILES := $(COMPILING_CPP_FILES) $(CORE_CPP_FILES)
 OBJ_FILES := $(patsubst $(COMPILING_DIR)/%.cpp, $(OBJ_DIR)/%.o, $(COMPILING_CPP_FILES))
 OBJ_FILES += $(patsubst $(CORE_DIR)/%.cpp, $(OBJ_DIR)/%.o, $(CORE_CPP_FILES))
 
-# Create the build and obj directories if they don't exist
+# Create the build and bin directories if they don't exist
 $(shell mkdir -p $(OBJ_DIR))
 
 .PHONY: all debug release clean cleanall
@@ -56,7 +56,7 @@ $(OBJ_DIR)/parser.o: $(OBJ_DIR)/parser.cpp
 	$(CXX) $(FLAGS) -I$(HEADER_DIR) -c $< -o $@
 
 # Rule to generate parser.cpp and parser.hpp
-$(OBJ_DIR)/parser.cpp $(OBJ_DIR)/parser.hpp: $(PARSER_DIR)/parser.y $(HEADER_DIR)/languageStructs.hpp $(HEADER_DIR)/colors.hpp
+$(OBJ_DIR)/parser.cpp $(OBJ_DIR)/parser.hpp: $(PARSER_DIR)/parser.y $(HEADER_DIR)/languageStructs.hpp $(HEADER_DIR)/utility.hpp
 	bison -Wall -d -o $@ $<
 
 # Clean rules

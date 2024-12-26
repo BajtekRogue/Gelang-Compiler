@@ -1,0 +1,132 @@
+# Preprocessing...
+# Store const = 1 at p[301]
+SET 1
+STORE 301
+# Store const = 1004 at p[302]
+SET 1004
+STORE 302
+# Finished preprocessing
+
+# MAIN 
+# a[1] := 5
+SET 5
+STORE 1005
+# a[2] := 3
+SET 3
+STORE 1006
+# a[3] := -8
+SET -8
+STORE 1007
+# a[4] := 1
+LOAD 301
+STORE 1008
+# a[5] := -2
+SET -2
+STORE 1009
+# a[6] := -9
+SET -9
+STORE 1010
+# a[7] := 4
+SET 4
+STORE 1011
+# a[8] := 7
+SET 7
+STORE 1012
+# a[9] := 6
+SET 6
+STORE 1013
+# a[10] := -10
+SET -10
+STORE 1014
+# n := 10
+SET 10
+STORE 1003
+# i := 1
+LOAD 301
+STORE 1001
+# WHILE _1_: i <= n
+LOAD 1003
+STORE 1
+LOAD 1001
+SUB 1
+JPOS 47
+# min := i
+LOAD 1001
+STORE 1015
+# j := i + 1
+LOAD 301
+ADD 1001
+STORE 1002
+# WHILE _2_: j <= n
+LOAD 1003
+STORE 1
+LOAD 1002
+SUB 1
+JPOS 17
+# IF _1_: a[j] < a[min]
+LOAD 302
+ADD 1015
+LOADI 0
+STORE 1
+LOAD 302
+ADD 1002
+LOADI 0
+SUB 1
+JPOS 4
+JZERO 3
+# min := j
+LOAD 1002
+STORE 1015
+# ENDIF _1_.
+# j := j + 1
+LOAD 301
+ADD 1002
+STORE 1002
+JUMP -20
+# ENDWHILE _2_: 
+# tmp := a[i]
+LOAD 302
+ADD 1001
+LOADI 0
+STORE 1004
+# a[i] := a[min]
+LOAD 302
+ADD 1001
+STORE 28
+LOAD 302
+ADD 1015
+LOADI 0
+STOREI 28
+# a[min] := tmp
+LOAD 302
+ADD 1015
+STORE 28
+LOAD 1004
+STOREI 28
+# i := i + 1
+LOAD 301
+ADD 1001
+STORE 1001
+JUMP -50
+# ENDWHILE _1_: 
+# i := 1
+LOAD 301
+STORE 1001
+# WHILE _3_: i <= n
+LOAD 1003
+STORE 1
+LOAD 1001
+SUB 1
+JPOS 9
+# WRITE a[i]
+LOAD 302
+ADD 1001
+LOADI 0
+PUT 0
+# i := i + 1
+LOAD 301
+ADD 1001
+STORE 1001
+JUMP -12
+# ENDWHILE _3_: 
+HALT

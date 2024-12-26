@@ -2,7 +2,8 @@
 #include "symbolsTable.hpp"
 #include "languageStructs.hpp"
 #include "compiling.hpp"
-#include "utlity.hpp"
+#include "utility.hpp"
+
 
 std::vector<AssemblyInstruction> compileRead(SymbolsTable& symbolsTable, const std::unique_ptr<ReadCommand>& cmd) {
     std::vector<AssemblyInstruction> result;

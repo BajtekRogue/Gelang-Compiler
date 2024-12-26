@@ -1,0 +1,155 @@
+# Preprocessing...
+# Store const = 2011 at p[301]
+SET 2011
+STORE 301
+# Store const = 2000 at p[302]
+SET 2000
+STORE 302
+# Store const = 1 at p[69]
+SET 1
+STORE 69
+# Finished preprocessing
+
+# Jump to MAIN procedure
+JUMP 43
+# 
+
+# PROCEDURE function
+# IF _1_: x[1] > y
+LOADI 1002
+STORE 1
+LOAD 69
+ADD 1001
+LOADI 0
+SUB 1
+JNEG 5
+JZERO 4
+# y := 1
+LOAD 69
+STOREI 1002
+JUMP 3
+# ELSE _1_: 
+# u := 5
+SET 5
+STORE 1005
+# ENDIF _1_.
+# IF _2_: y <= z[-32]
+SET -32
+ADD 1003
+LOADI 0
+STORE 1
+LOADI 1002
+SUB 1
+JPOS 3
+# v := 6
+SET 6
+STORE 1006
+# ENDIF _2_.
+# v := 0
+SUB 0
+STORE 1006
+# WHILE _1_: u != v
+LOAD 1006
+STORE 1
+LOAD 1005
+SUB 1
+JZERO 10
+# v := v + 1
+LOAD 69
+ADD 1006
+STORE 1006
+# u := u - 1
+LOAD 69
+STORE 1
+LOAD 1005
+SUB 1
+STORE 1005
+JUMP -13
+# ENDWHILE _1_: 
+# WRITE u
+PUT 1005
+# WRITE z[0]
+LOADI 1003
+PUT 0
+# RETURN function
+RTRN 1018
+# ENDPROCEDURE function
+
+# MAIN 
+# READ b
+GET 2011
+# Initializing FOR_UP _1_: 
+SET 10
+STORE 2013
+LOAD 69
+STORE 2012
+# FOR_UP _1_: 1 TO 10
+SUB 2013
+JPOS 13
+# a[i] := i
+LOAD 302
+ADD 2012
+STORE 28
+LOAD 2012
+STOREI 28
+# b := b + 1
+LOAD 69
+ADD 2011
+STORE 2011
+# i++
+LOAD 2012
+ADD 69
+STORE 2012
+JUMP -13
+# ENDFOR _1_.
+# Initializing FOR_DOWN _2_: 
+LOAD 69
+STORE 2015
+LOAD 2011
+STORE 2014
+# FOR_DOWN _2_: b DOWNTO 1
+SUB 2015
+JNEG 14
+# WRITE a[i]
+LOAD 302
+ADD 2014
+LOADI 0
+PUT 0
+# b := b - 1
+LOAD 69
+STORE 1
+LOAD 2011
+SUB 1
+STORE 2011
+# i--
+LOAD 2014
+SUB 69
+STORE 2014
+JUMP -14
+# ENDFOR _2_.
+# CALL function (a, b, a, b)
+LOAD 302
+STORE 1001
+LOAD 301
+STORE 1002
+LOAD 302
+STORE 1003
+LOAD 301
+STORE 1004
+# Setting return address and jumping to function
+SET 98
+STORE 1018
+JUMP -90
+# REPEAT _1_: 
+# a[1] := a[1] + 1
+LOAD 69
+ADD 2001
+STORE 2001
+LOAD 2011
+STORE 1
+LOAD 2001
+SUB 1
+JNEG -7
+JZERO -8
+# UNTIL _1_: a[1] > b
+HALT

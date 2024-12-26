@@ -1,0 +1,83 @@
+
+PROGRAM IS
+    a, b, c, d[4:6], i
+BEGIN
+    a := 12;
+    b := -3;
+    c := a + b;
+    i := 5;
+    d[i] := -5678;
+
+    IF a >= d[i] THEN
+        WRITE 11;
+    ELSE
+        WRITE -11;
+    ENDIF
+
+    IF a > d[i] THEN
+        WRITE 22;
+    ELSE
+        WRITE -22;
+    ENDIF
+
+    IF a = d[i] THEN
+        WRITE 33;
+    ELSE
+        WRITE -33;
+    ENDIF
+
+    IF a != d[i] THEN
+        WRITE 44;
+    ELSE
+        WRITE -44;
+    ENDIF
+
+    IF a < d[i] THEN
+        WRITE 55;
+    ELSE
+        WRITE -55;
+    ENDIF
+
+    IF a <= d[i] THEN
+        WRITE 66;
+    ELSE
+        WRITE -66;
+    ENDIF
+
+
+    IF c = c THEN
+        WRITE 11;
+    ELSE
+        WRITE -11;
+    ENDIF
+
+    IF c != c THEN
+        WRITE 22;
+    ELSE
+        WRITE -22;
+    ENDIF
+
+    IF c < c THEN
+        WRITE 33;
+    ELSE
+        WRITE -33;
+    ENDIF
+
+    IF c <= c THEN
+        WRITE 44;
+    ELSE
+        WRITE -44;
+    ENDIF
+
+    IF c > c THEN
+        WRITE 55;
+    ELSE
+        WRITE -55;
+    ENDIF
+
+    IF c >= c THEN
+        WRITE 66;
+    ELSE
+        WRITE -66;
+    ENDIF
+END

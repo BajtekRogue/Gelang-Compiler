@@ -1,0 +1,23 @@
+PROCEDURE plus_i_minus(u, v, T w) IS
+    s
+BEGIN
+    FOR i FROM 1 TO 100 DO
+        u := u + i;
+        v := v - i;
+        s := i * i;
+        w[5] := i + w[5];
+        w[5] := w[5] + s;
+    ENDFOR
+END
+
+PROGRAM IS
+    x, y, z[0:6]
+BEGIN
+    x := 456;
+    y := 123;
+    z[5] := 789;
+    plus_i_minus(x, y, z);
+    WRITE x;
+    WRITE y;
+    WRITE z[5];
+END

@@ -1,0 +1,195 @@
+# Preprocessing...
+# Store const = 1003 at p[301]
+SET 1003
+STORE 301
+# Store const = 118 at p[302]
+SET 118
+STORE 302
+# Store const = 1028 at p[303]
+SET 1028
+STORE 303
+# Store const = 1 at p[69]
+SET 1
+STORE 69
+# Store const = 1053 at p[305]
+SET 1053
+STORE 305
+# Finished preprocessing
+
+# Jump to MAIN procedure
+JUMP 59
+# 
+
+# PROCEDURE *
+# Negate x if needed
+LOAD 1
+STORE 4
+JZERO 54
+JPOS 4
+SUB 0
+SUB 4
+STORE 1
+# Negate y if needed
+LOAD 2
+STORE 5
+JZERO 47
+JPOS 4
+SUB 0
+SUB 5
+STORE 2
+# Swap x and y if needed
+LOAD 1
+SUB 2
+JPOS 8
+JZERO 7
+LOAD 1
+STORE 3
+LOAD 2
+STORE 1
+LOAD 3
+STORE 2
+# Set result to 0
+SUB 0
+STORE 3
+LOAD 2
+# Start the loop
+JZERO 16
+JNEG 15
+# Compute y % 2
+STORE 2
+HALF
+ADD 0
+SUB 2
+# If y % 2 != 0 then add x to the result
+JZERO 4
+LOAD 3
+ADD 1
+STORE 3
+# Double x and half y
+LOAD 1
+ADD 1
+STORE 1
+LOAD 2
+HALF
+JUMP -15
+# Negate the result if x < 0
+LOAD 4
+JPOS 4
+SUB 0
+SUB 3
+STORE 3
+# Negate the result if y < 0
+LOAD 5
+JPOS 4
+SUB 0
+SUB 3
+JUMP 2
+LOAD 3
+# Return
+JPOS 3
+JNEG 2
+SUB 0
+RTRN 56
+# ENDPROCEDURE *
+
+# MAIN 
+# n := 24
+SET 24
+STORE 1001
+# tc[0] := n
+LOAD 1001
+STORE 1053
+# tc[n] := n - tc[0]
+LOAD 305
+ADD 1001
+STORE 28
+LOAD 1001
+SUB 1053
+STOREI 28
+# j := tc[0] + 1
+LOAD 69
+ADD 1053
+STORE 1002
+# Initializing FOR_DOWN _1_: 
+LOAD 305
+ADD 1001
+LOADI 0
+STORE 1079
+LOAD 1053
+STORE 1078
+# FOR_DOWN _1_: tc[0] DOWNTO tc[n]
+SUB 1079
+JNEG 16
+# ta[i] := i
+LOAD 301
+ADD 1078
+STORE 28
+LOAD 1078
+STOREI 28
+# tb[i] := n - i
+LOAD 303
+ADD 1078
+STORE 28
+LOAD 1001
+SUB 1078
+STOREI 28
+# i--
+LOAD 1078
+SUB 69
+STORE 1078
+JUMP -16
+# ENDFOR _1_.
+# j := tc[n]
+LOAD 305
+ADD 1001
+LOADI 0
+STORE 1002
+# WHILE _1_: j <= tc[0]
+LOAD 1053
+STORE 1
+LOAD 1002
+SUB 1
+JPOS 20
+# tc[j] := ta[j] * tb[j]
+LOAD 305
+ADD 1002
+STORE 28
+LOAD 303
+ADD 1002
+LOADI 0
+STORE 2
+LOAD 301
+ADD 1002
+LOADI 0
+STORE 1
+# Setting return address and jumping to *
+SET 128
+STORE 56
+JUMP -116
+STOREI 28
+# j := j + 1
+LOAD 69
+ADD 1002
+STORE 1002
+JUMP -23
+# ENDWHILE _1_: 
+# Initializing FOR_UP _2_: 
+LOAD 1001
+STORE 1081
+SUB 0
+STORE 1080
+# FOR_UP _2_: 0 TO n
+SUB 1081
+JPOS 9
+# WRITE tc[i]
+LOAD 305
+ADD 1080
+LOADI 0
+PUT 0
+# i++
+LOAD 1080
+ADD 69
+STORE 1080
+JUMP -9
+# ENDFOR _2_.
+HALT

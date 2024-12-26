@@ -5,6 +5,4 @@ Add EXPRESSION:
 
 Optimalization:
     - Keep track of the accumulator?
-    - Optimize condition checking
-    - Efficient add and sub if can [local variable, local array, parameter int]
-    
+    - cache procedure call SET in a loop as it doesnt cache

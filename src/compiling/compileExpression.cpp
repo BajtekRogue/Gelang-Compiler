@@ -2,7 +2,7 @@
 #include "symbolsTable.hpp"
 #include "languageStructs.hpp"
 #include "compiling.hpp"
-#include "utlity.hpp"
+#include "utility.hpp"
 
 
 std::vector<AssemblyInstruction> compileExpression(SymbolsTable& symbolsTable, const std::unique_ptr<Expression>& expr){
@@ -180,37 +180,179 @@ std::vector<AssemblyInstruction> compileExpression(SymbolsTable& symbolsTable, c
         return code;
     }
 
-    // // Check if addition can be done efficiently
-    // if(expr->type == ExpressionType::Plus){
-        // TO DO
-    // }
+    // Check if addition can be done efficiently
+    if(expr->type == ExpressionType::Plus && left.isIdentifier()){
 
+        Identifier identifier = left.asIdentifier();
+
+        // If left is a variable
+        if(symbolsTable.isLocalVariable(identifier.id)){
+
+            int64_t varAddress = symbolsTable.getMemoryAddress_variable(identifier.id);
+            loadRightCode = getValueToDestinationAddress(symbolsTable, right, 0);
+            code.insert(code.end(), loadRightCode.begin(), loadRightCode.end());
+            code.push_back(AssemblyInstruction(Instruction::ADD, varAddress));
+
+            return code;
+        }
+
+        // If left is a parameter
+        if(symbolsTable.isParameter(identifier.id) && symbolsTable.getParameterType(identifier.id) == ParameterType::Integer){
+
+            int64_t paramAddress = symbolsTable.getMemoryAddressPointer_parameter(identifier.id);
+            loadRightCode = getValueToDestinationAddress(symbolsTable, right, 0);
+            code.insert(code.end(), loadRightCode.begin(), loadRightCode.end());
+            code.push_back(AssemblyInstruction(Instruction::ADDI, paramAddress));
+
+            return code;
+        }
+
+        // If left is a local array accesed by index
+        if(symbolsTable.isArrayDeclared(identifier.id) && identifier.getArrayAccess().isByIndex()){
+            int64_t index = identifier.getArrayAccess().getIndex();
+            int64_t arrayAddress = symbolsTable.getMemoryAddress_start(identifier.id) + symbolsTable.get_offset(identifier.id);
+            loadRightCode = getValueToDestinationAddress(symbolsTable, right, 0);
+            code.insert(code.end(), loadRightCode.begin(), loadRightCode.end());
+            code.push_back(AssemblyInstruction(Instruction::ADD, arrayAddress + index));
+
+            return code;
+        }
+
+        // If left is an iterator
+        if(symbolsTable.isIterator(identifier.id)){
+            int64_t iteratorAddress = symbolsTable.getMemoryAddress_variable(identifier.id);
+            loadRightCode = getValueToDestinationAddress(symbolsTable, right, 0);
+            code.insert(code.end(), loadRightCode.begin(), loadRightCode.end());
+            code.push_back(AssemblyInstruction(Instruction::ADD, iteratorAddress));
+
+            return code;
+        }
+    }
+
+    if(expr->type == ExpressionType::Plus && right.isIdentifier()){
+
+        Identifier identifier = right.asIdentifier();
+
+        // If right is a variable
+        if(symbolsTable.isLocalVariable(identifier.id)){
+
+            int64_t varAddress = symbolsTable.getMemoryAddress_variable(identifier.id);
+            loadLeftCode = getValueToDestinationAddress(symbolsTable, left, 0);
+            code.insert(code.end(), loadLeftCode.begin(), loadLeftCode.end());
+            code.push_back(AssemblyInstruction(Instruction::ADD, varAddress));
+
+            return code;
+        }
+
+        // If right is a parameter
+        if(symbolsTable.isParameter(identifier.id) && symbolsTable.getParameterType(identifier.id) == ParameterType::Integer){
+
+            int64_t paramAddress = symbolsTable.getMemoryAddressPointer_parameter(identifier.id);
+            loadLeftCode = getValueToDestinationAddress(symbolsTable, left, 0);
+            code.insert(code.end(), loadLeftCode.begin(), loadLeftCode.end());
+            code.push_back(AssemblyInstruction(Instruction::ADDI, paramAddress));
+
+            return code;
+        }
+
+        // If left is a local array accesed by index
+        if(symbolsTable.isArrayDeclared(identifier.id) && identifier.getArrayAccess().isByIndex()){
+            int64_t index = identifier.getArrayAccess().getIndex();
+            int64_t arrayAddress = symbolsTable.getMemoryAddress_start(identifier.id) + symbolsTable.get_offset(identifier.id);
+            loadLeftCode = getValueToDestinationAddress(symbolsTable, left, 0);
+            code.insert(code.end(), loadLeftCode.begin(), loadLeftCode.end());
+            code.push_back(AssemblyInstruction(Instruction::ADD, arrayAddress + index));
+
+            return code;
+        }
+
+        // If right is an iterator
+        if(symbolsTable.isIterator(identifier.id)){
+            int64_t iteratorAddress = symbolsTable.getMemoryAddress_variable(identifier.id);
+            loadLeftCode = getValueToDestinationAddress(symbolsTable, left, 0);
+            code.insert(code.end(), loadLeftCode.begin(), loadLeftCode.end());
+            code.push_back(AssemblyInstruction(Instruction::ADD, iteratorAddress));
+
+            return code;
+        }
+    }
+
+    // Check if subtraction can be done efficiently
+    if(expr->type == ExpressionType::Minus && right.isIdentifier()){
+
+        Identifier identifier = right.asIdentifier();
+
+        // If right is a variable
+        if(symbolsTable.isLocalVariable(identifier.id)){
+
+            int64_t varAddress = symbolsTable.getMemoryAddress_variable(identifier.id);
+            loadLeftCode = getValueToDestinationAddress(symbolsTable, left, 0);
+            code.insert(code.end(), loadLeftCode.begin(), loadLeftCode.end());
+            code.push_back(AssemblyInstruction(Instruction::SUB, varAddress));
+
+            return code;
+        }
+
+        // If right is a parameter
+        if(symbolsTable.isParameter(identifier.id) && symbolsTable.getParameterType(identifier.id) == ParameterType::Integer){
+
+            int64_t paramAddress = symbolsTable.getMemoryAddressPointer_parameter(identifier.id);
+            loadLeftCode = getValueToDestinationAddress(symbolsTable, left, 0);
+            code.insert(code.end(), loadLeftCode.begin(), loadLeftCode.end());
+            code.push_back(AssemblyInstruction(Instruction::SUBI, paramAddress));
+
+            return code;
+        }
+
+        // If right is a local array accesed by index
+        if(symbolsTable.isArrayDeclared(identifier.id) && identifier.getArrayAccess().isByIndex()){
+            int64_t index = identifier.getArrayAccess().getIndex();
+            int64_t arrayAddress = symbolsTable.getMemoryAddress_start(identifier.id) + symbolsTable.get_offset(identifier.id);
+            loadLeftCode = getValueToDestinationAddress(symbolsTable, left, 0);
+            code.insert(code.end(), loadLeftCode.begin(), loadLeftCode.end());
+            code.push_back(AssemblyInstruction(Instruction::SUB, arrayAddress + index));
+
+            return code;
+        }
+
+        // If right is an iterator
+        if(symbolsTable.isIterator(identifier.id)){
+            int64_t iteratorAddress = symbolsTable.getMemoryAddress_variable(identifier.id);
+            loadLeftCode = getValueToDestinationAddress(symbolsTable, left, 0);
+            code.insert(code.end(), loadLeftCode.begin(), loadLeftCode.end());
+            code.push_back(AssemblyInstruction(Instruction::SUB, iteratorAddress));
+
+            return code;
+        }
+    }
+
+    // Otherwise nothing can be done simply, load the values and perform the operation
     switch(expr->type){
         case ExpressionType::Plus:
-            // Add the value of the right expression to the accumulator and store the result
+            // Add the values
             loadRightCode = getValueToDestinationAddress(symbolsTable, right, 1);
-            code.insert(code.end(), loadRightCode.begin(), loadRightCode.end());
             loadLeftCode = getValueToDestinationAddress(symbolsTable, left, 0);
+            code.insert(code.end(), loadRightCode.begin(), loadRightCode.end());
             code.insert(code.end(), loadLeftCode.begin(), loadLeftCode.end());
             code.push_back(AssemblyInstruction(Instruction::ADD, 1));            
             return code;
             break;
         case ExpressionType::Minus:
-            // Subtract the value of the right expression from the accumulator and store the result
+            // Subtract the values
             loadRightCode = getValueToDestinationAddress(symbolsTable, right, 1);
-            code.insert(code.end(), loadRightCode.begin(), loadRightCode.end());
             loadLeftCode = getValueToDestinationAddress(symbolsTable, left, 0);
+            code.insert(code.end(), loadRightCode.begin(), loadRightCode.end());
             code.insert(code.end(), loadLeftCode.begin(), loadLeftCode.end());
             code.push_back(AssemblyInstruction(Instruction::SUB, 1));
             return code;
             break;
         case ExpressionType::Multiply:
             // Jump to the multiplication procedure
-            Arithmetic::multiplication = true;
             loadRightCode = getValueToDestinationAddress(symbolsTable, right, 2);
-            code.insert(code.end(), loadRightCode.begin(), loadRightCode.end());
             loadLeftCode = getValueToDestinationAddress(symbolsTable, left, 1);
+            code.insert(code.end(), loadRightCode.begin(), loadRightCode.end());
             code.insert(code.end(), loadLeftCode.begin(), loadLeftCode.end());
+            Arithmetic::multiplication = true;
             code.push_back(AssemblyInstruction(Instruction::LABEL_INSTRUCTION, "Setting return address and jumping to *"));
             code.push_back(AssemblyInstruction(Instruction::SET, "*"));
             code.push_back(AssemblyInstruction(Instruction::STORE, MEMORY_RETURN_MULTIPLICATION));

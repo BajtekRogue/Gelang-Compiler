@@ -1,0 +1,104 @@
+# Preprocessing...
+# Store const = 1 at p[301]
+SET 1
+STORE 301
+# Store const = 20 at p[302]
+SET 20
+STORE 302
+# Store const = 17 at p[303]
+SET 17
+STORE 303
+# Store const = 10 at p[304]
+SET 10
+STORE 304
+# Store const = -23 at p[305]
+SET -23
+STORE 305
+# Store const = -10 at p[306]
+SET -10
+STORE 306
+# Finished preprocessing
+
+# MAIN 
+# a := 100
+SET 100
+STORE 1001
+# WHILE _1_: a > -10
+LOAD 306
+STORE 1
+LOAD 1001
+SUB 1
+JNEG 55
+JZERO 54
+# b := -23
+LOAD 305
+STORE 1002
+# WHILE _2_: b <= 10
+LOAD 304
+STORE 1
+LOAD 1002
+SUB 1
+JPOS 41
+# c := 0
+SUB 0
+STORE 1003
+# WHILE _3_: c < 17
+LOAD 303
+STORE 1
+LOAD 1003
+SUB 1
+JPOS 30
+JZERO 29
+# d := 20
+LOAD 302
+STORE 1004
+# WHILE _4_: d >= 10
+LOAD 304
+STORE 1
+LOAD 1004
+SUB 1
+JNEG 18
+# e := 0
+SUB 0
+STORE 1005
+# WHILE _5_: e != 10
+LOAD 304
+STORE 1
+LOAD 1005
+SUB 1
+JZERO 5
+# e := e + 1
+LOAD 301
+ADD 1005
+STORE 1005
+JUMP -8
+# ENDWHILE _5_: 
+# d := d - 1
+LOAD 301
+STORE 1
+LOAD 1004
+SUB 1
+STORE 1004
+JUMP -21
+# ENDWHILE _4_: 
+# c := c + 1
+LOAD 301
+ADD 1003
+STORE 1003
+JUMP -33
+# ENDWHILE _3_: 
+# b := b + 1
+LOAD 301
+ADD 1002
+STORE 1002
+JUMP -44
+# ENDWHILE _2_: 
+# a := a - 1
+LOAD 301
+STORE 1
+LOAD 1001
+SUB 1
+STORE 1001
+JUMP -58
+# ENDWHILE _1_: 
+HALT

@@ -1,0 +1,86 @@
+# Preprocessing...
+# Store const = 2003 at p[301]
+SET 2003
+STORE 301
+# Store const = 3 at p[302]
+SET 3
+STORE 302
+# Store const = 5 at p[303]
+SET 5
+STORE 303
+# Finished preprocessing
+
+# Jump to MAIN procedure
+JUMP 22
+# 
+
+# PROCEDURE wtf
+# var := n[-1] + n[5]
+LOAD 303
+ADD 1001
+LOADI 0
+STORE 1
+SET -1
+ADD 1001
+LOADI 0
+ADD 1
+STORE 1003
+# m := m + 3
+LOAD 302
+ADDI 1002
+STOREI 1002
+# n[m] := var + n[m]
+LOAD 1001
+ADDI 1002
+STORE 28
+LOAD 1001
+ADDI 1002
+LOADI 0
+ADD 1003
+STOREI 28
+# RETURN wtf
+RTRN 1004
+# ENDPROCEDURE wtf
+
+# MAIN 
+# g := 1
+SET 1
+STORE 2001
+# h[-1] := 3
+LOAD 302
+STORE 2002
+# h[0] := 5
+LOAD 303
+STORE 2003
+# h[1] := 7
+SET 7
+STORE 2004
+# h[2] := 11
+SET 11
+STORE 2005
+# h[3] := 13
+SET 13
+STORE 2006
+# h[4] := 17
+SET 17
+STORE 2007
+# h[5] := 19
+SET 19
+STORE 2008
+# CALL wtf (h, g)
+LOAD 301
+STORE 1001
+SET 2001
+STORE 1002
+# Setting return address and jumping to wtf
+SET 51
+STORE 1004
+JUMP -43
+# WRITE g
+PUT 2001
+# WRITE h[g]
+LOAD 301
+ADD 2001
+LOADI 0
+PUT 0
+HALT

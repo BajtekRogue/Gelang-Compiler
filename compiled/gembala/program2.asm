@@ -1,0 +1,138 @@
+# Preprocessing...
+# Store const = 3001 at p[301]
+SET 3001
+STORE 301
+# Store const = 3000 at p[302]
+SET 3000
+STORE 302
+# Store const = 1 at p[69]
+SET 1
+STORE 69
+# Store const = 2 at p[304]
+SET 2
+STORE 304
+# Finished preprocessing
+
+# Jump to MAIN procedure
+JUMP 66
+# 
+
+# PROCEDURE licz
+# Initializing FOR_UP _1_: 
+LOADI 1002
+STORE 1005
+LOAD 304
+STORE 1004
+# FOR_UP _1_: 2 TO n
+SUB 1005
+JPOS 10
+# s[i] := 1
+LOAD 1001
+ADD 1004
+STORE 28
+LOAD 69
+STOREI 28
+# i++
+LOAD 1004
+ADD 69
+STORE 1004
+JUMP -10
+# ENDFOR _1_.
+# Initializing FOR_UP _2_: 
+LOADI 1002
+STORE 1007
+LOAD 304
+STORE 1006
+# FOR_UP _2_: 2 TO n
+SUB 1007
+JPOS 27
+# IF _1_: s[i] > 0
+LOAD 1001
+ADD 1006
+LOADI 0
+JNEG 19
+JZERO 18
+# j := i + i
+LOAD 1006
+ADD 1006
+STORE 1003
+# WHILE _1_: j <= n
+LOADI 1002
+STORE 1
+LOAD 1003
+SUB 1
+JPOS 10
+# s[j] := 0
+LOAD 1001
+ADD 1003
+STORE 28
+SUB 0
+STOREI 28
+# j := j + i
+LOAD 1006
+ADD 1003
+STORE 1003
+JUMP -13
+# ENDWHILE _1_: 
+# ENDIF _1_.
+# i++
+LOAD 1006
+ADD 69
+STORE 1006
+JUMP -27
+# ENDFOR _2_.
+# RETURN licz
+RTRN 1008
+# ENDPROCEDURE licz
+
+# PROCEDURE wypisz
+# Initializing FOR_DOWN _3_: 
+LOAD 304
+STORE 2004
+LOADI 2002
+STORE 2003
+# FOR_DOWN _3_: n DOWNTO 2
+SUB 2004
+JNEG 11
+# IF _2_: s[i] > 0
+LOAD 2001
+ADD 2003
+LOADI 0
+JNEG 3
+JZERO 2
+# WRITE i
+PUT 2003
+# ENDIF _2_.
+# i--
+LOAD 2003
+SUB 69
+STORE 2003
+JUMP -11
+# ENDFOR _3_.
+# RETURN wypisz
+RTRN 2005
+# ENDPROCEDURE wypisz
+
+# MAIN 
+# n := 100
+SET 100
+STORE 3001
+# CALL licz (sito, n)
+LOAD 302
+STORE 1001
+LOAD 301
+STORE 1002
+# Setting return address and jumping to licz
+SET 83
+STORE 1008
+JUMP -73
+# CALL wypisz (sito, n)
+LOAD 302
+STORE 2001
+LOAD 301
+STORE 2002
+# Setting return address and jumping to wypisz
+SET 90
+STORE 2005
+JUMP -32
+HALT

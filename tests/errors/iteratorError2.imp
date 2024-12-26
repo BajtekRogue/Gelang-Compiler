@@ -1,9 +1,0 @@
-PROGRAM IS
-    i, x
-BEGIN
-
-    FOR i FROM 100 DOWNTO -10 DO
-        x := i + 1;
-    ENDFOR
-
-END

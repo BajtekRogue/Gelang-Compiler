@@ -2,7 +2,7 @@
 #include "symbolsTable.hpp"
 #include "languageStructs.hpp"
 #include "compiling.hpp"
-#include "utlity.hpp"
+#include "utility.hpp"
 
 
 std::vector<AssemblyInstruction> compileForDownto(SymbolsTable& symbolsTable, const std::unique_ptr<ForDowntoCommand>& cmd){
@@ -60,6 +60,7 @@ std::vector<AssemblyInstruction> compileForDownto(SymbolsTable& symbolsTable, co
     code.push_back(AssemblyInstruction(Instruction::SUB, MEMORY_ONE));
     code.push_back(AssemblyInstruction(Instruction::STORE, iteratorAddress));
     code.push_back(AssemblyInstruction(Instruction::JUMP, -countRealInstructions(forDowntoCode) - 5));
+    code.push_back(AssemblyInstruction(Instruction::LABEL_ENDFOR, labelEnd));
 
     // Remove the iterator variable
     symbolsTable.removeIterator(cmd->iterator);

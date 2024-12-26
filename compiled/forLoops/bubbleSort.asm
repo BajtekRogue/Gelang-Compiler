@@ -1,0 +1,127 @@
+# Preprocessing...
+# Store const = 9 at p[301]
+SET 9
+STORE 301
+# Store const = 50 at p[302]
+SET 50
+STORE 302
+# Store const = 1 at p[69]
+SET 1
+STORE 69
+# Store const = 1002 at p[304]
+SET 1002
+STORE 304
+# Store const = 10 at p[305]
+SET 10
+STORE 305
+# Finished preprocessing
+
+# MAIN 
+# Initializing FOR_UP _1_: 
+LOAD 305
+STORE 1016
+SUB 0
+STORE 1015
+# FOR_UP _1_: 0 TO 10
+SUB 1016
+JPOS 11
+# a[i] := 50 - i
+LOAD 304
+ADD 1015
+STORE 28
+LOAD 302
+SUB 1015
+STOREI 28
+# i++
+LOAD 1015
+ADD 69
+STORE 1015
+JUMP -11
+# ENDFOR _1_.
+# Initializing FOR_UP _2_: 
+LOAD 301
+STORE 1018
+SUB 0
+STORE 1017
+# FOR_UP _2_: 0 TO 9
+SUB 1018
+JPOS 47
+# inner_bound := 9 - i
+LOAD 301
+SUB 1017
+STORE 1014
+# Initializing FOR_UP _3_: 
+LOAD 1014
+STORE 1020
+SUB 0
+STORE 1019
+# FOR_UP _3_: 0 TO inner_bound
+SUB 1020
+JPOS 34
+# next_index := j + 1
+LOAD 69
+ADD 1019
+STORE 1013
+# IF _1_: a[j] > a[next_index]
+LOAD 304
+ADD 1013
+LOADI 0
+STORE 1
+LOAD 304
+ADD 1019
+LOADI 0
+SUB 1
+JNEG 18
+JZERO 17
+# tmp := a[j]
+LOAD 304
+ADD 1019
+LOADI 0
+STORE 1001
+# a[j] := a[next_index]
+LOAD 304
+ADD 1019
+STORE 28
+LOAD 304
+ADD 1013
+LOADI 0
+STOREI 28
+# a[next_index] := tmp
+LOAD 304
+ADD 1013
+STORE 28
+LOAD 1001
+STOREI 28
+# ENDIF _1_.
+# j++
+LOAD 1019
+ADD 69
+STORE 1019
+JUMP -34
+# ENDFOR _3_.
+# i++
+LOAD 1017
+ADD 69
+STORE 1017
+JUMP -47
+# ENDFOR _2_.
+# Initializing FOR_UP _4_: 
+LOAD 305
+STORE 1022
+SUB 0
+STORE 1021
+# FOR_UP _4_: 0 TO 10
+SUB 1022
+JPOS 9
+# WRITE a[i]
+LOAD 304
+ADD 1021
+LOADI 0
+PUT 0
+# i++
+LOAD 1021
+ADD 69
+STORE 1021
+JUMP -9
+# ENDFOR _4_.
+HALT

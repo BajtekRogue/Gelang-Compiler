@@ -2,7 +2,7 @@
 #include "symbolsTable.hpp"
 #include "languageStructs.hpp"
 #include "compiling.hpp"
-#include "utlity.hpp"
+#include "utility.hpp"
 
 
 std::vector<AssemblyInstruction> compileAssign(SymbolsTable& symbolsTable, const std::unique_ptr<AssignCommand>& cmd){

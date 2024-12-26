@@ -1,0 +1,103 @@
+# Preprocessing...
+# Store const = 2006 at p[301]
+SET 2006
+STORE 301
+# Store const = 2005 at p[302]
+SET 2005
+STORE 302
+# Finished preprocessing
+
+# Jump to MAIN procedure
+JUMP 30
+# 
+
+# PROCEDURE gcd
+# x := a
+LOADI 1001
+STORE 1004
+# y := b
+LOADI 1002
+STORE 1005
+# WHILE _1_: y > 0
+LOAD 1005
+JNEG 21
+JZERO 20
+# IF _1_: x >= y
+LOAD 1005
+STORE 1
+LOAD 1004
+SUB 1
+JNEG 5
+# x := x - y
+LOAD 1004
+SUB 1005
+STORE 1004
+JUMP 10
+# ELSE _1_: 
+# x := x + y
+LOAD 1005
+ADD 1004
+STORE 1004
+# y := x - y
+LOAD 1004
+SUB 1005
+STORE 1005
+# x := x - y
+LOAD 1004
+SUB 1005
+STORE 1004
+# ENDIF _1_.
+JUMP -21
+# ENDWHILE _1_: 
+# c := x
+LOAD 1004
+STOREI 1003
+# RETURN gcd
+RTRN 1006
+# ENDPROCEDURE gcd
+
+# MAIN 
+# READ a
+GET 2001
+# READ b
+GET 2002
+# READ c
+GET 2003
+# READ d
+GET 2004
+# CALL gcd (a, b, x)
+SET 2001
+STORE 1001
+SET 2002
+STORE 1002
+LOAD 302
+STORE 1003
+# Setting return address and jumping to gcd
+SET 47
+STORE 1006
+JUMP -41
+# CALL gcd (c, d, y)
+SET 2003
+STORE 1001
+SET 2004
+STORE 1002
+LOAD 301
+STORE 1003
+# Setting return address and jumping to gcd
+SET 56
+STORE 1006
+JUMP -50
+# CALL gcd (x, y, z)
+LOAD 302
+STORE 1001
+LOAD 301
+STORE 1002
+SET 2007
+STORE 1003
+# Setting return address and jumping to gcd
+SET 65
+STORE 1006
+JUMP -59
+# WRITE z
+PUT 2007
+HALT

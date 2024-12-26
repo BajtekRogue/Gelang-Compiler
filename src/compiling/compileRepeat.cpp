@@ -2,8 +2,7 @@
 #include "symbolsTable.hpp"
 #include "languageStructs.hpp"
 #include "compiling.hpp"
-#include "utlity.hpp"
-#include "colors.hpp"
+#include "utility.hpp"
 
 
 std::vector<AssemblyInstruction> compileRepeat(SymbolsTable& symbolsTable, const std::unique_ptr<RepeatCommand>& cmd){
@@ -33,7 +32,7 @@ std::vector<AssemblyInstruction> compileRepeat(SymbolsTable& symbolsTable, const
             return code;
         }
         finiteLoop = false;
-        std::cout << color_Magenta << "Warning: Infinite UNTIL loop detected!" << color_Reset << std::endl;
+        std::cout << Colors::magenta << "Warning: Infinite UNTIL loop detected!" << Colors::reset << std::endl;
     }
 
     // Check the condition and then jump to the end of the while block
@@ -43,7 +42,8 @@ std::vector<AssemblyInstruction> compileRepeat(SymbolsTable& symbolsTable, const
     // Fix the jump addresses
     if(finiteLoop){
         fixUntilJump(code, loopSize, conditonSize);
-    }else{
+    }
+    else{
         code.push_back(AssemblyInstruction(Instruction::JUMP, -loopSize));
     }
     code.push_back(AssemblyInstruction(Instruction::LABEL_UNTIL, labelStart + originalCondition));

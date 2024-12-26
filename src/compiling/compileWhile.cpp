@@ -2,8 +2,7 @@
 #include "symbolsTable.hpp"
 #include "languageStructs.hpp"
 #include "compiling.hpp"
-#include "utlity.hpp"
-#include "colors.hpp"
+#include "utility.hpp"
 
 
 std::vector<AssemblyInstruction> compileWhile(SymbolsTable& symbolsTable, const std::unique_ptr<WhileCommand>& cmd){
@@ -30,7 +29,7 @@ std::vector<AssemblyInstruction> compileWhile(SymbolsTable& symbolsTable, const 
             code.push_back(AssemblyInstruction(Instruction::LABEL_ENDWHILE, labelEnd));
             return code;
         }
-        std::cout << color_Magenta << "Warning: Infinite WHILE loop detected!" << color_Reset << std::endl;
+        std::cout << Colors::magenta << "Warning: Infinite WHILE loop detected!" << Colors::reset << std::endl;
     }
 
     // Check the condition and then jump to the end of the while block

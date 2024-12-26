@@ -1,0 +1,28 @@
+PROCEDURE do_math(x, y) IS
+    f, g, h[-10:20], i, j, k
+BEGIN
+    f := x + 190;
+    g := 134 + y;
+    i := x - 813;
+    h[4] := f + 34;
+    h[3] := 1234 + i;
+    j := h[4] + y;
+    k := y + h[3];
+    y := y * x;
+    WRITE f;
+    WRITE g;
+    WRITE i;
+    WRITE h[4];
+    WRITE h[3];
+    WRITE j;
+    WRITE k;
+    WRITE y;
+END
+
+PROGRAM IS
+    a, b
+BEGIN
+    a := 10;
+    b := -7;
+    do_math(a, b);
+END

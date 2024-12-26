@@ -1,6 +1,6 @@
 #include "assembling.hpp"
 #include "languageStructs.hpp"
-#include "colors.hpp"
+#include "utility.hpp"
 #include "compiling.hpp"
 
 
@@ -9,7 +9,7 @@ extern void runParser(std::FILE* data, std::unique_ptr<Program>& parsedProgram);
 int main(int argc, char *argv[]) {
 
     if (argc < 3 || argc > 4) {
-        fprintf(stderr, "%sUsage: %s <inputFilePath> <outputFilePath> [-g]\n%s", color_White.c_str(), argv[0], color_Reset.c_str());
+        std::cerr << Colors::red << "Usage: " << argv[0] << " <inputFilePath> <outputFilePath> [-g]" << Colors::reset << std::endl;
         return 1;
     }
 
@@ -20,7 +20,7 @@ int main(int argc, char *argv[]) {
     // Open the input file
     data = std::fopen(argv[1], "r");
     if (!data) {
-        fprintf(stderr, "%sError: Could not open file %s %s\n", color_Red.c_str(), argv[1], color_Reset.c_str());
+        std::cerr << Colors::red << "Error: Could not open file " << argv[1] << Colors::reset << std::endl;
         return 1;
     }
 
@@ -35,12 +35,12 @@ int main(int argc, char *argv[]) {
     try {
         // Compile the program
         std::vector<AssemblyInstruction> code = compile(parsedProgram);
-        std::cout << color_Green << "Compilation successful\n" << color_Reset;
+        std::cout << Colors::green << "Compilation successful\n" << Colors::reset;
 
         // Open the output file
         std::ofstream outputFile(argv[2]);
         if (!outputFile) {
-            fprintf(stderr, "%sError: Could not open output file %s %s\n", color_Red.c_str(), argv[2], color_Reset.c_str());
+            std::cerr << Colors::red << "Error: Could not open output file " << argv[2] << Colors::reset << std::endl;
             return 1;
         }
 
@@ -58,27 +58,27 @@ int main(int argc, char *argv[]) {
 
     } catch (const std::logic_error& e) {
         // Handle specific logic errors during compilation
-        fprintf(stderr, "%sCompilation Error: %s%s\n", color_Red.c_str(), e.what(), color_Reset.c_str());
+        std::cerr << Colors::red << "Compilation Error: " << e.what() << Colors::reset << std::endl;
         return 1;
 
     } catch(const std::runtime_error& e){
         // Handle specific runtime errors during compilation
-        fprintf(stderr, "%sRuntime error: %s%s\n", color_Red.c_str(), e.what(), color_Reset.c_str());
+        std::cerr << Colors::red << "Runtime Error: " << e.what() << Colors::reset << std::endl;
         return 1;
 
     } catch (const std::bad_alloc& e) {
         // Handle memory allocation errors
-        fprintf(stderr, "%sMemory Allocation Error: Declared arrays are too large. Please decreace their sizes. %s\n", color_Red.c_str(), color_Reset.c_str());
+        std::cerr << Colors::red << "Memory Allocation Error: Declared arrays are too large. Please decreace their sizes. " << Colors::reset << std::endl;
         return 1;
 
     } catch (const std::exception& e) {
         // Catch any other standard exceptions
-        fprintf(stderr, "%sUnexpected Error: %s%s\n", color_Red.c_str(), e.what(), color_Reset.c_str());
+        std::cerr << Colors::red << "Unexpected Error: " << e.what() << Colors::reset << std::endl;
         return 1;
 
     } catch (...) {
         // Catch any unknown exceptions
-        fprintf(stderr, "%sUnknown Critical Error Occurred%s\n", color_Red.c_str(), color_Reset.c_str());
+        std::cerr << Colors::red << "Unknown Critical Error Occurred" << Colors::reset << std::endl;
         return 1;
     }
 }

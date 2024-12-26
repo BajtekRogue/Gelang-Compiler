@@ -1,7 +1,7 @@
 #!/bin/bash
 
 compiler=./build/ge
-vm=./build/vm/vm
+vm=./build/vm
 
 # Check if directory argument is provided
 if [ -z "$1" ]; then
@@ -15,10 +15,10 @@ compiled_dir="./compiled/$1"
 # Create the compiled output directory if it doesn't exist
 mkdir -p "$compiled_dir"
 
-# Process each .imp file in the input directory
-for input in "$input_dir"/*.imp; do
-    base_name=$(basename "$input" .imp)
-    output="$compiled_dir/$base_name.mr"
+# Process each .gbl file in the input directory
+for input in "$input_dir"/*.gbl; do
+    base_name=$(basename "$input" .gbl)
+    output="$compiled_dir/$base_name.asm"
 
     # Compile the input file
     $compiler "$input" "$output" "-g"

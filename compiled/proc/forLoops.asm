@@ -1,0 +1,108 @@
+# Preprocessing...
+# Store const = 2003 at p[301]
+SET 2003
+STORE 301
+# Store const = 1 at p[69]
+SET 1
+STORE 69
+# Store const = 100 at p[303]
+SET 100
+STORE 303
+# Store const = 5 at p[304]
+SET 5
+STORE 304
+# Finished preprocessing
+
+# Jump to MAIN procedure
+JUMP 36
+# 
+
+# PROCEDURE wtf
+# var := 100 / 20
+LOAD 304
+STORE 1003
+# Initializing FOR_UP _1_: 
+LOAD 1001
+ADD 1003
+LOADI 0
+STORE 1005
+LOAD 1001
+ADDI 1002
+LOADI 0
+STORE 1004
+# FOR_UP _1_: n[m] TO n[var]
+SUB 1005
+JPOS 16
+# WRITE i
+PUT 1004
+# n[var] := n[var] - 100
+LOAD 1001
+ADD 1003
+STORE 28
+LOAD 303
+STORE 1
+LOAD 1001
+ADD 1003
+LOADI 0
+SUB 1
+STOREI 28
+# i++
+LOAD 1004
+ADD 69
+STORE 1004
+JUMP -16
+# ENDFOR _1_.
+# n[m] := n[var]
+LOAD 1001
+ADDI 1002
+STORE 28
+LOAD 1001
+ADD 1003
+LOADI 0
+STOREI 28
+# RETURN wtf
+RTRN 1006
+# ENDPROCEDURE wtf
+
+# MAIN 
+# g := 1
+LOAD 69
+STORE 2001
+# h[-1] := 3
+SET 3
+STORE 2002
+# h[0] := 5
+LOAD 304
+STORE 2003
+# h[1] := 7
+SET 7
+STORE 2004
+# h[2] := 11
+SET 11
+STORE 2005
+# h[3] := 13
+SET 13
+STORE 2006
+# h[4] := 17
+SET 17
+STORE 2007
+# h[5] := 19
+SET 19
+STORE 2008
+# CALL wtf (h, g)
+LOAD 301
+STORE 1001
+SET 2001
+STORE 1002
+# Setting return address and jumping to wtf
+SET 67
+STORE 1006
+JUMP -57
+# WRITE g
+PUT 2001
+# WRITE h[g]
+LOAD 301
+ADD 2001
+LOADI 0
+PUT 0
+HALT

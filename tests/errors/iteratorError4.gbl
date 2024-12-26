@@ -1,0 +1,14 @@
+PROCEDURE procedure_name(parameters) IS
+    variables
+BEGIN
+    WRITE 67;
+END
+
+PROGRAM IS
+BEGIN
+
+    FOR i FROM 100 DOWNTO -10 DO
+        procedure_name(i);
+    ENDFOR
+
+END

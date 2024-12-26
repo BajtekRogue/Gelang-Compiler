@@ -8,7 +8,7 @@
 #include <cstring>
 #include <cinttypes>
 #include "../headers/languageStructs.hpp"
-#include "../headers/colors.hpp"
+#include "../headers/utility.hpp"
 }
 %{
 #include <iostream>
@@ -20,7 +20,7 @@
 #include <cstring>
 #include <cinttypes>
 #include "../headers/languageStructs.hpp"
-#include "../headers/colors.hpp" 
+#include "../headers/utility.hpp" 
 
 extern int yylineno;
 extern int yylex(void);
@@ -587,12 +587,10 @@ void yyerror([[maybe_unused]]Program** parsedProgram, [[maybe_unused]]const char
     extern int yylineno;  // The current line number
 
     // Print the standard error message
-    fprintf(stderr, "%sSyntax Error: Unexpected token: '%s' at line %d %s\n", 
-            color_Red.c_str(), yytext ? yytext : "unknown", yylineno, color_Reset.c_str());
+    std::cerr << Colors::red << "Syntax Error: Unexpected token: '" << (yytext ? yytext : "unknown") << "' at line " << yylineno << Colors::reset << std::endl;
 
     if (yylineno > 0 && static_cast<size_t>(yylineno) <= inputLines.size()) {
-        fprintf(stderr, "%sLine %d: %s%s\n", 
-            color_Yellow.c_str(), yylineno, inputLines[static_cast<size_t>(yylineno) - 1].c_str(), color_Reset.c_str());
+        std::cerr << Colors::yellow << "Line " << yylineno << ": " << inputLines[static_cast<size_t>(yylineno) - 1] << Colors::reset << std::endl;
     }
 
     // Clean up the program if partially parsed
@@ -606,7 +604,7 @@ void yyerror([[maybe_unused]]Program** parsedProgram, [[maybe_unused]]const char
 }
 
 void runParser(std::FILE* input, std::unique_ptr<Program>& parsedProgram) {
-    std::cout << color_Blue << "Parsing code..." <<color_Reset << std::endl;
+    std::cout << Colors::blue << "Parsing code..." << Colors::reset << std::endl;
     Program* program = nullptr;
     
     // Reset input file pointer to beginning
@@ -619,7 +617,7 @@ void runParser(std::FILE* input, std::unique_ptr<Program>& parsedProgram) {
     int parseResult = yyparse(&program);
     
     if (parseResult != 0 || program == nullptr) {
-        std::cerr << color_Red << "Parsing failed!" << color_Reset << std::endl;
+        std::cerr << Colors::red << "Parsing failed!" << Colors::reset << std::endl;
         if (program){
             delete program;
         }
@@ -627,5 +625,5 @@ void runParser(std::FILE* input, std::unique_ptr<Program>& parsedProgram) {
     }
     
     parsedProgram.reset(program); 
-    std::cout << color_Cyan << "Finished parsing code." << color_Reset << std::endl;
+    std::cout << Colors::cyan << "Finished parsing code." << Colors::reset << std::endl;
 }

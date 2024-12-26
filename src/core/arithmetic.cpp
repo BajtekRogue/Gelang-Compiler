@@ -1,5 +1,5 @@
 #include "assembling.hpp"
-#include "utlity.hpp"
+#include "utility.hpp"
 
 
 std::vector<AssemblyInstruction> generateMultiplication(){

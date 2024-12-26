@@ -1,0 +1,93 @@
+# in; out = 1, 1, 2, 1, 2, 2, -1, -2, -2, -1, -2, -1
+PROGRAM IS
+    a, b, c
+BEGIN
+    a := 12;
+    b := -3;
+    c := a + b;
+    
+    IF a >= 0 THEN
+        WRITE 1;
+    ELSE
+        WRITE 2;
+    ENDIF
+
+    IF a > 0 THEN
+        WRITE 1;
+    ELSE
+        WRITE 2;
+    ENDIF
+
+    IF a = 0 THEN
+        WRITE 1;
+    ELSE
+        WRITE 2;
+    ENDIF
+
+    IF a != 0 THEN
+        WRITE 1;
+    ELSE
+        WRITE 2;
+    ENDIF
+
+    IF a < 0 THEN
+        WRITE 1;
+    ELSE
+        WRITE 2;
+    ENDIF
+
+    IF a <= 0 THEN
+        WRITE 1;
+    ELSE
+        WRITE 2;
+    ENDIF
+
+
+    IF 0 >= b THEN
+        WRITE 1;
+    ELSE
+        WRITE 2;
+    ENDIF
+
+    IF 0 > b THEN
+        WRITE 1;
+    ELSE
+        WRITE 2;
+    ENDIF
+
+    IF 0 = c THEN
+        WRITE -1;
+    ELSE
+        WRITE -2;
+    ENDIF
+
+    IF 0 != c THEN
+        WRITE -1;
+    ELSE
+        WRITE -2;
+    ENDIF
+
+    IF 0 < c THEN
+        WRITE -1;
+    ELSE
+        WRITE -2;
+    ENDIF
+
+    IF 0 <= c THEN
+        WRITE -1;
+    ELSE
+        WRITE -2;
+    ENDIF
+
+    IF 0 > c THEN
+        WRITE -1;
+    ELSE
+        WRITE -2;
+    ENDIF
+
+    IF 0 >= c THEN
+        WRITE -1;
+    ELSE
+        WRITE -2;
+    ENDIF
+END

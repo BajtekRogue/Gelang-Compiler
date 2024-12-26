@@ -2,7 +2,7 @@
 #include "symbolsTable.hpp"
 #include "languageStructs.hpp"
 #include "compiling.hpp"
-#include "utlity.hpp"
+#include "utility.hpp"
 
 
 std::vector<AssemblyInstruction> cacheConstants(std::vector<AssemblyInstruction> code, bool isOnePresent){
@@ -65,6 +65,7 @@ std::vector<AssemblyInstruction> cacheConstants(std::vector<AssemblyInstruction>
         if(code[i].instruction == Instruction::SET && code[i].hasAddress()){
             int64_t constant = code[i].getAddress();
             
+
             if(constantsOccurences.find(constant) == constantsOccurences.end()){
                 // If it is in a loop it is worth storing it before
                 constantsOccurences[constant] = (loop ? 2 : 1);

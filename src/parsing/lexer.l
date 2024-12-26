@@ -11,10 +11,10 @@
 std::vector<std::string> inputLines;
 
 void reportLexerError(const std::string& message, size_t lineNumber) {
-    std::cerr << color_Red << "Lexical Error: " << message << " at line " << lineNumber << color_Reset << std::endl;
+    std::cerr << Colors::red << "Lexical Error: " << message << " at line " << lineNumber << Colors::reset << std::endl;
     
     if (lineNumber > 0 && lineNumber <= inputLines.size()) {
-        std::cerr << color_Yellow << "Line " << lineNumber << ": " << inputLines[lineNumber - 1] << color_Reset << std::endl;
+        std::cerr << Colors::yellow << "Line " << lineNumber << ": " << inputLines[lineNumber - 1] << Colors::reset << std::endl;
     }
     
     exit(1);
