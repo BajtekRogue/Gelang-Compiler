@@ -1,5 +1,6 @@
 #include "assembling.hpp"
 #include "utility.hpp"
+#include "nameSpaces.hpp"
 #include <iostream>
 #include <fstream>
 #include <sstream>
@@ -92,7 +93,6 @@ int main(int argc, char* argv[]){
             std::cerr << Colors::red << "Error: Negative memory address" << Colors::reset << std::endl;
             return 1;
         }
-
 
         switch(instruction) {
             case Instruction::GET:

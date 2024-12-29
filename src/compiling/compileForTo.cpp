@@ -3,7 +3,7 @@
 #include "languageStructs.hpp"
 #include "compiling.hpp"
 #include "utility.hpp"
-
+#include "nameSpaces.hpp"
 
 std::vector<AssemblyInstruction> compileForTo(SymbolsTable& symbolsTable, const std::unique_ptr<ForToCommand>& cmd){
 
@@ -18,28 +18,28 @@ std::vector<AssemblyInstruction> compileForTo(SymbolsTable& symbolsTable, const 
     if(cmd->fromValue->isNumber() && cmd->toValue->isNumber() && cmd->fromValue->asNumber() > cmd->toValue->asNumber()){
         code.push_back(AssemblyInstruction(Instruction::LABEL_FOR_UP, labelStart + cmd->bounds()));
         code.push_back(AssemblyInstruction(Instruction::LABEL_ENDFOR, labelEnd));
-        symbolsTable.validateIterator(cmd->iterator);
+        symbolsTable.validateIterator(cmd->iterator, cmd->lineNumber);
         return code;
     }
 
     // Check if lower bound is valid
     if(cmd->fromValue->isIdentifier()){
-        validateUseOfVariable(symbolsTable, cmd->fromValue->asIdentifier(), "FOR loop", true);
+        validateUseOfVariable(symbolsTable, cmd->fromValue->asIdentifier(), cmd->lineNumber, true);
     }
     // Check if upper bound is valid
     if(cmd->toValue->isIdentifier()){
-        validateUseOfVariable(symbolsTable, cmd->toValue->asIdentifier(), "FOR loop", true);
+        validateUseOfVariable(symbolsTable, cmd->toValue->asIdentifier(), cmd->lineNumber, true);
     }
 
     // Create the iterator variable
     code.push_back(AssemblyInstruction(Instruction::LABEL_INSTRUCTION, "Initializing FOR_UP " + labelStart));
-    symbolsTable.addIterator(cmd->iterator);
-    int64_t iteratorAddress = symbolsTable.getMemoryAddress_variable(cmd->iterator);
+    symbolsTable.addIterator(cmd->iterator, cmd->lineNumber);
+    int64_t iteratorAddress = symbolsTable.getMemoryAddressVariable(cmd->iterator);
     std::vector<AssemblyInstruction> initilizeIteratorCode = getValueToDestinationAddress(symbolsTable, *(cmd->fromValue), iteratorAddress);
 
     // Make copy of the upper bound in case it changes during the loop
     symbolsTable.addForLoopBound(cmd->iterator, cmd->iterator + "_LIMIT");
-    int64_t finalBoundAddress = symbolsTable.getMemoryAddress_forLoopBound(cmd->iterator);
+    int64_t finalBoundAddress = symbolsTable.getMemoryAddress_ForLoopBound(cmd->iterator);
     std::vector<AssemblyInstruction> copyBoundCode = getValueToDestinationAddress(symbolsTable, *(cmd->toValue), finalBoundAddress);
 
     code.insert(code.end(), copyBoundCode.begin(), copyBoundCode.end());

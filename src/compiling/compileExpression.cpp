@@ -5,7 +5,7 @@
 #include "utility.hpp"
 
 
-std::vector<AssemblyInstruction> compileExpression(SymbolsTable& symbolsTable, const std::unique_ptr<Expression>& expr){
+std::vector<AssemblyInstruction> compileExpression(SymbolsTable& symbolsTable, const std::unique_ptr<Expression>& expr, int lineNumber){
 
     std::vector<AssemblyInstruction> code;
 
@@ -17,7 +17,7 @@ std::vector<AssemblyInstruction> compileExpression(SymbolsTable& symbolsTable, c
 
         // Check if the variable is used correctly
         if(left.isIdentifier()){
-            validateUseOfVariable(symbolsTable, left.asIdentifier(), "expression", true);
+            validateUseOfVariable(symbolsTable, left.asIdentifier(), lineNumber, true);
         }
         
         return getValueToDestinationAddress(symbolsTable, left, 0);
@@ -75,10 +75,10 @@ std::vector<AssemblyInstruction> compileExpression(SymbolsTable& symbolsTable, c
 
     // Check if the variables are declared and initialized before arithmetic operations
     if(left.isIdentifier()){
-        validateUseOfVariable(symbolsTable, left.asIdentifier(), "expression", true);
+        validateUseOfVariable(symbolsTable, left.asIdentifier(), lineNumber, true);
     }
     if(right.isIdentifier()){
-        validateUseOfVariable(symbolsTable, right.asIdentifier(), "expression", true);
+        validateUseOfVariable(symbolsTable, right.asIdentifier(), lineNumber, true);
     }
 
     std::vector<AssemblyInstruction> loadRightCode;
@@ -198,7 +198,7 @@ std::vector<AssemblyInstruction> compileExpression(SymbolsTable& symbolsTable, c
         // If left is a variable
         if(symbolsTable.isLocalVariable(identifier.id)){
 
-            int64_t varAddress = symbolsTable.getMemoryAddress_variable(identifier.id);
+            int64_t varAddress = symbolsTable.getMemoryAddressVariable(identifier.id);
             loadRightCode = getValueToDestinationAddress(symbolsTable, right, 0);
             code.insert(code.end(), loadRightCode.begin(), loadRightCode.end());
             code.push_back(AssemblyInstruction(Instruction::ADD, varAddress));
@@ -209,7 +209,7 @@ std::vector<AssemblyInstruction> compileExpression(SymbolsTable& symbolsTable, c
         // If left is a parameter
         if(symbolsTable.isParameter(identifier.id) && symbolsTable.getParameterType(identifier.id) == ParameterType::Integer){
 
-            int64_t paramAddress = symbolsTable.getMemoryAddressPointer_parameter(identifier.id);
+            int64_t paramAddress = symbolsTable.getMemoryAddressPointerParameter(identifier.id);
             loadRightCode = getValueToDestinationAddress(symbolsTable, right, 0);
             code.insert(code.end(), loadRightCode.begin(), loadRightCode.end());
             code.push_back(AssemblyInstruction(Instruction::ADDI, paramAddress));
@@ -220,7 +220,7 @@ std::vector<AssemblyInstruction> compileExpression(SymbolsTable& symbolsTable, c
         // If left is a local array accesed by index
         if(symbolsTable.isArrayDeclared(identifier.id) && identifier.getArrayAccess().isByIndex()){
             int64_t index = identifier.getArrayAccess().getIndex();
-            int64_t arrayAddress = symbolsTable.getMemoryAddress_start(identifier.id) + symbolsTable.get_offset(identifier.id);
+            int64_t arrayAddress = symbolsTable.getMemoryAddressStart(identifier.id) + symbolsTable.getOffset(identifier.id);
             loadRightCode = getValueToDestinationAddress(symbolsTable, right, 0);
             code.insert(code.end(), loadRightCode.begin(), loadRightCode.end());
             code.push_back(AssemblyInstruction(Instruction::ADD, arrayAddress + index));
@@ -230,7 +230,7 @@ std::vector<AssemblyInstruction> compileExpression(SymbolsTable& symbolsTable, c
 
         // If left is an iterator
         if(symbolsTable.isIterator(identifier.id)){
-            int64_t iteratorAddress = symbolsTable.getMemoryAddress_variable(identifier.id);
+            int64_t iteratorAddress = symbolsTable.getMemoryAddressVariable(identifier.id);
             loadRightCode = getValueToDestinationAddress(symbolsTable, right, 0);
             code.insert(code.end(), loadRightCode.begin(), loadRightCode.end());
             code.push_back(AssemblyInstruction(Instruction::ADD, iteratorAddress));
@@ -246,7 +246,7 @@ std::vector<AssemblyInstruction> compileExpression(SymbolsTable& symbolsTable, c
         // If right is a variable
         if(symbolsTable.isLocalVariable(identifier.id)){
 
-            int64_t varAddress = symbolsTable.getMemoryAddress_variable(identifier.id);
+            int64_t varAddress = symbolsTable.getMemoryAddressVariable(identifier.id);
             loadLeftCode = getValueToDestinationAddress(symbolsTable, left, 0);
             code.insert(code.end(), loadLeftCode.begin(), loadLeftCode.end());
             code.push_back(AssemblyInstruction(Instruction::ADD, varAddress));
@@ -257,7 +257,7 @@ std::vector<AssemblyInstruction> compileExpression(SymbolsTable& symbolsTable, c
         // If right is a parameter
         if(symbolsTable.isParameter(identifier.id) && symbolsTable.getParameterType(identifier.id) == ParameterType::Integer){
 
-            int64_t paramAddress = symbolsTable.getMemoryAddressPointer_parameter(identifier.id);
+            int64_t paramAddress = symbolsTable.getMemoryAddressPointerParameter(identifier.id);
             loadLeftCode = getValueToDestinationAddress(symbolsTable, left, 0);
             code.insert(code.end(), loadLeftCode.begin(), loadLeftCode.end());
             code.push_back(AssemblyInstruction(Instruction::ADDI, paramAddress));
@@ -268,7 +268,7 @@ std::vector<AssemblyInstruction> compileExpression(SymbolsTable& symbolsTable, c
         // If left is a local array accesed by index
         if(symbolsTable.isArrayDeclared(identifier.id) && identifier.getArrayAccess().isByIndex()){
             int64_t index = identifier.getArrayAccess().getIndex();
-            int64_t arrayAddress = symbolsTable.getMemoryAddress_start(identifier.id) + symbolsTable.get_offset(identifier.id);
+            int64_t arrayAddress = symbolsTable.getMemoryAddressStart(identifier.id) + symbolsTable.getOffset(identifier.id);
             loadLeftCode = getValueToDestinationAddress(symbolsTable, left, 0);
             code.insert(code.end(), loadLeftCode.begin(), loadLeftCode.end());
             code.push_back(AssemblyInstruction(Instruction::ADD, arrayAddress + index));
@@ -278,7 +278,7 @@ std::vector<AssemblyInstruction> compileExpression(SymbolsTable& symbolsTable, c
 
         // If right is an iterator
         if(symbolsTable.isIterator(identifier.id)){
-            int64_t iteratorAddress = symbolsTable.getMemoryAddress_variable(identifier.id);
+            int64_t iteratorAddress = symbolsTable.getMemoryAddressVariable(identifier.id);
             loadLeftCode = getValueToDestinationAddress(symbolsTable, left, 0);
             code.insert(code.end(), loadLeftCode.begin(), loadLeftCode.end());
             code.push_back(AssemblyInstruction(Instruction::ADD, iteratorAddress));
@@ -295,7 +295,7 @@ std::vector<AssemblyInstruction> compileExpression(SymbolsTable& symbolsTable, c
         // If right is a variable
         if(symbolsTable.isLocalVariable(identifier.id)){
 
-            int64_t varAddress = symbolsTable.getMemoryAddress_variable(identifier.id);
+            int64_t varAddress = symbolsTable.getMemoryAddressVariable(identifier.id);
             loadLeftCode = getValueToDestinationAddress(symbolsTable, left, 0);
             code.insert(code.end(), loadLeftCode.begin(), loadLeftCode.end());
             code.push_back(AssemblyInstruction(Instruction::SUB, varAddress));
@@ -306,7 +306,7 @@ std::vector<AssemblyInstruction> compileExpression(SymbolsTable& symbolsTable, c
         // If right is a parameter
         if(symbolsTable.isParameter(identifier.id) && symbolsTable.getParameterType(identifier.id) == ParameterType::Integer){
 
-            int64_t paramAddress = symbolsTable.getMemoryAddressPointer_parameter(identifier.id);
+            int64_t paramAddress = symbolsTable.getMemoryAddressPointerParameter(identifier.id);
             loadLeftCode = getValueToDestinationAddress(symbolsTable, left, 0);
             code.insert(code.end(), loadLeftCode.begin(), loadLeftCode.end());
             code.push_back(AssemblyInstruction(Instruction::SUBI, paramAddress));
@@ -317,7 +317,7 @@ std::vector<AssemblyInstruction> compileExpression(SymbolsTable& symbolsTable, c
         // If right is a local array accesed by index
         if(symbolsTable.isArrayDeclared(identifier.id) && identifier.getArrayAccess().isByIndex()){
             int64_t index = identifier.getArrayAccess().getIndex();
-            int64_t arrayAddress = symbolsTable.getMemoryAddress_start(identifier.id) + symbolsTable.get_offset(identifier.id);
+            int64_t arrayAddress = symbolsTable.getMemoryAddressStart(identifier.id) + symbolsTable.getOffset(identifier.id);
             loadLeftCode = getValueToDestinationAddress(symbolsTable, left, 0);
             code.insert(code.end(), loadLeftCode.begin(), loadLeftCode.end());
             code.push_back(AssemblyInstruction(Instruction::SUB, arrayAddress + index));
@@ -327,7 +327,7 @@ std::vector<AssemblyInstruction> compileExpression(SymbolsTable& symbolsTable, c
 
         // If right is an iterator
         if(symbolsTable.isIterator(identifier.id)){
-            int64_t iteratorAddress = symbolsTable.getMemoryAddress_variable(identifier.id);
+            int64_t iteratorAddress = symbolsTable.getMemoryAddressVariable(identifier.id);
             loadLeftCode = getValueToDestinationAddress(symbolsTable, left, 0);
             code.insert(code.end(), loadLeftCode.begin(), loadLeftCode.end());
             code.push_back(AssemblyInstruction(Instruction::SUB, iteratorAddress));

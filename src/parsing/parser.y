@@ -8,7 +8,7 @@
 #include <cstring>
 #include <cinttypes>
 #include "../headers/languageStructs.hpp"
-#include "../headers/utility.hpp"
+#include "../headers/nameSpaces.hpp"
 }
 %{
 #include <iostream>
@@ -20,7 +20,7 @@
 #include <cstring>
 #include <cinttypes>
 #include "../headers/languageStructs.hpp"
-#include "../headers/utility.hpp" 
+#include "../headers/nameSpaces.hpp" 
 
 extern int yylineno;
 extern int yylex(void);
@@ -29,12 +29,22 @@ extern std::vector<std::string> inputLines;
 void yyerror(Program** parsedProgram, const char *s);
 void yyset_in(std::FILE * inStr);
 
+extern int ifCounter;
+extern int whileCounter;
+extern int repeatCounter;
+extern int forCounter;
+
+extern std::vector<int> ifStack;
+extern std::vector<int> whileStack;
+extern std::vector<int> repeatStack;
+extern std::vector<int> forStack;
+
+extern int mainStartLine;
 %}
 
 %locations
 %define parse.error verbose
 %parse-param {Program** parsedProgram}
-
 
 /* Full Token Definitions */
 %token PROGRAM IS BEGIN_BLOCK END 
@@ -56,7 +66,6 @@ void yyset_in(std::FILE * inStr);
 %token SEMICOLON COLON COMMA 
 %token LPAREN RPAREN 
 %token LBRACKET RBRACKET
-
 
 /* Types */
 %union {
@@ -124,6 +133,7 @@ program_all: procedures main {
     (*parsedProgram)->declarations = std::move($2->declarations);
     (*parsedProgram)->mainCommands = std::move($2->commands);
     $$ = *parsedProgram;
+    $$->lineNumber = mainStartLine;
     delete $2;
 };
 
@@ -157,6 +167,7 @@ main:
         main->declarations = std::move(*$3);
         main->commands = std::move(*$5);
         $$ = main.release();
+        $$->lineNumber = yylineno;
         delete $3;
         delete $5;
     }
@@ -186,6 +197,7 @@ command:
         cmd->identifier.reset($1);
         cmd->expression.reset($3);
         $$ = cmd;
+        $$->lineNumber = yylineno;
     }
     | IF condition THEN commands ELSE commands ENDIF {
         auto cmd = new IfElseCommand();
@@ -193,6 +205,8 @@ command:
         cmd->thenCommands = std::move(*$4);
         cmd->elseCommands = std::move(*$6);
         $$ = cmd;
+        $$->lineNumber = ifStack.back();
+        ifCounter++;
         delete $4;
         delete $6;
     }
@@ -201,6 +215,8 @@ command:
         cmd->condition.reset($2);
         cmd->thenCommands = std::move(*$4);
         $$ = cmd;
+        $$->lineNumber = ifStack.back();
+        ifCounter++;
         delete $4;
     }
     | WHILE condition DO commands ENDWHILE {
@@ -208,6 +224,8 @@ command:
         cmd->condition.reset($2);
         cmd->commands = std::move(*$4);
         $$ = cmd;
+        $$->lineNumber = whileStack.back();
+        whileCounter++;
         delete $4;
     }
     | REPEAT commands UNTIL condition SEMICOLON {
@@ -215,6 +233,8 @@ command:
         cmd->commands = std::move(*$2);
         cmd->condition.reset($4);
         $$ = cmd;
+        $$->lineNumber = repeatStack.back();
+        repeatCounter++;
         delete $2;
     }
     | FOR pidentifier FROM value TO value DO commands ENDFOR {
@@ -224,6 +244,8 @@ command:
         cmd->toValue.reset($6);
         cmd->commands = std::move(*$8);
         $$ = cmd;
+        $$->lineNumber = forStack.back();
+        forCounter++;
         delete $8;
     }
     | FOR pidentifier FROM value DOWNTO value DO commands ENDFOR {
@@ -233,20 +255,25 @@ command:
         cmd->downtoValue.reset($6);
         cmd->commands = std::move(*$8);
         $$ = cmd;
+        $$->lineNumber = forStack.back();
+        forCounter++;
         delete $8;
     }
     | proc_call SEMICOLON {
         $$ = $1;
+        $$->lineNumber = yylineno;
     }
     | READ identifier SEMICOLON {
         auto cmd = new ReadCommand();
         cmd->identifier.reset($2);
         $$ = cmd;
+        $$->lineNumber = yylineno;
     }
     | WRITE value SEMICOLON {
         auto cmd = new WriteCommand();
         cmd->value.reset($2);
         $$ = cmd;
+        $$->lineNumber = yylineno;
     };
 
 proc_head: 
@@ -255,6 +282,7 @@ proc_head:
         proc->identifier = std::string($1);
         proc->parameters = $3 ? std::move(*$3) : std::vector<std::unique_ptr<Parameter>>();
         $$ = proc;
+        $$->lineNumber = yylineno;
         if ($1) {
             free($1);
         }

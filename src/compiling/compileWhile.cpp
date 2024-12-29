@@ -3,7 +3,7 @@
 #include "languageStructs.hpp"
 #include "compiling.hpp"
 #include "utility.hpp"
-
+#include "nameSpaces.hpp"
 
 std::vector<AssemblyInstruction> compileWhile(SymbolsTable& symbolsTable, const std::unique_ptr<WhileCommand>& cmd){
 
@@ -18,7 +18,7 @@ std::vector<AssemblyInstruction> compileWhile(SymbolsTable& symbolsTable, const 
     // Compile the while loop
     std::vector<AssemblyInstruction> whileCode = compileAll(symbolsTable, cmd->commands);
     int64_t jumpAddress = countRealInstructions(whileCode) + 2;
-    auto [conditionCode, conditionValue] = compileCondition(symbolsTable, cmd->condition, jumpAddress);
+    auto [conditionCode, conditionValue] = compileCondition(symbolsTable, cmd->condition, jumpAddress, cmd->lineNumber);
 
     // Get these to check back the condition
     int64_t jumBackToCond = -countRealInstructions(whileCode) - countRealInstructions(conditionCode);
@@ -29,7 +29,7 @@ std::vector<AssemblyInstruction> compileWhile(SymbolsTable& symbolsTable, const 
             code.push_back(AssemblyInstruction(Instruction::LABEL_ENDWHILE, labelEnd));
             return code;
         }
-        std::cout << Colors::magenta << "Warning: Infinite WHILE loop detected!" << Colors::reset << std::endl;
+        ErrorHandler::infiniteWhileLoop(cmd->lineNumber);
     }
 
     // Check the condition and then jump to the end of the while block

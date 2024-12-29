@@ -5,42 +5,159 @@ STORE 301
 # Store const = 2000 at p[302]
 SET 2000
 STORE 302
+# Store const = 5 at p[303]
+SET 5
+STORE 303
 # Store const = 1 at p[69]
 SET 1
 STORE 69
 # Finished preprocessing
 
 # Jump to MAIN procedure
-JUMP 43
+JUMP 136
 # 
+
+# PROCEDURE /@\
+# Negate x if needed
+LOAD 72
+STORE 30
+JZERO 80
+JPOS 4
+SUB 0
+SUB 30
+STORE 72
+# Negate y if needed
+LOAD 73
+STORE 60
+JZERO 73
+JPOS 4
+SUB 0
+SUB 60
+STORE 73
+# Set quotient to 0, remainder to x, current to y and powet to 1
+LOAD 72
+STORE 120
+SUB 0
+STORE 90
+LOAD 73
+STORE 150
+LOAD 69
+STORE 180
+# Shift y left until just before it exceeds x
+LOAD 120
+HALF
+STORE 210
+LOAD 150
+SUB 210
+JPOS 8
+LOAD 150
+ADD 0
+STORE 150
+LOAD 180
+ADD 0
+STORE 180
+JUMP -9
+# While power > 0
+LOAD 180
+JZERO 15
+# If remainder >= current
+LOAD 120
+SUB 150
+JNEG 5
+STORE 120
+LOAD 90
+ADD 180
+STORE 90
+# Left shift current and power
+LOAD 150
+HALF
+STORE 150
+LOAD 180
+HALF
+STORE 180
+JUMP -15
+# If x < 0 then check y
+LOAD 30
+JPOS 14
+# Negate the result if y < 0
+LOAD 60
+JPOS 5
+SUB 0
+SUB 120
+STORE 120
+JUMP 17
+# Shft the result if y > 0
+SUB 0
+SUB 90
+SUB 69
+STORE 90
+LOAD 73
+SUB 120
+STORE 120
+# Shft the result if y < 0
+LOAD 60
+JPOS 8
+SUB 0
+SUB 90
+SUB 69
+STORE 90
+LOAD 120
+SUB 73
+STORE 120
+# Check what to return
+LOAD 75
+JZERO 3
+LOAD 120
+JUMP 2
+LOAD 90
+JUMP 2
+SUB 0
+RTRN 161
+# ENDPROCEDURE /@\
 
 # PROCEDURE function
 # IF _1_: x[1] > y
-LOADI 1002
-STORE 1
 LOAD 69
 ADD 1001
 LOADI 0
-SUB 1
-JNEG 5
-JZERO 4
+SUBI 1002
+JNEG 21
+JZERO 20
+# u := 3 * 4
+SET 12
+STORE 1005
+# u := 20 / 5
+SET 4
+STORE 1005
+# v := x[1] % 5
+LOAD 303
+STORE 73
+LOAD 69
+ADD 1001
+LOADI 0
+STORE 72
+LOAD 69
+STORE 75
+# Setting return address and jumping to /@\
+SET 113
+STORE 161
+JUMP -103
+STORE 1006
 # y := 1
 LOAD 69
 STOREI 1002
 JUMP 3
 # ELSE _1_: 
 # u := 5
-SET 5
+LOAD 303
 STORE 1005
 # ENDIF _1_.
 # IF _2_: y <= z[-32]
 SET -32
 ADD 1003
 LOADI 0
-STORE 1
-LOADI 1002
-SUB 1
-JPOS 3
+SUBI 1002
+JNEG 3
 # v := 6
 SET 6
 STORE 1006
@@ -49,10 +166,8 @@ STORE 1006
 SUB 0
 STORE 1006
 # WHILE _1_: u != v
-LOAD 1006
-STORE 1
 LOAD 1005
-SUB 1
+SUB 1006
 JZERO 10
 # v := v + 1
 LOAD 69
@@ -64,7 +179,7 @@ STORE 1
 LOAD 1005
 SUB 1
 STORE 1005
-JUMP -13
+JUMP -11
 # ENDWHILE _1_: 
 # WRITE u
 PUT 1005
@@ -89,9 +204,9 @@ JPOS 13
 # a[i] := i
 LOAD 302
 ADD 2012
-STORE 28
+STORE 144
 LOAD 2012
-STOREI 28
+STOREI 144
 # b := b + 1
 LOAD 69
 ADD 2011
@@ -137,19 +252,17 @@ STORE 1003
 LOAD 301
 STORE 1004
 # Setting return address and jumping to function
-SET 98
+SET 193
 STORE 1018
-JUMP -90
+JUMP -100
 # REPEAT _1_: 
 # a[1] := a[1] + 1
 LOAD 69
 ADD 2001
 STORE 2001
-LOAD 2011
-STORE 1
 LOAD 2001
-SUB 1
-JNEG -7
-JZERO -8
+SUB 2011
+JNEG -5
+JZERO -6
 # UNTIL _1_: a[1] > b
 HALT

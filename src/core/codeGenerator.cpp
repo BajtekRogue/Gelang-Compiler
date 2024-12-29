@@ -3,7 +3,8 @@
 #include "languageStructs.hpp"
 #include "compiling.hpp"
 #include "utility.hpp"
-
+#include "errorHandler.hpp"
+#include "nameSpaces.hpp"
 
 std::vector<AssemblyInstruction> compile(std::unique_ptr<Program>& program) {
 
@@ -13,7 +14,7 @@ std::vector<AssemblyInstruction> compile(std::unique_ptr<Program>& program) {
     std::unordered_set<std::string> procedureNames;
     for(const auto& procedure : program->procedures) {
         if(procedureNames.find(procedure->identifier) != procedureNames.end()) {
-            throw std::logic_error("Procedure `" + procedure->identifier + "` was already declared");
+            ErrorHandler::redeclarationProcedure(procedure->identifier, procedure->lineNumber);
         }
         procedureNames.insert(procedure->identifier);
     }
@@ -30,11 +31,11 @@ std::vector<AssemblyInstruction> compile(std::unique_ptr<Program>& program) {
 
         // Add parameters and variables to the table
         for(const auto& param: program->procedures[i]->parameters) {
-            proceduresTables[i].addParameter(param->identifier, param->type);
+            proceduresTables[i].addParameter(param->identifier, param->type, program->procedures[i]->lineNumber);
         }
 
         for(const auto& decl : program->procedures[i]->declarations) {
-            proceduresTables[i].addVariable(decl);
+            proceduresTables[i].addVariable(decl, program->procedures[i]->lineNumber);
         }
 
         // Add above declared procedures to be available in the current one
@@ -64,7 +65,7 @@ std::vector<AssemblyInstruction> compile(std::unique_ptr<Program>& program) {
     mainCode.push_back(AssemblyInstruction(Instruction::LABEL_MAIN, ""));
 
     for(const auto& decl : program->declarations) {
-        mainTable.addVariable(decl);
+        mainTable.addVariable(decl, program->lineNumber);
     }
 
     for(size_t i = 0; i < proceduresTables.size(); i++) {

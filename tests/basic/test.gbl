@@ -1,0 +1,15 @@
+PROCEDURE function(t) IS
+BEGIN
+  WRITE 1234;
+END
+
+PROGRAM IS
+  x, y
+BEGIN
+  x := 3;
+  y := x;
+
+  IF x = x THEN
+    function(y);
+  ENDIF
+END

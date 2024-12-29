@@ -1,0 +1,5 @@
+PROGRAM IS
+    a[1:20]
+BEGIN
+    a[50] := 5;
+END

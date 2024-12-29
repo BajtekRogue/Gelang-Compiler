@@ -36,7 +36,7 @@ std::vector<AssemblyInstruction> getValueToDestinationAddress(SymbolsTable& symb
     // If it is an integer parameter
     if(symbolsTable.isParameter(id) && symbolsTable.getParameterType(id) == ParameterType::Integer){
 
-        int64_t parameterAddress = symbolsTable.getMemoryAddressPointer_parameter(id);
+        int64_t parameterAddress = symbolsTable.getMemoryAddressPointerParameter(id);
 
         // If destination is the accumulator, load the pointer
         if(destination == 0){
@@ -53,7 +53,7 @@ std::vector<AssemblyInstruction> getValueToDestinationAddress(SymbolsTable& symb
     // Check if identifier is a variable
     if(identifier.isVariable()){
 
-        int64_t currentAddress = symbolsTable.getMemoryAddress_variable(id);
+        int64_t currentAddress = symbolsTable.getMemoryAddressVariable(id);
 
         // If destination is current address, do nothing
         if(destination == currentAddress){
@@ -81,7 +81,7 @@ std::vector<AssemblyInstruction> getValueToDestinationAddress(SymbolsTable& symb
         int64_t index = arrayAccess.getIndex();
 
         // Get memory address of array at the index and ouput the value there
-        int64_t currentAddress = symbolsTable.getMemoryAddress_at(id, index);
+        int64_t currentAddress = symbolsTable.getMemoryAddressAt(id, index);
 
         // If destination is current address, do nothing
         if(destination == currentAddress){
@@ -104,7 +104,7 @@ std::vector<AssemblyInstruction> getValueToDestinationAddress(SymbolsTable& symb
     if(arrayAccess.isByIndex() && symbolsTable.isParameter(id)){
 
         int64_t index = arrayAccess.getIndex();
-        int64_t arrayAddress = symbolsTable.getMemoryAddressPointer_parameter(id);
+        int64_t arrayAddress = symbolsTable.getMemoryAddressPointerParameter(id);
 
         // If index is 0 we can just load the pointer
         if(index == 0){
@@ -137,8 +137,8 @@ std::vector<AssemblyInstruction> getValueToDestinationAddress(SymbolsTable& symb
     // If both array and the variable are local
     if(!symbolsTable.isParameter(id) && !symbolsTable.isParameter(indexIdentifier)){
 
-        int64_t indexAddress = symbolsTable.getMemoryAddress_variable(indexIdentifier);
-        int64_t arrayStartAddress = symbolsTable.getMemoryAddress_start(id) + symbolsTable.get_offset(id);
+        int64_t indexAddress = symbolsTable.getMemoryAddressVariable(indexIdentifier);
+        int64_t arrayStartAddress = symbolsTable.getMemoryAddressStart(id) + symbolsTable.getOffset(id);
 
         // Load into the accumulator the value at the index of the array
         code.push_back(AssemblyInstruction(Instruction::SET, arrayStartAddress));
@@ -156,8 +156,8 @@ std::vector<AssemblyInstruction> getValueToDestinationAddress(SymbolsTable& symb
     // If array is local but the index is a parameter
     if(!symbolsTable.isParameter(id) && symbolsTable.isParameter(indexIdentifier)){
 
-        int64_t indexAddress = symbolsTable.getMemoryAddressPointer_parameter(indexIdentifier);
-        int64_t arrayStartAddress = symbolsTable.getMemoryAddress_start(id) + symbolsTable.get_offset(id);
+        int64_t indexAddress = symbolsTable.getMemoryAddressPointerParameter(indexIdentifier);
+        int64_t arrayStartAddress = symbolsTable.getMemoryAddressStart(id) + symbolsTable.getOffset(id);
 
         // Load into the accumulator the value at the index of the array
         code.push_back(AssemblyInstruction(Instruction::SET, arrayStartAddress));
@@ -175,8 +175,8 @@ std::vector<AssemblyInstruction> getValueToDestinationAddress(SymbolsTable& symb
     // If array is a parameter but the index is local
     if(symbolsTable.isParameter(id) && !symbolsTable.isParameter(indexIdentifier)){
 
-        int64_t indexAddress = symbolsTable.getMemoryAddress_variable(indexIdentifier);
-        int64_t arrayAddress = symbolsTable.getMemoryAddressPointer_parameter(id);
+        int64_t indexAddress = symbolsTable.getMemoryAddressVariable(indexIdentifier);
+        int64_t arrayAddress = symbolsTable.getMemoryAddressPointerParameter(id);
 
         // Load into the accumulator the value at the index of the array
         code.push_back(AssemblyInstruction(Instruction::LOAD, arrayAddress));
@@ -194,8 +194,8 @@ std::vector<AssemblyInstruction> getValueToDestinationAddress(SymbolsTable& symb
     // If both array and the index are parameters
     if(symbolsTable.isParameter(id) && symbolsTable.isParameter(indexIdentifier)){
 
-        int64_t indexAddress = symbolsTable.getMemoryAddressPointer_parameter(indexIdentifier);
-        int64_t arrayAddress = symbolsTable.getMemoryAddressPointer_parameter(id);
+        int64_t indexAddress = symbolsTable.getMemoryAddressPointerParameter(indexIdentifier);
+        int64_t arrayAddress = symbolsTable.getMemoryAddressPointerParameter(id);
 
         // Load into the accumulator the value at the index of the array
         code.push_back(AssemblyInstruction(Instruction::LOAD, arrayAddress));
@@ -213,7 +213,7 @@ std::vector<AssemblyInstruction> getValueToDestinationAddress(SymbolsTable& symb
 }
 
 
-void validateUseOfVariable(SymbolsTable& symbolsTable, const Identifier& identifier, const std::string commandName, bool mustBeInitialized, bool arrayAsPointer){
+void validateUseOfVariable(SymbolsTable& symbolsTable, const Identifier& identifier, int lineNumber, bool mustBeInitialized, bool arrayAsPointer){
     
     std::string id = identifier.id;
 
@@ -227,7 +227,7 @@ void validateUseOfVariable(SymbolsTable& symbolsTable, const Identifier& identif
         
         // If array is not declared, throw an error
         if(!symbolsTable.isArrayDeclared(id)){
-            throw std::logic_error("Array '" + id + "' not declared but is used as a pointer in " + commandName);
+            ErrorHandler::notDeclaredVariable(id, lineNumber);
         }
 
         return;
@@ -241,24 +241,24 @@ void validateUseOfVariable(SymbolsTable& symbolsTable, const Identifier& identif
 
             // If parameter is an array, throw an error
             if(symbolsTable.getParameterType(id) == ParameterType::Array){
-                throw std::logic_error("Parameter '" + id + "' is an array but is used as a variable in " + commandName);
+                ErrorHandler::arrayUsedAsVariable(id, lineNumber);
             }
             return;
         }
 
         // If it is an array but is used as variable, throw an error
         if(symbolsTable.isArrayDeclared(id)){
-            throw std::logic_error("Array '" + id + "' is used as a variable in " + commandName);
+            ErrorHandler::arrayUsedAsVariable(id, lineNumber);
         }
 
         // If identifier is not declared, throw an error
         if(!symbolsTable.isVariableDeclared(id)){
-            throw std::logic_error("Variable '" + id + "' not declared but is used in " + commandName);
+            ErrorHandler::notDeclaredVariable(id, lineNumber);
         }
 
         // If variable is not initialized, throw an error
         if(mustBeInitialized && !symbolsTable.isVariableInitialized(id)){
-            throw std::logic_error("Variable '" + id + "' not initialized but is used in " + commandName);
+            ErrorHandler::uninitializedVariable(id, lineNumber);
         }
 
         return;
@@ -269,17 +269,17 @@ void validateUseOfVariable(SymbolsTable& symbolsTable, const Identifier& identif
 
     // If it is a integer parameter, throw an error
     if(symbolsTable.isParameter(id) && symbolsTable.getParameterType(id) == ParameterType::Integer){
-        throw std::logic_error("Parameter '" + id + "' is an integer but is used as an array in " + commandName);
+        ErrorHandler::variableUsedAsArray(id, lineNumber);
     }
 
     // If array is not declared, throw an error
     if(!symbolsTable.isArrayDeclared(id) && !symbolsTable.isParameter(id)){
-        throw std::logic_error("Array '" + id + "' not declared but is used in " + commandName);
+        ErrorHandler::notDeclaredArray(id, lineNumber);
     }
 
     // If variable is used as an array, throw an error
     if(symbolsTable.isVariableDeclared(id)){
-        throw std::logic_error("Variable '" + id + "' is used as an array in " + commandName);
+        ErrorHandler::variableUsedAsArray(id, lineNumber);
     }
 
     // If array is accessed by index
@@ -290,7 +290,7 @@ void validateUseOfVariable(SymbolsTable& symbolsTable, const Identifier& identif
         // If index is out of bounds, throw an error
         // Cannot check if this is correct for parameters arrays
         if(!symbolsTable.isInsideArray(id, index) && !symbolsTable.isParameter(id)){
-            throw std::logic_error("Index '" + std::to_string(index) + "' which is out of bounds for the array '" + id + "' used in " + commandName);
+            ErrorHandler::outOfBoundsArray(id, index, lineNumber);
         }
 
         return;
@@ -306,22 +306,22 @@ void validateUseOfVariable(SymbolsTable& symbolsTable, const Identifier& identif
 
     // If index is an array parameter, throw an error
     if(symbolsTable.isParameter(indexIdentifier) && symbolsTable.getParameterType(indexIdentifier) == ParameterType::Array){
-        throw std::logic_error("Parameter '" + indexIdentifier + "' is an array but is used as an index in " + commandName);
+        ErrorHandler::arrayUsedAsVariable(indexIdentifier, lineNumber);
     }
 
     // If index is an array variable, throw an error
     if(symbolsTable.isArrayDeclared(indexIdentifier)){
-        throw std::logic_error("Array '" + indexIdentifier + "' is used as an index in " + commandName);
+        ErrorHandler::arrayUsedAsVariable(indexIdentifier, lineNumber);
     }
 
     // If index is not declared, throw an error
     if(!symbolsTable.isVariableDeclared(indexIdentifier)){
-        throw std::logic_error("Variable '" + indexIdentifier + "' not declared but is used as index in " + commandName);
+        ErrorHandler::notDeclaredVariable(indexIdentifier, lineNumber);
     }
 
     // If index is not initialized, throw an error
     if(!symbolsTable.isVariableInitialized(indexIdentifier)){
-        throw std::logic_error("Variable '" + indexIdentifier + "' not initialized but is used as index in " + commandName);
+        ErrorHandler::uninitializedVariable(indexIdentifier, lineNumber);
     }
 
     return;
@@ -410,7 +410,7 @@ std::vector<AssemblyInstruction> getAddressToDestinationAddress(SymbolsTable& sy
     // If variable is local
     if(symbolsTable.isVariableDeclared(identifier.id)){
         
-        int64_t varAddress = symbolsTable.getMemoryAddress_variable(identifier.id);
+        int64_t varAddress = symbolsTable.getMemoryAddressVariable(identifier.id);
 
         code.push_back(AssemblyInstruction(Instruction::SET, varAddress));
         code.push_back(AssemblyInstruction(Instruction::STORE, destination));
@@ -421,7 +421,7 @@ std::vector<AssemblyInstruction> getAddressToDestinationAddress(SymbolsTable& sy
     // If variable is a parameter
     if(symbolsTable.isParameter(identifier.id) && symbolsTable.getParameterType(identifier.id) == ParameterType::Integer){
         
-        int64_t paramAddress = symbolsTable.getMemoryAddressPointer_parameter(identifier.id);
+        int64_t paramAddress = symbolsTable.getMemoryAddressPointerParameter(identifier.id);
 
         code.push_back(AssemblyInstruction(Instruction::LOAD, paramAddress));
         code.push_back(AssemblyInstruction(Instruction::STORE, destination));
@@ -432,7 +432,7 @@ std::vector<AssemblyInstruction> getAddressToDestinationAddress(SymbolsTable& sy
     // If variable is a local array
     if(symbolsTable.isArrayDeclared(identifier.id)){
         
-        int64_t arrayAddress = symbolsTable.getMemoryAddress_start(identifier.id) + symbolsTable.get_offset(identifier.id);
+        int64_t arrayAddress = symbolsTable.getMemoryAddressStart(identifier.id) + symbolsTable.getOffset(identifier.id);
 
         code.push_back(AssemblyInstruction(Instruction::SET, arrayAddress));
         code.push_back(AssemblyInstruction(Instruction::STORE, destination));
@@ -443,7 +443,7 @@ std::vector<AssemblyInstruction> getAddressToDestinationAddress(SymbolsTable& sy
     // If variable is a parameter array
     if(symbolsTable.isParameter(identifier.id) && symbolsTable.getParameterType(identifier.id) == ParameterType::Array){
         
-        int64_t arrayAddress = symbolsTable.getMemoryAddressPointer_parameter(identifier.id);
+        int64_t arrayAddress = symbolsTable.getMemoryAddressPointerParameter(identifier.id);
 
         code.push_back(AssemblyInstruction(Instruction::LOAD, arrayAddress));
         code.push_back(AssemblyInstruction(Instruction::STORE, destination));
@@ -481,4 +481,3 @@ void fixProcedureCallsJumps(std::vector<AssemblyInstruction>& code){
         }
     }
 }
-

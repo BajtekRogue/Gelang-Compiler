@@ -388,7 +388,8 @@ struct Condition {
 // Base Command structure
 struct Command {
     CommandType type;
-    
+    int lineNumber;
+
     Command(CommandType t) : type(t) {}
     virtual ~Command() = default;
     virtual std::string toString() const = 0;
@@ -634,6 +635,7 @@ struct Procedure {
     std::vector<std::unique_ptr<Parameter>> parameters;
     std::vector<std::unique_ptr<Variable>> declarations;  
     std::vector<std::unique_ptr<Command>> commands;
+    int lineNumber;
 
     std::vector<ParameterType> getParameterTypes() const {
         std::vector<ParameterType> result;
@@ -668,6 +670,7 @@ struct Procedure {
 struct Main{
     std::vector<std::unique_ptr<Variable>> declarations;
     std::vector<std::unique_ptr<Command>> commands;
+    int lineNumber;
 
     std::string toString() const{
         std::string result = "MAIN: \n";
@@ -690,6 +693,7 @@ struct Program {
     std::vector<std::unique_ptr<Procedure>> procedures;
     std::vector<std::unique_ptr<Variable>> declarations;  
     std::vector<std::unique_ptr<Command>> mainCommands;
+    int lineNumber;
 
     std::string toString() const{
         std::string result = "PROGRAM:\nProcedures:\n";

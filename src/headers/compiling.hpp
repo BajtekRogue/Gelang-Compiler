@@ -83,7 +83,7 @@ std::vector<AssemblyInstruction> compileAssign(SymbolsTable& symbolsTable, const
  * @param expr given expression
  * @return `std::vector<AssemblyInstruction>` instructions generated in the process 
  */
-std::vector<AssemblyInstruction> compileExpression(SymbolsTable& symbolsTable, const std::unique_ptr<Expression>& expr);
+std::vector<AssemblyInstruction> compileExpression(SymbolsTable& symbolsTable, const std::unique_ptr<Expression>& expr, int lineNumber);
 
 
 // compileIf.cpp
@@ -116,7 +116,7 @@ std::vector<AssemblyInstruction> compileIfElse(SymbolsTable& symbolsTable, const
  * @param jumpAddress address to jump to if the condition is false
  * @return `std::pair<std::vector<AssemblyInstruction>, std::optional<bool>>` instructions generated in the process and the value of the condition if it is known during compile time
  */
-std::pair<std::vector<AssemblyInstruction>, std::optional<bool>> compileCondition(SymbolsTable& symbolsTable, const std::unique_ptr<Condition>& cond, int64_t jumpAddress);
+std::pair<std::vector<AssemblyInstruction>, std::optional<bool>> compileCondition(SymbolsTable& symbolsTable, const std::unique_ptr<Condition>& cond, int64_t jumpAddress, int lineNumber);
 
 
 // compileWhile.cpp

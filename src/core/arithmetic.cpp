@@ -1,6 +1,6 @@
 #include "assembling.hpp"
 #include "utility.hpp"
-
+#include "nameSpaces.hpp"
 
 std::vector<AssemblyInstruction> generateMultiplication(){
 

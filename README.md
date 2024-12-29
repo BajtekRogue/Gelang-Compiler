@@ -35,9 +35,9 @@ where
 - when variables used in condition are not initilized
 
 ## FOR loops
-- when an iterator of a FOR loop is being modified by := instruction
-- when an iterator of a FOR loop is being modified by READ command
-- when an iterator of a FOR loop is being modified by procedure call with it as an argument 
+- when iterator of a FOR loop is being modified by := instruction
+- when iterator of a FOR loop is being modified by READ command
+- when iterator of a FOR loop is being modified by procedure call with it as an argument 
 - when lower and upper bounds of a FOR loop are not initilized
 - when a variable with the same id as the iterator already exists
 
@@ -63,7 +63,7 @@ where
 - when the condition is a contradiction the loop is not compiled. However its label is still generated
 
 ## UNTIL loops
-- when the condition is a tautlogy commands of the loop are inlined and the condition is not checked
+- when the condition is a tautology commands of the loop are inlined and the condition is not checked
 
 ## FOR loops
 - when the loop is degenerate, that is lower > upper bound (or lower < upper bound in the case of DOWN vewrsion) the loop is not compiled. However its label is still generated

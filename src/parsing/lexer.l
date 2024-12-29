@@ -10,6 +10,18 @@
 // Store lines for error reporting
 std::vector<std::string> inputLines;
 
+int ifCounter = 0;
+int whileCounter = 0;
+int repeatCounter = 0;
+int forCounter = 0;
+
+std::vector<int> ifStack;
+std::vector<int> whileStack;
+std::vector<int> repeatStack;
+std::vector<int> forStack;
+
+int mainStartLine = 0;
+
 void reportLexerError(const std::string& message, size_t lineNumber) {
     std::cerr << Colors::red << "Lexical Error: " << message << " at line " << lineNumber << Colors::reset << std::endl;
     
@@ -19,7 +31,6 @@ void reportLexerError(const std::string& message, size_t lineNumber) {
     
     exit(1);
 }
-
 
 void initializeLineTracking(std::FILE* inputFile) {
     inputLines.clear();
@@ -60,20 +71,20 @@ IDENTIFIER  [_a-z]+
 }
 
  /* Keywords */
-"PROGRAM"       { return PROGRAM; }
+"PROGRAM"       { mainStartLine = yylineno; return PROGRAM; }
 "IS"            { return IS; }
 "BEGIN"         { return BEGIN_BLOCK; }
 "END"           { return END; }
-"IF"            { return IF; }
+"IF"            { ifStack.push_back(yylineno);  return IF; }
 "THEN"          { return THEN; }
 "ELSE"          { return ELSE; }
 "ENDIF"         { return ENDIF; }
-"WHILE"         { return WHILE; }
+"WHILE"         { whileStack.push_back(yylineno);  return WHILE; }
 "DO"            { return DO; }
 "ENDWHILE"      { return ENDWHILE; }
-"REPEAT"        { return REPEAT; }
+"REPEAT"        { repeatStack.push_back(yylineno);  return REPEAT; }
 "UNTIL"         { return UNTIL; }
-"FOR"           { return FOR; }
+"FOR"           { forStack.push_back(yylineno); return FOR; }
 "FROM"          { return FROM; }
 "TO"            { return TO; }
 "DOWNTO"        { return DOWNTO; }

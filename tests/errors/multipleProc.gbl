@@ -1,0 +1,22 @@
+PROCEDURE twoja_stara(r) IS
+    x
+BEGIN
+    x := 4;
+END
+
+PROCEDURE function(t) IS
+BEGIN
+  WRITE 1234;
+END
+
+PROCEDURE twoja_stara(q) IS
+    tyu
+BEGIN
+    READ tyu;
+END
+
+PROGRAM IS
+    x, y
+BEGIN
+    function(y);
+END

@@ -2,6 +2,7 @@
 #define SYMBOLS_TABLE_HPP
 
 #include "languageStructs.hpp"
+#include "errorHandler.hpp"
 #include <unordered_map>
 #include <unordered_set>
 #include <memory>
@@ -14,23 +15,23 @@
 
 
 // make sure arrays are indexed from 0
-struct Array_offset{
+struct ArrayOffset{
     std::string identifier;
     int64_t size;
     int64_t offset;
 
-    Array_offset(const std::string& id, int64_t start, int64_t end){
+    ArrayOffset(const std::string& id, int64_t start, int64_t end){
         identifier = id;
         offset = -start;
         size = end - start + 1;
     } 
 
-    bool operator==(const Array_offset& other) const {
+    bool operator==(const ArrayOffset& other) const {
         return identifier == other.identifier && offset == other.offset && size == other.size;
 
     }
     
-    bool operator<(const Array_offset& other) const {
+    bool operator<(const ArrayOffset& other) const {
         if (identifier != other.identifier) {
             return identifier < other.identifier;
         }else if (offset != other.offset) {
@@ -45,11 +46,11 @@ struct Array_offset{
     }
 };
 
-// hash function for Array_offset
+// hash function for ArrayOffset
 namespace std {
     template <>
-    struct hash<Array_offset> {
-        std::size_t operator()(const Array_offset& k) const {
+    struct hash<ArrayOffset> {
+        std::size_t operator()(const ArrayOffset& k) const {
             return ((std::hash<std::string>()(k.identifier)
                     ^ (std::hash<int64_t>()(k.offset) << 1)) >> 1)
                     ^ (std::hash<int64_t>()(k.size) << 1);
@@ -65,22 +66,22 @@ public:
     bool isVariableDeclared(const std::string& identifier) const;
     bool isVariableInitialized(const std::string& identifier) const;
     void markAsInitialized(const std::string& identifier);
-    int64_t getMemoryAddress_variable(const std::string& identifier) const;
+    int64_t getMemoryAddressVariable(const std::string& identifier) const;
 
     bool isArrayDeclared(const std::string& identifier) const;
-    int64_t getMemoryAddress_at(const std::string& identifier, int64_t index) const;
-    int64_t getMemoryAddress_start(const std::string& identifier) const;
+    int64_t getMemoryAddressAt(const std::string& identifier, int64_t index) const;
+    int64_t getMemoryAddressStart(const std::string& identifier) const;
     bool isInsideArray(const std::string& identifier, int64_t index) const;
-    int64_t get_offset(const std::string& identifier) const;
+    int64_t getOffset(const std::string& identifier) const;
     
-    void addVariable(const std::unique_ptr<Variable>& var);
+    void addVariable(const std::unique_ptr<Variable>& var, int lineNumer);
 
-    void validateIterator(const std::string& identifier) const;
-    void addIterator(const std::string& identifier);
+    void validateIterator(const std::string& identifier, int lineNumber) const;
+    void addIterator(const std::string& identifier, int lineNumber);
     void removeIterator(const std::string& identifier);
     bool isIterator(const std::string& identifier) const;
     void addForLoopBound(const std::string& identifier, const std::string& boundIdentifier);
-    int64_t getMemoryAddress_forLoopBound(const std::string& identifier) const;
+    int64_t getMemoryAddress_ForLoopBound(const std::string& identifier) const;
     
     void addProcedure(const std::string& identifier, const std::vector<ParameterType>& parameters, const std::vector<int64_t>& parametersMemoryAddresses, int64_t returnAddress);
     bool isProcedureDeclared(const std::string& identifier) const;
@@ -88,9 +89,9 @@ public:
     const std::vector<int64_t>& getProcedureParametersMemoryAddresses(const std::string& identifier) const;
     int64_t getProcedureReturnAddress(const std::string& identifier) const;
 
-    void addParameter(const std::string& identifier, ParameterType type);
+    void addParameter(const std::string& identifier, ParameterType type, int lineNumer);
     ParameterType getParameterType(const std::string& identifier) const;
-    int64_t getMemoryAddressPointer_parameter(const std::string& identifier) const;
+    int64_t getMemoryAddressPointerParameter(const std::string& identifier) const;
 
     int64_t getLastMemoryAddress() const;
     
@@ -112,8 +113,8 @@ private:
     std::unordered_map<std::string, bool> _initializedVariables;
     std::unordered_map<std::string, int64_t> _memoryAddressesVariables;
 
-    std::unordered_set<Array_offset> _arrays;
-    std::unordered_map<Array_offset, std::pair<int64_t, int64_t>> _memoryAddressesArrays;
+    std::unordered_set<ArrayOffset> _arrays;
+    std::unordered_map<ArrayOffset, std::pair<int64_t, int64_t>> _memoryAddressesArrays;
 
     std::unordered_set<std::string> _iterators;
     std::unordered_map<std::string, std::string> _forLoopBounds;
@@ -129,7 +130,7 @@ private:
     int64_t _lastMemoryAddress;
     int64_t _returnAddress;
 
-    void _addVariable(const std::unique_ptr<Variable>& var, int64_t memoryAddress);
+    void _addVariable(const std::unique_ptr<Variable>& var, int64_t memoryAddress, int lineNumer);
 
 };
 

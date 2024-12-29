@@ -5,21 +5,23 @@ STORE 301
 # Store const = 1 at p[302]
 SET 1
 STORE 302
-# Store const = -1 at p[303]
-SET -1
-STORE 303
 # Finished preprocessing
 
 # MAIN 
-# x := 4
-SET 4
+# x := 0
+SUB 0
 STORE 1001
+# y := 1000000000000000
+SET 1000000000000000
+STORE 1002
 # REPEAT _1_: 
-# x := -1 - x
-LOAD 303
-SUB 1001
+# x := x + y
+LOAD 1002
+ADD 1001
 STORE 1001
-JUMP -3
+# WRITE x
+PUT 1001
+JUMP -4
 # UNTIL _1_: 3 < 0
 # WHILE _1_: 1 = 1
 # x := 1 + x

@@ -1,0 +1,7 @@
+PROGRAM IS
+    x, a[1:4], y
+BEGIN
+    IF x = 1 THEN
+        WRITE 66;
+    ENDIF
+END

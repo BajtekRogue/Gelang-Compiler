@@ -3,7 +3,7 @@
 #include "languageStructs.hpp"
 #include "compiling.hpp"
 #include "utility.hpp"
-
+#include "nameSpaces.hpp"
 
 std::vector<AssemblyInstruction> compileIf(SymbolsTable& symbolsTable, const std::unique_ptr<IfCommand>& cmd){
 
@@ -18,14 +18,14 @@ std::vector<AssemblyInstruction> compileIf(SymbolsTable& symbolsTable, const std
     // Compile the if block
     std::vector<AssemblyInstruction> thenCode = compileAll(symbolsTable, cmd->thenCommands);
     int64_t jumpAddress = countRealInstructions(thenCode) + 1;
-    auto [conditionCode, conditionValue] = compileCondition(symbolsTable, cmd->condition, jumpAddress);
+    auto [conditionCode, conditionValue] = compileCondition(symbolsTable, cmd->condition, jumpAddress, cmd->lineNumber);
 
     // Check if condition is known during compile time
     if(conditionValue.has_value()){
         if(conditionValue.value()){
             code.insert(code.end(), thenCode.begin(), thenCode.end());
-            code.push_back(AssemblyInstruction(Instruction::LABEL_ENDIF, labelEnd));
         }
+        code.push_back(AssemblyInstruction(Instruction::LABEL_ENDIF, labelEnd));
         return code;
     }
 

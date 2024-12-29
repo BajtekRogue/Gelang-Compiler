@@ -3,7 +3,7 @@
 #include "languageStructs.hpp"
 #include "compiling.hpp"
 #include "utility.hpp"
-
+#include "nameSpaces.hpp"
 
 std::vector<AssemblyInstruction> compileRepeat(SymbolsTable& symbolsTable, const std::unique_ptr<RepeatCommand>& cmd){
 
@@ -19,7 +19,7 @@ std::vector<AssemblyInstruction> compileRepeat(SymbolsTable& symbolsTable, const
     // Compile the loop
     std::vector<AssemblyInstruction> repeatCode = compileAll(symbolsTable, cmd->commands);
     int64_t loopSize = countRealInstructions(repeatCode);
-    auto [conditionCode, conditionValue] = compileCondition(symbolsTable, cmd->condition, -1);
+    auto [conditionCode, conditionValue] = compileCondition(symbolsTable, cmd->condition, -1, cmd->lineNumber);
 
     // The loop will be repeated at least once
     code.insert(code.end(), repeatCode.begin(), repeatCode.end());
@@ -32,7 +32,7 @@ std::vector<AssemblyInstruction> compileRepeat(SymbolsTable& symbolsTable, const
             return code;
         }
         finiteLoop = false;
-        std::cout << Colors::magenta << "Warning: Infinite UNTIL loop detected!" << Colors::reset << std::endl;
+        ErrorHandler::infiniteRepeatLoop(cmd->lineNumber);
     }
 
     // Check the condition and then jump to the end of the while block

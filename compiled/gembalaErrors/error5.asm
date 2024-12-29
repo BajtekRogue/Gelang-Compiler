@@ -1,0 +1,49 @@
+# Preprocessing...
+# Store const = 2000 at p[301]
+SET 2000
+STORE 301
+# Finished preprocessing
+
+# Jump to MAIN procedure
+JUMP 16
+# 
+
+# PROCEDURE pa
+# d := b
+LOADI 1002
+STORE 1009
+# a[d] := c[d] + a[b]
+LOAD 1001
+ADD 1009
+STORE 144
+LOAD 1001
+ADDI 1002
+LOADI 0
+STORE 1
+SET 1003
+ADD 1009
+LOADI 0
+ADD 1
+STOREI 144
+# RETURN pa
+RTRN 1010
+# ENDPROCEDURE pa
+
+# MAIN 
+# READ b
+GET 2011
+# CALL pa (a, b)
+LOAD 301
+STORE 1001
+SET 2011
+STORE 1002
+# Setting return address and jumping to pa
+SET 26
+STORE 1010
+JUMP -22
+# WRITE a[b]
+LOAD 301
+ADD 2011
+LOADI 0
+PUT 0
+HALT

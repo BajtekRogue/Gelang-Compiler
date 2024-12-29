@@ -3,7 +3,7 @@
 #include "languageStructs.hpp"
 #include "compiling.hpp"
 #include "utility.hpp"
-
+#include "nameSpaces.hpp"
 
 std::vector<AssemblyInstruction> compileIfElse(SymbolsTable& symbolsTable, const std::unique_ptr<IfElseCommand>& cmd){
 
@@ -20,7 +20,7 @@ std::vector<AssemblyInstruction> compileIfElse(SymbolsTable& symbolsTable, const
     std::vector<AssemblyInstruction> elseCode = compileAll(symbolsTable, cmd->elseCommands);
     int64_t jumpAddress = countRealInstructions(thenCode) + 2;
     int64_t jumpAddressElse = countRealInstructions(elseCode) + 1;
-    auto [conditionCode, conditionValue] = compileCondition(symbolsTable, cmd->condition, jumpAddress);
+    auto [conditionCode, conditionValue] = compileCondition(symbolsTable, cmd->condition, jumpAddress, cmd->lineNumber);
 
     // Check if condition is known during compile time
     if(conditionValue.has_value()){
