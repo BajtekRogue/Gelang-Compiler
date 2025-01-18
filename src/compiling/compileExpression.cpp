@@ -32,18 +32,26 @@ std::vector<AssemblyInstruction> compileExpression(SymbolsTable& symbolsTable, c
         int64_t leftNum = left.asNumber();
         int64_t rightNum = right.asNumber();
         int64_t resultNum = 0;
+        bool isOverflow = false;
 
         switch(expr->type){
             case ExpressionType::Plus:
+                isOverflow = isAdditionOverflow(leftNum, rightNum);
                 resultNum = leftNum + rightNum;
                 break;
             case ExpressionType::Minus:
+                isOverflow = isSububOverflow(leftNum, rightNum);
                 resultNum = leftNum - rightNum;
                 break;
             case ExpressionType::Multiply:
+                isOverflow = isMulOverflow(leftNum, rightNum);
                 resultNum = leftNum * rightNum;
                 break;
             case ExpressionType::Divide:
+                isOverflow = isDivisionOverflow(leftNum, rightNum);
+                if (isOverflow) {
+                    break;
+                }
                 resultNum = (rightNum == 0 ? 0 : leftNum / rightNum);
                 if(leftNum < 0 && rightNum > 0){
                     resultNum -= 1;
@@ -52,6 +60,10 @@ std::vector<AssemblyInstruction> compileExpression(SymbolsTable& symbolsTable, c
                 }
                 break;
             case ExpressionType::Modulo:
+                isOverflow = isModuloOverflow(leftNum, rightNum);
+                if (isOverflow) {
+                    break;
+                }
                 resultNum = (rightNum == 0 ? 0 : leftNum % rightNum);
                 if(leftNum < 0 && rightNum > 0){
                     resultNum += rightNum;
@@ -62,15 +74,18 @@ std::vector<AssemblyInstruction> compileExpression(SymbolsTable& symbolsTable, c
             default:
                 throw std::runtime_error("Unknown expression type");
         }
-            
-        // If 0 clear the accumulator because it is cheaper
-        if(resultNum == 0){
-            code.push_back(AssemblyInstruction(Instruction::SUB, 0));
+        
+        // If there is no overflow we are good
+        if(!isOverflow) {
+            // If 0 clear the accumulator because it is cheaper
+            if(resultNum == 0){
+                code.push_back(AssemblyInstruction(Instruction::SUB, 0));
+            }
+            else{
+                code.push_back(AssemblyInstruction(Instruction::SET, resultNum));
+            }
+            return code;
         }
-        else{
-            code.push_back(AssemblyInstruction(Instruction::SET, resultNum));
-        }
-        return code;
     }
 
     // Check if the variables are declared and initialized before arithmetic operations

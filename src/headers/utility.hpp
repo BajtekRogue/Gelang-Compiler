@@ -116,6 +116,30 @@ std::vector<AssemblyInstruction> generateMultiplication();
  */
 std::vector<AssemblyInstruction> generateDivision();
 
+/**
+ * @brief Checks if operation overflowed
+ */
+bool isAdditionOverflow(int64_t a, int64_t b);
+
+/**
+ * @brief Checks if operation overflowed
+ */
+bool isSububOverflow(int64_t a, int64_t b);
+
+/**
+ * @brief Checks if operation overflowed
+ */
+bool isMulOverflow(int64_t a, int64_t b);
+
+/**
+ * @brief Checks if operation overflowed
+ */
+bool isDivisionOverflow(int64_t a, int64_t b);
+
+/**
+ * @brief Checks if operation overflowed
+ */
+bool isModuloOverflow(int64_t a, int64_t b);
 
 // optimalization.cpp
 /**

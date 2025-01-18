@@ -1,6 +1,7 @@
 #include "assembling.hpp"
 #include "utility.hpp"
 #include "nameSpaces.hpp"
+#include <limits>
 
 std::vector<AssemblyInstruction> generateMultiplication(){
 
@@ -247,4 +248,45 @@ std::vector<AssemblyInstruction> generateDivision(){
     code.push_back(AssemblyInstruction(Instruction::LABEL_ENDPROCEDURE, Arithmetic::divisionProcedureName + "\n"));
 
     return code;
+}
+
+bool isAdditionOverflow(int64_t a, int64_t b) {
+    return (b > 0 && a > std::numeric_limits<int64_t>::max() - b) || (b < 0 && a < std::numeric_limits<int64_t>::min() - b);
+}
+
+bool isSububOverflow(int64_t a, int64_t b) {
+    return (b > 0 && a < std::numeric_limits<int64_t>::min() + b) || (b < 0 && a > std::numeric_limits<int64_t>::max() + b);
+}
+
+bool isMulOverflow(int64_t a, int64_t b) {
+    if (a == 0 || b == 0) {
+        return false;
+    }
+    if (a == -1 && b == std::numeric_limits<int64_t>::min()) {
+        return true;
+    }
+    if (b == -1 && a == std::numeric_limits<int64_t>::min()) {
+        return true;
+    }
+    if (a > 0 && b > 0 && a > std::numeric_limits<int64_t>::max() / b) {
+        return true;
+    }
+    if (a < 0 && b < 0 && a < std::numeric_limits<int64_t>::max() / b) {
+        return true;
+    }
+    if (a > 0 && b < 0 && b < std::numeric_limits<int64_t>::min() / a) {
+        return true;
+    }
+    if (a < 0 && b > 0 && a < std::numeric_limits<int64_t>::min() / b) {
+        return true;
+    }
+    return false;
+}
+
+bool isDivisionOverflow(int64_t a, int64_t b) {
+    return b == -1 && a == std::numeric_limits<int64_t>::min();
+}
+
+bool isModuloOverflow(int64_t a, int64_t b) {
+    return b == -1 && a == std::numeric_limits<int64_t>::min();
 }

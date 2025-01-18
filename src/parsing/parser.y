@@ -118,7 +118,7 @@ extern int mainStartLine;
 %type <int_val>  number
 
 %token <str_val> IDENTIFIER ARRAY
-%token <int_val> NUMBER
+%token <int_val> NUMBER NEG_INF
 
 %%
 
@@ -586,6 +586,9 @@ number:
     | MINUS NUMBER {
         $$ = -$2;
     };
+    | MINUS NEG_INF {
+        $$ = -9223372036854775808;
+    }
 
 identifier: 
     pidentifier {

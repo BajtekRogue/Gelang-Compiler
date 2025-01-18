@@ -143,7 +143,7 @@ std::vector<AssemblyInstruction> cacheConstants(std::vector<AssemblyInstruction>
     for(const auto& [constant, occurence] : constantsOccurences){
         if(occurence > 1){
             int64_t destination = (Arithmetic::isOneNeeded && constant == 1 ? Memory::one : memoryAddress);
-            newCode.push_back(AssemblyInstruction(Instruction::LABEL_INSTRUCTION, "Store const = " + std::to_string(constant) + " at p[" + std::to_string(destination) + "]"));
+            newCode.push_back(AssemblyInstruction(Instruction::LABEL_INSTRUCTION, "Store const " + std::to_string(constant) + " at p[" + std::to_string(destination) + "]"));
             newCode.push_back(AssemblyInstruction(Instruction::SET, constant));
             newCode.push_back(AssemblyInstruction(Instruction::STORE, destination));
             constantsMemoryAddresses[constant] = destination;
