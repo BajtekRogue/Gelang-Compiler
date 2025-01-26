@@ -1,0 +1,16 @@
+# in=; out= 0, 0, 0, 0
+PROGRAM IS
+    a, a_, i, j, k, l, z
+BEGIN
+    z := 0;
+    a := 111;
+    a_ := -111;
+    i := a / z;
+    j := a_ / z;
+    k := a % z;
+    l := a_ % z;
+    WRITE i;
+    WRITE j;
+    WRITE k;
+    WRITE l;
+END

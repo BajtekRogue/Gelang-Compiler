@@ -129,7 +129,7 @@ std::vector<AssemblyInstruction> generateDivision(){
     code.push_back(AssemblyInstruction(Instruction::LABEL_INSTRUCTION, "Negate x if needed"));
     code.push_back(AssemblyInstruction(Instruction::LOAD, Memory::divisionLeft));
     code.push_back(AssemblyInstruction(Instruction::STORE, X_ADDRESS));
-    code.push_back(AssemblyInstruction(Instruction::JZERO, 80));
+    code.push_back(AssemblyInstruction(Instruction::JZERO, 93));
     code.push_back(AssemblyInstruction(Instruction::JPOS, 4));
     code.push_back(AssemblyInstruction(Instruction::SUB, 0));
     code.push_back(AssemblyInstruction(Instruction::SUB, X_ADDRESS));
@@ -139,7 +139,7 @@ std::vector<AssemblyInstruction> generateDivision(){
     code.push_back(AssemblyInstruction(Instruction::LABEL_INSTRUCTION, "Negate y if needed"));
     code.push_back(AssemblyInstruction(Instruction::LOAD, Memory::divisionRight));
     code.push_back(AssemblyInstruction(Instruction::STORE, Y_ADDRESS));
-    code.push_back(AssemblyInstruction(Instruction::JZERO, 73));
+    code.push_back(AssemblyInstruction(Instruction::JZERO, 86));
     code.push_back(AssemblyInstruction(Instruction::JPOS, 4));
     code.push_back(AssemblyInstruction(Instruction::SUB, 0));
     code.push_back(AssemblyInstruction(Instruction::SUB, Y_ADDRESS));
@@ -198,6 +198,21 @@ std::vector<AssemblyInstruction> generateDivision(){
 
     // Continue the loop
     code.push_back(AssemblyInstruction(Instruction::JUMP, -15));
+
+    // If r == 0 need to fix differently
+    code.push_back(AssemblyInstruction(Instruction::LOAD, REMAINDER_ADDRESS));
+    code.push_back(AssemblyInstruction(Instruction::JPOS, 12));
+    code.push_back(AssemblyInstruction(Instruction::LOAD, X_ADDRESS));
+    code.push_back(AssemblyInstruction(Instruction::JPOS, 4));
+    code.push_back(AssemblyInstruction(Instruction::SUB, 0));
+    code.push_back(AssemblyInstruction(Instruction::SUB, QUOTIENT_ADDRESS));
+    code.push_back(AssemblyInstruction(Instruction::STORE, QUOTIENT_ADDRESS));
+    code.push_back(AssemblyInstruction(Instruction::LOAD, Y_ADDRESS));
+    code.push_back(AssemblyInstruction(Instruction::JPOS, 4));
+    code.push_back(AssemblyInstruction(Instruction::SUB, 0));
+    code.push_back(AssemblyInstruction(Instruction::SUB, QUOTIENT_ADDRESS));
+    code.push_back(AssemblyInstruction(Instruction::STORE, QUOTIENT_ADDRESS));
+    code.push_back(AssemblyInstruction(Instruction::JUMP, 25));
 
     // If x < 0 then check y
     code.push_back(AssemblyInstruction(Instruction::LABEL_INSTRUCTION, "If x < 0 then check y"));

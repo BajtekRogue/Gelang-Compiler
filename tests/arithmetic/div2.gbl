@@ -1,0 +1,25 @@
+# in=; out= 5, 0, -5, 0, -5, 0, 5, 0
+PROGRAM IS
+    a, b, c, d, a_, b_
+BEGIN
+    a := 20;
+    b := 4;
+    a_ := -20;
+    b_ := -4;
+    c := a / b;
+    d := a % b;
+    WRITE c;
+    WRITE d;
+    c := a_ / b;
+    d := a_ % b;
+    WRITE c;
+    WRITE d;
+    c := a / b_;
+    d := a % b_;
+    WRITE c;
+    WRITE d;
+    c := a_ / b_;
+    d := a_ % b_;
+    WRITE c;
+    WRITE d;
+END

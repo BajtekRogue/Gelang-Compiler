@@ -1,4 +1,0 @@
-
-- Keep track of the accumulator?
-- cache procedure call SET in a loop as it doesnt cache
-- eliminate "dead code" [code that is useless]
