@@ -587,7 +587,7 @@ number:
         $$ = -$2;
     };
     | MINUS NEG_INF {
-        $$ = -9223372036854775808;
+        $$ = static_cast<long long>(-9223372036854775808ULL);
     }
 
 identifier: 
