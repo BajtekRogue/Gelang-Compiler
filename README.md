@@ -1,69 +1,73 @@
+# General
+Compiler for a simple interpretative language, Gelang. The language folder contains details about the language itself, including its grammar and rules. It also provides information about the custom assembly that the source files are compiled into.
+
 # Compiling:
-Make sure you are in the `../Gelang` directory. The run the command `make`. The executable for the compiler path is `./build/ge`
+Make sure you are in the `../Gelang` directory. Then run the command `make`. The executable for the compiler path is `./build/ge`. You will also need to compile the virtual machine, you can do it with `g++ ./src/virtualMachine/vm.cpp -I ./src/headers/ -o ./build/vm`.
 
 # Runing:
+Use the following command to run the compiler:
 `./build/ge <inputFilePath> <outputFilePath> [-g]`
 where
 - `<inputFilePath>` is the path to Gelang source code
 - `<outputFilePath>` is the path to the compiled code in GeAssembly
-
-`-g` flag enables labels in the generated assembly
+- `-g` flag enables labels in the generated assembly
+To run the assemly on the virtual machine run `./build/ve <outputFilePath>`.
 
 # Errors:
 ## Variables
-- when trying to use a variable as an array
-- when trying to use an array as a variable
-- when an array with bigger lower bound than upper bound is declared
-- when trying to access an array as constant number index outside of its bounds
+- Attempting to use a variable as an array
+- Attempting to use an array as a variable
+- Declaring an array with a lower bound greater than its upper bound
+- Accessing an array with a constant index outside its declared bounds
 
 ## READ instruction
-- when trying to read into a number
+- Attempting to read into a number
 
 ## WRITE instruction
-- when variable being printed out is not initilized
+- Printing a variable that has not been initialized
 
 ## := instruction
-- when variables used in expression are not initilized
+- Using uninitialized variables in an expression
 
 ## IF statments
-- when variables used in condition are not initilized
+- Using uninitialized variables in the condition
 
 ## WHILE loops
-- when variables used in condition are not initilized
+- Using uninitialized variables in the condition
 
 ## UNTIL loops
-- when variables used in condition are not initilized
+- Using uninitialized variables in the condition
 
 ## FOR loops
-- when iterator of a FOR loop is being modified by := instruction
-- when iterator of a FOR loop is being modified by READ command
-- when iterator of a FOR loop is being modified by procedure call with it as an argument 
-- when lower and upper bounds of a FOR loop are not initilized
-- when a variable with the same id as the iterator already exists
+- Modifying the iterator of a FOR loop using the := instruction
+- Modifying the iterator of a FOR loop using the READ command
+- Modifying the iterator of a FOR loop through a procedure call with it as an argument
+- Using uninitialized variables for the lower or upper bounds of a FOR loop
+- Declaring a variable with the same name as the loop iterator
 
 
 # Warrnings:
 ## WHILE loops
-- when an infinite WHILE loop is detected
+- Detecting an infinite WHILE loop
 
 ## UNTIL loops
-- when an infinite UNTIL loop is detected
+- Detecting an infinite UNTIL loop
 
 
 
 # Optimilizations:
 ## Expressions
-- when an experssion is known at compile time it will be automatically calculated
-- when an expression can be reduced due to algebraic identeties it will be simplified
+- Expressions known at compile time are automatically evaluated
+- Expressions are simplified using algebraic identities whenever possible
 
 ## IF statments
-- when the statment's logical value is known at compile time due to it's being a tautology or a contradiction it is not checked and the appropriate section of the instruction is executed. However its label is still generated
+- If the condition is known at compile time (e.g., a tautology or a contradiction), it is not checked, and the appropriate section of the instruction is executed. However, its label is still generated
 
 ## WHILE loops
-- when the condition is a contradiction the loop is not compiled. However its label is still generated
+-If the condition is always false (a contradiction), the loop is not compiled. However, its label is still generated
 
 ## UNTIL loops
-- when the condition is a tautology commands of the loop are inlined and the condition is not checked
+- If the condition is always true (a tautology), the loop's commands are inlined, and the condition is not checked
 
 ## FOR loops
-- when the loop is degenerate, that is lower > upper bound (or lower < upper bound in the case of DOWN vewrsion) the loop is not compiled. However its label is still generated
+- If the loop is degenerate (i.e., the lower bound is greater than the upper bound, or vice versa in the case of a DOWN loop), it is not compiled. However, its label is still generated

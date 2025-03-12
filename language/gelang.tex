@@ -1,0 +1,104 @@
+\documentclass{article}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage[margin=1in]{geometry}
+
+\begin{document}
+
+\title{GELANG}
+\author{}
+\date{}
+\maketitle
+
+\section*{Imperative Language Specification}
+
+The language grammar is provided in \texttt{grammar.txt} file. Moreover:
+
+\begin{enumerate}
+    \item Arithmetic operations are performed on 64bit integer numbers. 
+    \begin{itemize}
+        \item Division by zero yield a result of 0 and a remainder of 0 as well.
+        \item The remainder from division has the same sign as the divisor, just as in Python.
+    \end{itemize}
+    
+    \item Arrays can be declared with integer indices. 
+    \begin{itemize}
+        \item An identifier \texttt{t[i]} refers to the $i$-th element of the array \texttt{t}
+        \item A declaration where the first number is greater than the second is flagged as an error.
+        \item A declaration of the form \texttt{t[-10:10]} means declaring an array with 21 elements indexed from -10 to 10
+    \end{itemize}
+    
+    \item Procedures cannot contain recursive calls. Formal parameters are passed by reference (IN-OUT parameters).
+    \begin{itemize}
+        \item Variables used within a procedure must be either formal parameters or declared inside the procedure.
+        \item The name of the array in formal parameters should be preceded by the letter T.
+        \item Only previously defined procedures can be called.
+        \item The formal parameters of the calling procedure and its local variables can be provided as arguments to the called procedures.
+        \item FOR loop iterators cannot be passed as arguments to a procedure.
+    \end{itemize}
+
+    \item A FOR loop has a local iterator, which takes values from the value after \texttt{FROM} to the value after \texttt{TO/DOWNTO} in increments of +1 or -1 accordingly.
+    \begin{itemize}
+        \item The number of iterations of the FOR loop is determined at the beginning and cannot change during execution.
+        \item The iterator of the FOR loop cannot be modified within the loop.Trying to do so will result in compilation error.
+    \end{itemize}
+
+    \item A REPEAT-UNTIL loop finishes when the condition written after \texttt{UNTIL} is satisfied. The loop will execute at least once.
+
+    \item The \texttt{READ} instruction reads a value from the input and assigns it to a variable, while the \texttt{WRITE} instruction outputs the value of a variable or number to the output.
+
+    \item The remaining instructions are consistent with their meaning in most programming languages.
+
+    \item A \texttt{pidentifier} is described by the regular expression \texttt{[\_a-z]+}.
+    
+    \item A \texttt{num} is an 64bit integer in decimal notation. 
+
+    \item Lowercase and uppercase letters are distinguished.
+
+    \item The program may include comments starting with \# and valid until the end of the line.
+\end{enumerate}
+
+\section*{Virtual Machine}
+
+The virtual machine consists of a program counter $k$ and a sequence of memory cells $p_i$, for $i = 0, 1, 2, \dots$ (for technical reasons, $i \leq 2^{62}$). The memory cell $p_0$ serves as an accumulator. The machine operates on 64bit integer numbers. The machine program consists of a sequence of instructions, which are implicitly numbered starting from zero. At each step, the instruction at index $k$ is executed until a HALT instruction is encountered. Initially, the contents of memory cells are undefined, and the program counter $k$ is set to 0.
+
+Table \ref{tab:instructions} lists the available instructions along with their interpretations and execution costs. Comments can be included in the program using the format \#comment. Whitespace in the code is ignored. Jumping to a nonexistent instruction is treated as an error.
+
+\begin{table}[h]
+\centering
+\renewcommand{\arraystretch}{1.4}
+\begin{tabular}{|c|>{\raggedright\arraybackslash}m{9cm}|c|}
+\hline
+\textbf{Instruction} & \textbf{Interpretation} & \textbf{Time} \\
+\hline
+GET $i$  & Reads a number and stores it in memory cell $p_i$, then $k \gets k + 1$ & 100 \\
+PUT $i$  & Displays the contents of memory cell $p_i$, then $k \gets k + 1$ & 100 \\
+\hline
+LOAD $i$  & $p_0 \gets p_i$, then $k \gets k + 1$ & 10 \\
+STORE $i$  & $p_i \gets p_0$, then $k \gets k + 1$ & 10 \\
+LOADI $i$  & $p_0 \gets p_{p_i}$, then $k \gets k + 1$ & 20 \\
+STOREI $i$  & $p_{p_i} \gets p_0$, then $k \gets k + 1$ & 20 \\
+\hline
+ADD $i$  & $p_0 \gets p_0 + p_i$, then $k \gets k + 1$ & 10 \\
+SUB $i$  & $p_0 \gets p_0 - p_i$, then $k \gets k + 1$ & 10 \\
+ADDI $i$  & $p_0 \gets p_0 + p_{p_i}$, then $k \gets k + 1$ & 20 \\
+SUBI $i$  & $p_0 \gets p_0 - p_{p_i}$, then $k \gets k + 1$ & 20 \\
+\hline
+SET $x$  & $p_0 \gets x$, then $k \gets k + 1$ & 50 \\
+HALF  & $p_0 \gets \lfloor p_0 / 2 \rfloor$, then $k \gets k + 1$ & 5 \\
+\hline
+JUMP $j$  & $k \gets k + j$ & 1 \\
+JPOS $j$  & If $p_0 > 0$, then $k \gets k + j$, otherwise $k \gets k + 1$ & 1 \\
+JZERO $j$  & If $p_0 = 0$, then $k \gets k + j$, otherwise $k \gets k + 1$ & 1 \\
+JNEG $j$  & If $p_0 < 0$, then $k \gets k + j$, otherwise $k \gets k + 1$ & 1 \\
+\hline
+RTRN $i$  & $k \gets p_i$ & 10 \\
+HALT  & Stops the program & 0 \\
+\hline
+\end{tabular}
+\caption{Instruction set of the virtual machine}
+\label{tab:instructions}
+\end{table}
+
+\end{document}
